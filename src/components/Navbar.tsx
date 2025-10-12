@@ -31,25 +31,25 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
           {!isAuthenticated ? (
             <>
               <Link
-                to="/#quienes-somos"
+                to="/quienes-somos"
                 className={`text-sm font-medium transition-quirona hover:text-primary ${
-                  isActive("/#quienes-somos") ? "text-primary" : "text-foreground"
+                  isActive("/quienes-somos") ? "text-primary" : "text-foreground"
                 }`}
               >
                 Quiénes somos
               </Link>
               <Link
-                to="/#preguntas"
+                to="/preguntas"
                 className={`text-sm font-medium transition-quirona hover:text-primary ${
-                  isActive("/#preguntas") ? "text-primary" : "text-foreground"
+                  isActive("/preguntas") ? "text-primary" : "text-foreground"
                 }`}
               >
                 Preguntas frecuentes
               </Link>
               <Link
-                to="/#contenidos"
+                to="/contenidos"
                 className={`text-sm font-medium transition-quirona hover:text-primary ${
-                  isActive("/#contenidos") ? "text-primary" : "text-foreground"
+                  isActive("/contenidos") ? "text-primary" : "text-foreground"
                 }`}
               >
                 Contenidos
