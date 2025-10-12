@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Logo } from "./Logo";
+import  logo  from "../assets/logo.jpeg";
 import { Button } from "./ui/button";
 import { User } from "lucide-react";
 import {
@@ -24,7 +24,7 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/">
-          <Logo />
+          <img src={logo} alt="Quirona Logo" className="h-16 w-auto"  />
         </Link>
 
         <div className="flex items-center gap-6">
