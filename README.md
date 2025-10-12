@@ -1,73 +1,74 @@
-# Welcome to your Lovable project
+🌸 Proyecto Quirona Empower Her
 
-## Project info
+Bienvenida al repositorio del proyecto Quirona Empower Her.
+Este documento te guiará paso a paso para instalar las herramientas necesarias, clonar el repositorio y ejecutar el proyecto correctamente en tu computadora.
 
-**URL**: https://lovable.dev/projects/99ddf245-3adb-4cb0-807a-a10b66541f46
+Instalar Node.js
+Node.js es necesario para ejecutar el proyecto y manejar las dependencias.
 
-## How can I edit this code?
+Ingresa a la página oficial: https://nodejs.org/
 
-There are several ways of editing your application.
+Descarga la versión LTS (recomendada).
 
-**Use Lovable**
+Ejecuta el instalador y deja las opciones por defecto.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/99ddf245-3adb-4cb0-807a-a10b66541f46) and start prompting.
+Verifica que la instalación se haya realizado correctamente con los comandos:
+node -v
+npm -v
+Si ambos comandos muestran una versión, todo está correcto.
 
-Changes made via Lovable will be committed automatically to this repo.
+Instalar Git
+Git permite gestionar el control de versiones y clonar el repositorio del proyecto.
 
-**Use your preferred IDE**
+Descarga Git desde: https://git-scm.com/downloads
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Instálalo dejando las opciones por defecto y asegúrate de marcar “Add Git to PATH”.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Verifica la instalación con:
+git --version
 
-Follow these steps:
+Vincular GitHub con Visual Studio Code
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Abre Visual Studio Code.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Dirígete a la pestaña Control de código fuente (ícono de ramita o con Ctrl + Shift + G).
 
-# Step 3: Install the necessary dependencies.
-npm i
+Inicia sesión con tu cuenta de GitHub (clic en “Iniciar sesión con GitHub” o “Publicar en GitHub”).
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Autoriza a Visual Studio Code para acceder a tu cuenta.
+
+Comprueba que tu usuario de GitHub aparezca correctamente en la esquina inferior izquierda.
+
+Clonar el repositorio
+Con Git instalado y GitHub vinculado, ahora puedes clonar el proyecto.
+
+Abre una terminal en Visual Studio Code o PowerShell.
+
+Ejecuta el comando:
+git clone https://github.com/leyvaortiznazli/quirona-empower-her.git
+
+Entra en la carpeta del proyecto:
+cd quirona-empower-her
+
+Instalar dependencias
+Antes de ejecutar el proyecto, instala todas las dependencias necesarias con:
+npm install
+Este comando descargará los paquetes definidos en el archivo package.json.
+
+Ejecutar el proyecto
+Una vez instaladas las dependencias, inicia el proyecto con:
 npm run dev
-```
+El servidor se iniciará automáticamente.
+Podrás abrir el proyecto en tu navegador en una dirección similar a:
+http://localhost:5173
 
-**Edit a file directly in GitHub**
+Solución de posibles errores
+Si encuentras errores, revisa lo siguiente:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Asegúrate de tener Node.js y Git correctamente instalados.
 
-**Use GitHub Codespaces**
+Verifica que estás dentro de la carpeta del proyecto antes de ejecutar los comandos (cd quirona-empower-her).
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/99ddf245-3adb-4cb0-807a-a10b66541f46) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Si el error está relacionado con permisos o versiones, intenta ejecutar:
+npm cache clean --force
+npm install
