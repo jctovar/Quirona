@@ -7,6 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { PlayCircle } from "lucide-react";
+// Register.tsx
+import { supabase } from "@/supabaseClient"; 
+// ...
 
 const Register = () => {
   const navigate = useNavigate();
@@ -27,23 +30,51 @@ const Register = () => {
     toast.success("¡Excelente! Ahora completa tu registro");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Register.tsx
+
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validaciones básicas
-    if (!formData.username || !formData.email || !formData.password || !formData.tutorEmail1) {
-      toast.error("Por favor completa los campos obligatorios");
-      return;
-    }
-
     if (formData.password !== formData.confirmPassword) {
       toast.error("Las contraseñas no coinciden");
       return;
     }
+    
+    try {
+        // --- PASO 1: Creación de Usuario con Supabase Auth (Email y Password) ---
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+            email: formData.email,
+            password: formData.password,
+        });
 
-    toast.success("¡Registro exitoso! Redirigiendo...");
-    setTimeout(() => navigate("/initial-question"), 1500);
-  };
+        if (authError) throw authError;
+
+        // --- PASO 2: Insertar Datos Relacionales en la Tabla 'usuarios' ---
+        // Usamos el ID de Auth para vincular los datos relacionales
+        const { error: dbError } = await supabase.from('usuarios').insert([
+            {
+                id: authData.user?.id, // ID único del servicio de Auth
+                username: formData.username,
+                nacionalidad: formData.nationality,
+                curp: formData.curp,
+                tutor_email_1: formData.tutorEmail1,
+                tutor_email_2: formData.tutorEmail2 || null,
+                // No insertamos email ni password, ya que Auth lo maneja.
+            }
+        ]);
+        
+        if (dbError) throw dbError; // Maneja errores como CURP o username duplicados
+
+        toast.success("¡Registro exitoso! Por favor, revisa tu correo para confirmar la cuenta.");
+        // Supabase por defecto requiere verificación de email
+        setTimeout(() => navigate("/check-email"), 1500); 
+
+    } catch (error: any) {
+        // Muestra errores de Auth o de la Base de Datos
+        console.error("Supabase Error:", error);
+        toast.error(error.message || "Ocurrió un error al registrar.");
+    }
+};
 
   if (showVideo) {
     return (
