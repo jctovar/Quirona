@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import QuienesSomos from "./pages/QuienesSomos";
 import Preguntas from "./pages/Preguntas";
 import Contenidos from "./pages/Contenidos";
+import Trabajos from "./pages/Trabajos";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import InitialQuestion from "./pages/InitialQuestion";
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/quienes-somos" element={<QuienesSomos />} />
           <Route path="/preguntas" element={<Preguntas />} />
           <Route path="/contenidos" element={<Contenidos />} />
+          <Route path="/trabajos" element={<Trabajos />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/initial-question" element={<InitialQuestion />} />
