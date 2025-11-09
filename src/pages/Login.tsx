@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { supabase } from "@/supabaseClient";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,42 +15,26 @@ const Login = () => {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
-    };
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Función modificada: Ahora es sincrónica y solo simula el éxito.
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simulación de validación
     // 1. Validación de Frontend
     if (!formData.username || !formData.password) {
-    toast.error("Por favor ingresa tu correo y contraseña.");
-    return;
+      toast.error("Por favor ingresa tu correo y contraseña.");
+      return;
     }
 
-    try {
-        // 2. Llamada a Supabase Auth para iniciar sesión
-        const { error } = await supabase.auth.signInWithPassword({
-            email: formData.username, // Usa el campo 'username' como email
-            password: formData.password,
-        });
+    // --- SIMULACIÓN DE INICIO DE SESIÓN EXITOSO (SIN BACKEND) ---
 
-        if (error) {
-            // Lanza el error para que el bloque 'catch' lo maneje.
-            throw error; 
-        }
-        // 3. Éxito y Redirección
-        toast.success("¡Bienvenida a QUIRONA!");
-        setTimeout(() => navigate("/dashboard"), 1000);
-
-    } catch (error: any) {
-        // 4. Manejo de Errores de Autenticación
-        // Usamos un mensaje genérico por seguridad
-        let errorMessage = "Error en el inicio de sesión. Verifica tu correo y contraseña.";
-        
-        console.error("Supabase Login Error:", error.message);
-        toast.error(errorMessage);
-    }
+    // 2. Simulación de éxito
+    toast.success("¡Bienvenida a QUIRONA! (Simulación de éxito)");
+    
+    // 3. Redirección
+    setTimeout(() => navigate("/initial-question"), 1000);
   };
 
   return (
@@ -76,11 +59,11 @@ const Login = () => {
                 <div className="space-y-2">
                   <Label htmlFor="username">Usuario</Label>
                   <Input
-                    id="usarname"
+                    id="username"
                     type="email"
                     placeholder="tu_email@ejemplo.com"
                     value={formData.username}
-                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    onChange={handleChange}
                     className="h-11"
                   />
                 </div>
@@ -92,7 +75,7 @@ const Login = () => {
                     type="password"
                     placeholder="Tu contraseña"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={handleChange}
                     className="h-11"
                   />
                 </div>
@@ -109,7 +92,7 @@ const Login = () => {
 
                 <div className="text-center text-sm text-muted-foreground">
                   ¿No tienes una cuenta?{" "}
-                  <Link to="/register" className="text-primary hover:underline font-medium">
+                  <Link to="/Register" className="text-primary hover:underline font-medium">
                     Regístrate aquí
                   </Link>
                 </div>
