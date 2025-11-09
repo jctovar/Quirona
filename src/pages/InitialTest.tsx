@@ -64,12 +64,6 @@ const InitialTest = () => {
     trabajoSalud: undefined,
     actividadSalud: undefined,
   });
-  
-
-  const [answers, setAnswers] = useState<Record<string, any>>({
-    edad: [18]
-  });
-
 
   const estados = [
     "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas",
@@ -82,10 +76,7 @@ const InitialTest = () => {
 
   // 3. Función de actualización con tipado para la clave
   const updateAnswer = <K extends keyof AnswersState>(key: K, value: AnswersState[K]) => {
-
-  const updateAnswer = (key: string, value: any) => {
-
-    setAnswers(prev => ({ ...prev, [key]: value }));
+    setAnswers(prev => ({ ...prev, [key]: value } as AnswersState));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
