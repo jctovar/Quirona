@@ -4,40 +4,34 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { ClipboardCheck } from "lucide-react";
 import { toast } from "sonner";
 
 const InitialTest = () => {
   const navigate = useNavigate();
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<Record<string, any>>({
+    edad: [18]
+  });
 
-  const questions = [
-    {
-      id: "q1",
-      question: "¿Sabes qué es la violencia ginecológica?",
-      options: ["Sí, completamente", "Tengo una idea general", "No estoy segura", "No lo sé"],
-    },
-    {
-      id: "q2",
-      question: "¿Conoces tus derechos durante una consulta ginecológica?",
-      options: ["Sí, los conozco bien", "Conozco algunos", "No estoy segura", "No los conozco"],
-    },
-    {
-      id: "q3",
-      question: "¿Te sientes cómoda haciendo preguntas sobre tu salud reproductiva?",
-      options: ["Muy cómoda", "Algo cómoda", "Poco cómoda", "Nada cómoda"],
-    },
+  const estados = [
+    "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas",
+    "Chihuahua", "Ciudad de México", "Coahuila", "Colima", "Durango", "Guanajuato",
+    "Guerrero", "Hidalgo", "Jalisco", "México", "Michoacán", "Morelos", "Nayarit",
+    "Nuevo León", "Oaxaca", "Puebla", "Querétaro", "Quintana Roo", "San Luis Potosí",
+    "Sinaloa", "Sonora", "Tabasco", "Tamaulipas", "Tlaxcala", "Veracruz", "Yucatán", "Zacatecas"
   ];
+
+  const updateAnswer = (key: string, value: any) => {
+    setAnswers(prev => ({ ...prev, [key]: value }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (Object.keys(answers).length < questions.length) {
-      toast.error("Por favor responde todas las preguntas");
-      return;
-    }
-
+    console.log("Respuestas del test:", answers);
     toast.success("Test completado. ¡Bienvenida a tu aprendizaje!");
     setTimeout(() => navigate("/dashboard"), 1500);
   };
@@ -55,40 +49,332 @@ const InitialTest = () => {
               </div>
               <CardTitle className="text-3xl font-bold">Test inicial</CardTitle>
               <CardDescription className="text-base">
-                Estas preguntas nos ayudarán a conocer tu nivel de conocimiento actual
+                A continuación te realizaremos una serie de preguntas sobre ti, tu vida y sobre tu salud. Por favor, respóndelas de la manera más honesta posible. Tus respuestas nos permitirán conocerte mejor, evaluar nuestro trabajo y saber si esta intervención resulta benéfica para ti.
               </CardDescription>
+              <p className="text-sm font-semibold mt-4">Para empezar, queremos saber algunos datos sobre ti.</p>
             </CardHeader>
             
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-8">
-                {questions.map((q, index) => (
-                  <div key={q.id} className="space-y-4">
-                    <div className="flex gap-3">
-                      <span className="w-8 h-8 gradient-primary rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                        {index + 1}
-                      </span>
-                      <Label className="text-lg font-semibold leading-tight">{q.question}</Label>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Identidad de género */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">En cuanto a tu género, te identificas como:</Label>
+                  <RadioGroup value={answers.genero} onValueChange={(value) => updateAnswer("genero", value)}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="mujer" id="gen-mujer" />
+                      <Label htmlFor="gen-mujer" className="font-normal cursor-pointer">Mujer</Label>
                     </div>
-                    
-                    <RadioGroup
-                      value={answers[q.id]}
-                      onValueChange={(value) => setAnswers({ ...answers, [q.id]: value })}
-                      className="pl-11 space-y-3"
-                    >
-                      {q.options.map((option) => (
-                        <div key={option} className="flex items-center space-x-3">
-                          <RadioGroupItem value={option} id={`${q.id}-${option}`} />
-                          <Label 
-                            htmlFor={`${q.id}-${option}`}
-                            className="font-normal cursor-pointer"
-                          >
-                            {option}
-                          </Label>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="hombre" id="gen-hombre" />
+                      <Label htmlFor="gen-hombre" className="font-normal cursor-pointer">Hombre</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="otra" id="gen-otra" />
+                      <Label htmlFor="gen-otra" className="font-normal cursor-pointer">Otra identidad</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="prefiero-no-decir" id="gen-no" />
+                      <Label htmlFor="gen-no" className="font-normal cursor-pointer">Prefiero no decir</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                {/* Sexo al nacer */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">Al nacer ¿Qué sexo se te atribuyó?</Label>
+                  <RadioGroup value={answers.sexoNacer} onValueChange={(value) => updateAnswer("sexoNacer", value)}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="mujer" id="sexo-mujer" />
+                      <Label htmlFor="sexo-mujer" className="font-normal cursor-pointer">Mujer</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="hombre" id="sexo-hombre" />
+                      <Label htmlFor="sexo-hombre" className="font-normal cursor-pointer">Hombre</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="prefiero-no-decir" id="sexo-no" />
+                      <Label htmlFor="sexo-no" className="font-normal cursor-pointer">Prefiero no decir</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                {/* Orientación sexual */}
+                <div className="space-y-3">
+                  <Label htmlFor="orientacion" className="text-base font-semibold">En cuanto a tu orientación sexual te consideras:</Label>
+                  <Input 
+                    id="orientacion" 
+                    value={answers.orientacion || ""} 
+                    onChange={(e) => updateAnswer("orientacion", e.target.value)}
+                    placeholder="Escribe tu respuesta"
+                  />
+                </div>
+
+                {/* Edad con slider */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">Tu edad en años es: {answers.edad?.[0] || 18}</Label>
+                  <Slider 
+                    value={answers.edad || [18]} 
+                    onValueChange={(value) => updateAnswer("edad", value)}
+                    min={10}
+                    max={100}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Estado */}
+                <div className="space-y-3">
+                  <Label htmlFor="estado" className="text-base font-semibold">¿En qué Estado de la República vives?</Label>
+                  <Select value={answers.estado} onValueChange={(value) => updateAnswer("estado", value)}>
+                    <SelectTrigger id="estado">
+                      <SelectValue placeholder="Selecciona un estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {estados.map(estado => (
+                        <SelectItem key={estado} value={estado}>{estado}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Grado de estudios */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">¿Cuál es tu último grado de estudios?</Label>
+                  <RadioGroup value={answers.estudios} onValueChange={(value) => updateAnswer("estudios", value)}>
+                    {["Primaria", "Secundaria", "Preparatoria", "Universidad", "Posgrado"].map(nivel => (
+                      <div key={nivel} className="flex items-center space-x-2">
+                        <RadioGroupItem value={nivel} id={`est-${nivel}`} />
+                        <Label htmlFor={`est-${nivel}`} className="font-normal cursor-pointer">{nivel}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Trasfondo cultural */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">Muchas personas que viven en México tienen diferentes trasfondos de origen y cultural. De los siguientes ¿Qué trasfondo cultural y de origen aplica mejor a ti?</Label>
+                  <RadioGroup value={answers.trasfondo} onValueChange={(value) => updateAnswer("trasfondo", value)}>
+                    {[
+                      "Latinoamericana", "Europea", "Blanca americana", "Africana",
+                      "Asiática (ej. China, Coreana, Japonesa)", "Sur asiática (ej. India, Pakistaní, Sri Lanka)",
+                      "Sudeste asiática (ej. Camboya, Indonesia, Vietnamita)", "Árabe",
+                      "Multicultural (ej. origen de dos o más de las anteriores)"
+                    ].map(origen => (
+                      <div key={origen} className="flex items-center space-x-2">
+                        <RadioGroupItem value={origen} id={`tras-${origen}`} />
+                        <Label htmlFor={`tras-${origen}`} className="font-normal cursor-pointer">{origen}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Afromexicana */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">Por tus antepasados y de acuerdo con tus costumbres y tradiciones, ¿te consideras afromexicana, negra o afrodescendiente?</Label>
+                  <RadioGroup value={answers.afromexicana} onValueChange={(value) => updateAnswer("afromexicana", value)}>
+                    {["Sí", "No", "No lo sé"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`afro-${opt}`} />
+                        <Label htmlFor={`afro-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Indígena */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">De acuerdo a tus costumbres y tradiciones, ¿te consideras indígena?</Label>
+                  <RadioGroup value={answers.indigena} onValueChange={(value) => updateAnswer("indigena", value)}>
+                    {["Sí", "No", "No lo sé"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`ind-${opt}`} />
+                        <Label htmlFor={`ind-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Lengua indígena */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">¿Hablas alguna lengua indígena?</Label>
+                  <RadioGroup value={answers.lenguaIndigena} onValueChange={(value) => updateAnswer("lenguaIndigena", value)}>
+                    {["Sí", "No", "No lo sé"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`lengua-${opt}`} />
+                        <Label htmlFor={`lengua-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Cuál lengua */}
+                {answers.lenguaIndigena === "Sí" && (
+                  <div className="space-y-3">
+                    <Label htmlFor="cualLengua" className="text-base font-semibold">¿Qué dialecto o lengua indígena hablas?</Label>
+                    <Input 
+                      id="cualLengua" 
+                      value={answers.cualLengua || ""} 
+                      onChange={(e) => updateAnswer("cualLengua", e.target.value)}
+                      placeholder="Escribe tu respuesta"
+                    />
+                  </div>
+                )}
+
+                {/* Estudios jefe/a hogar */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">Pensando en la jefa o jefe de tu hogar, ¿Cuál fue el último año de estudios que aprobó en la escuela?</Label>
+                  <RadioGroup value={answers.estudiosJefe} onValueChange={(value) => updateAnswer("estudiosJefe", value)}>
+                    {[
+                      "No estudió", "Primaria Incompleta", "Primaria Completa", "Secundaria Incompleta",
+                      "Secundaria Completa", "Carrera comercial", "Carrera técnica", "Preparatoria Incompleta",
+                      "Preparatoria Completa", "Licenciatura Incompleta", "Licenciatura Completa",
+                      "Diplomado o maestría", "Doctorado"
+                    ].map(nivel => (
+                      <div key={nivel} className="flex items-center space-x-2">
+                        <RadioGroupItem value={nivel} id={`jefe-${nivel}`} />
+                        <Label htmlFor={`jefe-${nivel}`} className="font-normal cursor-pointer">{nivel}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Baños */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">¿Cuántos baños completos con regadera y W.C. (excusado) hay en tu vivienda?</Label>
+                  <RadioGroup value={answers.banos} onValueChange={(value) => updateAnswer("banos", value)}>
+                    {["0", "1", "2 o más"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`bano-${opt}`} />
+                        <Label htmlFor={`bano-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Automóviles */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">¿Cuántos automóviles o camionetas tienen en tu hogar?</Label>
+                  <RadioGroup value={answers.autos} onValueChange={(value) => updateAnswer("autos", value)}>
+                    {["0", "1", "2 o más"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`auto-${opt}`} />
+                        <Label htmlFor={`auto-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Internet */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">Sin tomar en cuenta la conexión móvil que pudieras tener desde algún celular ¿tu hogar cuenta con internet?</Label>
+                  <RadioGroup value={answers.internet} onValueChange={(value) => updateAnswer("internet", value)}>
+                    {["Sí tiene", "No tiene"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`int-${opt}`} />
+                        <Label htmlFor={`int-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Personas que trabajan */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">De todas las personas de 14 años o más que viven en el hogar, ¿Cuántas trabajaron en el último mes?</Label>
+                  <RadioGroup value={answers.trabajadores} onValueChange={(value) => updateAnswer("trabajadores", value)}>
+                    {["0", "1", "2", "3", "4 o más"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`trab-${opt}`} />
+                        <Label htmlFor={`trab-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Cuartos para dormir */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">En tu vivienda, ¿Cuántos cuartos se usan para dormir, sin contar pasillos ni baños?</Label>
+                  <RadioGroup value={answers.cuartos} onValueChange={(value) => updateAnswer("cuartos", value)}>
+                    {["0", "1", "2", "3", "4 o más"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`cuart-${opt}`} />
+                        <Label htmlFor={`cuart-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Consulta ginecológica */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">Al día de hoy ¿has asistido alguna vez a una consulta ginecológica o recibido atención ginecológica?</Label>
+                  <RadioGroup value={answers.consultaGine} onValueChange={(value) => updateAnswer("consultaGine", value)}>
+                    {["Sí", "No"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`gine-${opt}`} />
+                        <Label htmlFor={`gine-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Estudios en salud */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">¿Tienes estudios en alguna área de la salud como medicina, enfermería, psicología, optometría, odontología, partera o doula?</Label>
+                  <RadioGroup value={answers.estudiosSalud} onValueChange={(value) => updateAnswer("estudiosSalud", value)}>
+                    {["Sí", "No"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`esalud-${opt}`} />
+                        <Label htmlFor={`esalud-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Área de estudios en salud */}
+                {answers.estudiosSalud === "Sí" && (
+                  <div className="space-y-3">
+                    <Label htmlFor="areasSalud" className="text-base font-semibold">¿Cuáles áreas de estudio?</Label>
+                    <Input 
+                      id="areasSalud" 
+                      value={answers.areasSalud || ""} 
+                      onChange={(e) => updateAnswer("areasSalud", e.target.value)}
+                      placeholder="Escribe las áreas"
+                    />
+                  </div>
+                )}
+
+                {/* Trabajo en institución de salud */}
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">¿Trabajas en alguna institución de salud particular o pública?</Label>
+                  <RadioGroup value={answers.trabajoSalud} onValueChange={(value) => updateAnswer("trabajoSalud", value)}>
+                    {["Sí", "No"].map(opt => (
+                      <div key={opt} className="flex items-center space-x-2">
+                        <RadioGroupItem value={opt} id={`tsalud-${opt}`} />
+                        <Label htmlFor={`tsalud-${opt}`} className="font-normal cursor-pointer">{opt}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                {/* Actividad profesional en salud */}
+                {answers.trabajoSalud === "Sí" && (
+                  <div className="space-y-3">
+                    <Label className="text-base font-semibold">¿Qué descripción se ajusta mejor a tu actividad profesional en salud?</Label>
+                    <RadioGroup value={answers.actividadSalud} onValueChange={(value) => updateAnswer("actividadSalud", value)}>
+                      {[
+                        "Estudiante de medicina", "Estudiante de enfermería", "Estudiante en otra área de la salud",
+                        "Médico general", "Médico especialista", "Ginecólogo/obstetra", "Médico cirujano",
+                        "Enfermera/o profesional", "Enfermera/o familiar", "Enfermera/o pediátrica", "Enfermera/o geriátrica",
+                        "Partera con conocimientos tradicionales", "Partera con formación profesional", "Paramédico/a",
+                        "Nutricionista", "Psicólogo", "Fisioterapeuta", "Odontólogo", "Optometrista"
+                      ].map(act => (
+                        <div key={act} className="flex items-center space-x-2">
+                          <RadioGroupItem value={act} id={`act-${act}`} />
+                          <Label htmlFor={`act-${act}`} className="font-normal cursor-pointer">{act}</Label>
                         </div>
                       ))}
                     </RadioGroup>
                   </div>
-                ))}
+                )}
 
                 <div className="pt-4">
                   <Button 
