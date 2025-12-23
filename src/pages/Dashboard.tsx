@@ -49,7 +49,7 @@ const Dashboard = () => {
         onLogout={handleLogout}
       />
       
-      <div className="pt-24 pb-16 px-4">
+      <div className="pt-96 pb-16 px-4">
         <div className="container mx-auto">
           {/* Hero section */}
           <div className="text-center mb-12">

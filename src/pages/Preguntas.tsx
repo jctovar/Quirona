@@ -1,24 +1,17 @@
 import { Navbar } from "@/components/Navbar";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import unamlogo from "@/assets/unamlogo.png";
-import suayedlogo from "@/assets/suayedlogo.png";
-import labpsit from "@/assets/labpsit.png";
 import ipnLogo from "@/assets/IPN-Logo.png";
 import escudoESCOM from "@/assets/escudoESCOM.png";
+import labpsit from "@/assets/labpsit.png";
+import suayedlogo from "@/assets/suayedlogo.png";
+import unamlogo from "@/assets/unamlogo.png";
 
-const institutions = [
-  { id: 1, src: unamlogo, alt: "UNAM" },
-  { id: 2, src: suayedlogo, alt: "SUAyED" },
-  { id: 3, src: labpsit, alt: "LabPsit" },
-  { id: 4, src: ipnLogo, alt: "IPN" },
-  { id: 5, src: escudoESCOM, alt: "ESCOM" },
-];
 const Preguntas = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
       
-      <section className="pt-24 pb-16 px-4">
+      <section className="pt-96 pb-16 px-4">
         <div className="container mx-auto max-w-4xl">
           <h1 className="text-4xl font-bold text-center mb-4">Preguntas frecuentes</h1>
           <p className="text-center text-muted-foreground mb-12">
@@ -171,55 +164,43 @@ const Preguntas = () => {
         </div>
       </section>
 
-      
-           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center">
-            {institutions.map((inst) => (
-              <div
-                key={inst.id}
-                className="aspect-square bg-background rounded-lg shadow-md flex items-center justify-center p-4 hover:shadow-quirona transition-all"
-              >
-                <img
-                  src={inst.src}
-                  alt={inst.alt}
-                  className="w-24 h-24 object-contain"
-                />
-              </div>
-            ))}
-          </div>
-          {/* Footer */}
-      <footer className="py-12 px-4 border-t bg-muted/20">
+      {/* Footer */}
+      <footer className="py-12 px-4 border-t bg-muted/30">
         <div className="container mx-auto">
-          {/* Dirección */}
-          <div className="text-center mb-8">
-            <p className="text-muted-foreground">
-              Av. de los Barrios No. 1, Los Reyes Iztacala, Tlalnepantla de Baz. Méx. 54090
-            </p>
+          {/* Logos institucionales */}
+          <div className="flex flex-wrap justify-center items-center gap-8 mb-8">
+            <img src={unamlogo} alt="UNAM" className="h-16 object-contain" />
+            <img src={suayedlogo} alt="SUAYED" className="h-16 object-contain" />
+            <img src={labpsit} alt="LABPSIT" className="h-16 object-contain" />
+            <img src={ipnLogo} alt="IPN" className="h-16 object-contain" />
+            <img src={escudoESCOM} alt="ESCOM" className="h-16 object-contain" />
           </div>
 
+          {/* Dirección */}
+          <p className="text-center text-muted-foreground mb-6">
+            Av. de los Barrios No. 1, Los Reyes Iztacala, Tlalnepantla de Baz. Méx. 54090
+          </p>
+
           {/* Enlaces */}
-          <div className="flex flex-wrap justify-center gap-6 mb-8">
-            <a href="#" className="text-primary hover:underline font-medium">
+          <div className="flex flex-wrap justify-center gap-6 mb-6">
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
               Aviso de privacidad
             </a>
-            <a href="#" className="text-primary hover:underline font-medium">
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
               ¿Tienes dudas?
             </a>
-            <a href="#" className="text-primary hover:underline font-medium">
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
               Redes sociales
             </a>
           </div>
 
           {/* Copyright */}
-          <div className="text-center">
-            <p className="text-muted-foreground text-sm">
-              © 2025 QUIRONA UNAM. Educación en salud ginecológica.
-            </p>
-          </div>
+          <p className="text-center text-muted-foreground">
+            © 2025 QUIRONA UNAM. Educación en salud ginecológica.
+          </p>
         </div>
       </footer>
-        </div>
-
-    
+    </div>
   );
 };
 

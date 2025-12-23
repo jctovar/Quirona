@@ -2,17 +2,10 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
 import unamlogo from "@/assets/unamlogo.png";
-<<<<<<< HEAD
-import suayedlogo from "@/assets/suayedlogo.png";
-import labpsit from "@/assets/labpsit.png";
-import ipnLogo from "@/assets/IPN-Logo.png";
-import escudoESCOM from "@/assets/escudoESCOM.png";
-=======
 import escudoESCOM from "@/assets/escudoESCOM.png";
 import suayedlogo from "@/assets/suayedlogo.png";
 import labpsit from "@/assets/labpsit.png";
 import ipnLogo from "@/assets/IPN-Logo.png";
->>>>>>> ebdcaa6cb9bb71771910c2fb8c1d5e789e4ce510
 
 const teamMembers = [
   { name: "Mtro. Javier Dario Ríos Castillo" },
@@ -25,18 +18,11 @@ const teamMembers = [
 ];
 
 const institutions = [
-  { id: 1, src: unamlogo, alt: "UNAM" },
-<<<<<<< HEAD
-  { id: 2, src: suayedlogo, alt: "SUAyED" },
-  { id: 3, src: labpsit, alt: "LabPsit" },
-  { id: 4, src: ipnLogo, alt: "IPN" },
-  { id: 5, src: escudoESCOM, alt: "ESCOM" },
-=======
-  { id: 2, src: escudoESCOM, alt: "ESCOM" },
-  { id: 3, src: suayedlogo, alt: "SUAyED" },
-  { id: 4, src: labpsit, alt: "LabPsit" },
-  { id: 5, src: ipnLogo, alt: "IPN" },
->>>>>>> ebdcaa6cb9bb71771910c2fb8c1d5e789e4ce510
+  { id: 1, src: unamlogo, alt: 'UNAM' },
+  { id: 2, src: suayedlogo, alt: 'SUAYED' },
+  { id: 3, src: labpsit, alt: 'LABPSIT' },
+  { id: 4, src: ipnLogo, alt: 'IPN' },
+  { id: 5, src: escudoESCOM, alt: 'ESCOM' },
 ];
 
 const QuienesSomos = () => {
@@ -52,7 +38,7 @@ const QuienesSomos = () => {
       <Navbar />
       
       {/* Navigation Buttons */}
-      <section className="pt-24 pb-8 px-4">
+      <section className="pt-96 pb-8 px-4">
         <div className="container mx-auto">
           <div className="flex flex-wrap justify-center gap-4">
             <Button 

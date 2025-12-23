@@ -11,7 +11,7 @@ const PreEducation = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar />
       
-      <div className="pt-24 pb-16 px-4">
+      <div className="pt-96 pb-16 px-4">
         <div className="container mx-auto max-w-3xl">
           <Card className="shadow-quirona border-2">
             <CardHeader className="text-center">

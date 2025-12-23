@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { Button } from "./ui/button";
 import { User, Menu, Mail, Facebook, Instagram } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,30 +36,17 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
     { to: "/dashboard", label: "Página Principal" },
   ];
 
-  const navRef = useRef<HTMLElement | null>(null);
-  const [navHeight, setNavHeight] = useState<number>(0);
-
-  useEffect(() => {
-    const updateHeight = () => {
-      if (navRef.current) setNavHeight(navRef.current.offsetHeight);
-    };
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
-    return () => window.removeEventListener("resize", updateHeight);
-  }, []);
-
-  return (<>
-
-    <nav ref={navRef} className="fixed top-0 left-0 right-0 z-50">
+  return (
+    <nav className="fixed top-0 left-0 right-0 z-50">
       {/* Barra superior teal */}
       <div className="bg-primary h-3"></div>
       
       {/* Contenedor principal del header */}
       <div className="bg-background border-b border-border">
         {/* Fila superior: email y redes sociales */}
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between border-b border-border/50">
+        <div className="container mx-auto px-4 py-2 flex items-center justify-between border-b border-border/50">
           <div className="flex items-center gap-2 text-primary">
-            <Mail className="w-8 h-8" />
+            <Mail className="w-4 h-4" />
             <a href="mailto:quirona@iztacala.unam.mx" className="text-lg font-medium hover:underline">
               quirona@iztacala.unam.mx
             </a>
@@ -76,13 +63,13 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
         </div>
 
         {/* Línea decorativa primary */}
-        <div className="h-1 bg-primary"></div>
+        <div className="h-0.5 bg-primary"></div>
 
         {/* Fila principal: logo y navegación */}
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo grande */}
           <Link to="/" className="flex-shrink-0">
-            <img src={logo} alt="Quirona Logo" className="h-48 md:h-40 w-auto" />
+            <img src={logo} alt="Quirona Logo" className="h-40 md:h-45 w-auto" />
           </Link>
 
           {/* Menú Desktop */}
@@ -102,12 +89,12 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
             {!isAuthenticated ? (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" className="text-lg font-semibold uppercase tracking-wide">
+                  <Button variant="ghost" className="text-sm font-semibold uppercase tracking-wide">
                     Iniciar sesión
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button className="gradient-primary text-lg  font-semibold uppercase tracking-wide transition-quirona hover:opacity-90">
+                  <Button className="gradient-primary text-sm font-semibold uppercase tracking-wide transition-quirona hover:opacity-90">
                     Registrarse
                   </Button>
                 </Link>
@@ -202,6 +189,5 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
         </div>
       </div>
     </nav>
-    <div style={{ height: navHeight }} aria-hidden="true" />
-  </>);
+  );
 };
