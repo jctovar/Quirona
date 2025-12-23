@@ -2,17 +2,10 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
 import unamlogo from "@/assets/unamlogo.png";
-<<<<<<< HEAD
 import suayedlogo from "@/assets/suayedlogo.png";
 import labpsit from "@/assets/labpsit.png";
 import ipnLogo from "@/assets/IPN-Logo.png";
 import escudoESCOM from "@/assets/escudoESCOM.png";
-=======
-import escudoESCOM from "@/assets/escudoESCOM.png";
-import suayedlogo from "@/assets/suayedlogo.png";
-import labpsit from "@/assets/labpsit.png";
-import ipnLogo from "@/assets/IPN-Logo.png";
->>>>>>> ebdcaa6cb9bb71771910c2fb8c1d5e789e4ce510
 
 const teamMembers = [
   { name: "Mtro. Javier Dario Ríos Castillo" },
@@ -26,17 +19,10 @@ const teamMembers = [
 
 const institutions = [
   { id: 1, src: unamlogo, alt: "UNAM" },
-<<<<<<< HEAD
   { id: 2, src: suayedlogo, alt: "SUAyED" },
   { id: 3, src: labpsit, alt: "LabPsit" },
   { id: 4, src: ipnLogo, alt: "IPN" },
   { id: 5, src: escudoESCOM, alt: "ESCOM" },
-=======
-  { id: 2, src: escudoESCOM, alt: "ESCOM" },
-  { id: 3, src: suayedlogo, alt: "SUAyED" },
-  { id: 4, src: labpsit, alt: "LabPsit" },
-  { id: 5, src: ipnLogo, alt: "IPN" },
->>>>>>> ebdcaa6cb9bb71771910c2fb8c1d5e789e4ce510
 ];
 
 const QuienesSomos = () => {
@@ -277,19 +263,17 @@ const QuienesSomos = () => {
       {/* Footer */}
       <footer className="py-12 px-4 border-t bg-muted/20">
         <div className="container mx-auto">
-          {/* Dirección */}
           <div className="text-center mb-8">
             <p className="text-muted-foreground">
               Av. de los Barrios No. 1, Los Reyes Iztacala, Tlalnepantla de Baz. Méx. 54090
             </p>
           </div>
 
-          {/* Enlaces */}
           <div className="flex flex-wrap justify-center gap-6 mb-8">
             <a href="#" className="text-primary hover:underline font-medium">
               Aviso de privacidad
             </a>
-            <a href="#" className="text-primary hover:underline font-medium">
+            <a href="/preguntas" className="text-primary hover:underline font-medium">
               ¿Tienes dudas?
             </a>
             <a href="#" className="text-primary hover:underline font-medium">
@@ -297,7 +281,6 @@ const QuienesSomos = () => {
             </a>
           </div>
 
-          {/* Copyright */}
           <div className="text-center">
             <p className="text-muted-foreground text-sm">
               © 2025 QUIRONA UNAM. Educación en salud ginecológica.

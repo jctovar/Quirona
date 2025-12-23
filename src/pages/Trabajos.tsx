@@ -1,19 +1,11 @@
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GraduationCap, FileText, Building2 } from "lucide-react";
-<<<<<<< HEAD
 import unamlogo from "@/assets/unamlogo.png";
 import suayedlogo from "@/assets/suayedlogo.png";
 import labpsit from "@/assets/labpsit.png";
 import ipnLogo from "@/assets/IPN-Logo.png";
 import escudoESCOM from "@/assets/escudoESCOM.png";
-=======
-import unamLogo from "@/assets/unamlogo.png";
-import ipnLogo from "@/assets/IPN-Logo.png";
-import escudoESCOM from "@/assets/escudoESCOM.png";
-import labpsitLogo from "@/assets/labpsit.png";
-import suayedLogo from "@/assets/suayedlogo.png";
->>>>>>> ebdcaa6cb9bb71771910c2fb8c1d5e789e4ce510
 
 const institutions = [
   { id: 1, src: unamlogo, alt: "UNAM" },
@@ -22,6 +14,7 @@ const institutions = [
   { id: 4, src: ipnLogo, alt: "IPN" },
   { id: 5, src: escudoESCOM, alt: "ESCOM" },
 ];
+
 const Trabajos = () => {
   const trabajosEjemplo = [
     {
@@ -150,8 +143,10 @@ const Trabajos = () => {
         </div>
       </main>
 
-<<<<<<< HEAD
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center">
+      {/* Instituciones */}
+      <section className="py-12 px-4 bg-muted/30">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center">
             {institutions.map((inst) => (
               <div
                 key={inst.id}
@@ -165,69 +160,35 @@ const Trabajos = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <footer className="py-12 px-4 border-t bg-muted/20">
+      {/* Footer */}
+      <footer className="py-12 px-4 border-t bg-muted/20">
         <div className="container mx-auto">
-          {/* Dirección */}
           <div className="text-center mb-8">
             <p className="text-muted-foreground">
               Av. de los Barrios No. 1, Los Reyes Iztacala, Tlalnepantla de Baz. Méx. 54090
             </p>
           </div>
 
-          {/* Enlaces */}
           <div className="flex flex-wrap justify-center gap-6 mb-8">
             <a href="#" className="text-primary hover:underline font-medium">
               Aviso de privacidad
             </a>
-            <a href="#" className="text-primary hover:underline font-medium">
+            <a href="/preguntas" className="text-primary hover:underline font-medium">
               ¿Tienes dudas?
             </a>
             <a href="#" className="text-primary hover:underline font-medium">
-=======
-      {/* Footer */}
-      <footer className="py-12 px-4 border-t bg-muted/30">
-        <div className="container mx-auto">
-          {/* Logos institucionales */}
-          <div className="flex flex-wrap justify-center items-center gap-8 mb-8">
-            <img src={unamLogo} alt="UNAM" className="h-16 object-contain" />
-            <img src={ipnLogo} alt="IPN" className="h-16 object-contain" />
-            <img src={escudoESCOM} alt="ESCOM" className="h-16 object-contain" />
-            <img src={labpsitLogo} alt="LABPSIIT" className="h-16 object-contain" />
-            <img src={suayedLogo} alt="SUAyED" className="h-16 object-contain" />
-          </div>
-
-          {/* Dirección */}
-          <p className="text-center text-muted-foreground mb-6">
-            Av. de los Barrios No. 1, Los Reyes Iztacala, Tlalnepantla de Baz. Méx. 54090
-          </p>
-
-          {/* Enlaces */}
-          <div className="flex flex-wrap justify-center gap-6 mb-6">
-            <a href="/aviso-privacidad" className="text-muted-foreground hover:text-primary transition-colors">
-              Aviso de privacidad
-            </a>
-            <a href="/contacto" className="text-muted-foreground hover:text-primary transition-colors">
-              ¿Tienes dudas?
-            </a>
-            <a href="#redes" className="text-muted-foreground hover:text-primary transition-colors">
->>>>>>> ebdcaa6cb9bb71771910c2fb8c1d5e789e4ce510
               Redes sociales
             </a>
           </div>
 
-          {/* Copyright */}
-<<<<<<< HEAD
           <div className="text-center">
             <p className="text-muted-foreground text-sm">
               © 2025 QUIRONA UNAM. Educación en salud ginecológica.
             </p>
           </div>
-=======
-          <p className="text-center text-muted-foreground">
-            © 2025 QUIRONA UNAM. Educación en salud ginecológica.
-          </p>
->>>>>>> ebdcaa6cb9bb71771910c2fb8c1d5e789e4ce510
         </div>
       </footer>
     </div>
