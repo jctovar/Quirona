@@ -263,19 +263,17 @@ const QuienesSomos = () => {
       {/* Footer */}
       <footer className="py-12 px-4 border-t bg-muted/20">
         <div className="container mx-auto">
-          {/* Dirección */}
           <div className="text-center mb-8">
             <p className="text-muted-foreground">
               Av. de los Barrios No. 1, Los Reyes Iztacala, Tlalnepantla de Baz. Méx. 54090
             </p>
           </div>
 
-          {/* Enlaces */}
           <div className="flex flex-wrap justify-center gap-6 mb-8">
             <a href="#" className="text-primary hover:underline font-medium">
               Aviso de privacidad
             </a>
-            <a href="#" className="text-primary hover:underline font-medium">
+            <a href="/preguntas" className="text-primary hover:underline font-medium">
               ¿Tienes dudas?
             </a>
             <a href="#" className="text-primary hover:underline font-medium">
@@ -283,7 +281,6 @@ const QuienesSomos = () => {
             </a>
           </div>
 
-          {/* Copyright */}
           <div className="text-center">
             <p className="text-muted-foreground text-sm">
               © 2025 QUIRONA UNAM. Educación en salud ginecológica.
