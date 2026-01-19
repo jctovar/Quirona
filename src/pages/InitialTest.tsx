@@ -16,7 +16,8 @@ interface AnswersState {
   edad: number[];
   genero: string | undefined;
   sexoNacer: string | undefined;
-  orientacion: string;
+  orientacion: string | undefined;
+  orientacionOtra: string;
   estado: string | undefined;
   estudios: string | undefined;
   trasfondo: string | undefined;
@@ -44,7 +45,8 @@ const InitialTest = () => {
     edad: [18], // Inicializado como array de números para el Slider
     genero: undefined,
     sexoNacer: undefined,
-    orientacion: "",
+    orientacion: undefined,
+    orientacionOtra: "",
     estado: undefined,
     estudios: undefined,
     trasfondo: undefined,
@@ -84,8 +86,8 @@ const InitialTest = () => {
     console.log("Respuestas del test:", answers);
     // Nota: Aquí podrías añadir una validación para asegurar que todos los campos requeridos tengan valor.
 
-    toast.success("Test completado. ¡Bienvenida a tu aprendizaje!");
-    setTimeout(() => navigate("/dashboard"), 1500);
+    toast.success("Test completado. ¡Pasemos al siguiente cuestionario!");
+    setTimeout(() => navigate("/semantic-network-test"), 1500);
   };
 
   return (
@@ -152,13 +154,44 @@ const InitialTest = () => {
 
                 {/* Orientación sexual */}
                 <div className="space-y-3">
-                  <Label htmlFor="orientacion" className="text-base font-semibold">En cuanto a tu orientación sexual te consideras:</Label>
-                  <Input 
-                    id="orientacion" 
-                    value={answers.orientacion || ""} 
-                    onChange={(e) => updateAnswer("orientacion", e.target.value)}
-                    placeholder="Escribe tu respuesta"
-                  />
+                  <Label className="text-base font-semibold">En cuanto a tu orientación sexual te consideras:</Label>
+                  <RadioGroup value={answers.orientacion} onValueChange={(value) => updateAnswer("orientacion", value)}>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Heterosexual" id="ori-heterosexual" />
+                      <Label htmlFor="ori-heterosexual" className="font-normal cursor-pointer">Heterosexual: Atracción hacia personas del sexo opuesto.</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Homosexual" id="ori-homosexual" />
+                      <Label htmlFor="ori-homosexual" className="font-normal cursor-pointer">Homosexual: Atracción hacia personas del mismo sexo (gays o lesbianas).</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Bisexual" id="ori-bisexual" />
+                      <Label htmlFor="ori-bisexual" className="font-normal cursor-pointer">Bisexual: Atracción hacia personas de más de un género o sexo.</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Pansexual" id="ori-pansexual" />
+                      <Label htmlFor="ori-pansexual" className="font-normal cursor-pointer">Pansexual: Atracción hacia personas sin importar su género o sexo.</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Asexual" id="ori-asexual" />
+                      <Label htmlFor="ori-asexual" className="font-normal cursor-pointer">Asexual: No experimenta atracción sexual</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Otra" id="ori-otra" />
+                      <Label htmlFor="ori-otra" className="font-normal cursor-pointer">Otra</Label>
+                    </div>
+                  </RadioGroup>
+                  {answers.orientacion === "Otra" && (
+                    <div className="space-y-3">
+                      <Label htmlFor="orientacionOtra" className="text-base font-semibold">Especifica tu orientación sexual:</Label>
+                      <Input 
+                        id="orientacionOtra" 
+                        value={answers.orientacionOtra || ""} 
+                        onChange={(e) => updateAnswer("orientacionOtra", e.target.value)}
+                        placeholder="Escribe tu respuesta"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Edad con slider */}
@@ -208,8 +241,8 @@ const InitialTest = () => {
                   <RadioGroup value={answers.trasfondo} onValueChange={(value) => updateAnswer("trasfondo", value)}>
                     {[
                       "Latinoamericana", "Europea", "Blanca americana", "Africana",
-                      "Asiática (ej. China, Coreana, Japonesa)", "Sur asiática (ej. India, Pakistaní, Sri Lanka)",
-                      "Sudeste asiática (ej. Camboya, Indonesia, Vietnamita)", "Árabe",
+                      "Asiática (ej. China, Coreana, Japonesa)", "Sur asiática (ej. Indi, Pakistaní, Sri Lanka)",
+                      "Sudeste asiática (ej. Cambodí, Indonesia, Vietnamita)", "Árabe",
                       "Multicultural (ej. origen de dos o más de las anteriores)"
                     ].map(origen => (
                       <div key={origen} className="flex items-center space-x-2">
@@ -305,7 +338,7 @@ const InitialTest = () => {
 
                 {/* Automóviles */}
                 <div className="space-y-3">
-                  <Label className="text-base font-semibold">¿Cuántos automóviles o camionetas tienen en tu hogar?</Label>
+                  <Label className="text-base font-semibold">¿Cuántos automóviles o camionetas tienen en tu hogar, incluyendo camionetas cerradas, o con cabina o caja?</Label>
                   <RadioGroup value={answers.autos} onValueChange={(value) => updateAnswer("autos", value)}>
                     {["0", "1", "2 o más"].map(opt => (
                       <div key={opt} className="flex items-center space-x-2">
@@ -384,18 +417,6 @@ const InitialTest = () => {
                 {/* Área de estudios en salud */}
                 {answers.estudiosSalud === "Sí" && (
                   <div className="space-y-3">
-                    <Label htmlFor="areasSalud" className="text-base font-semibold">¿Cuáles áreas de estudio?</Label>
-                    <Input 
-                      id="areasSalud" 
-                      value={answers.areasSalud || ""} 
-                      onChange={(e) => updateAnswer("areasSalud", e.target.value)}
-                      placeholder="Escribe las áreas"
-                    />
-                  </div>
-                )}
-
-                {/* Trabajo en institución de salud */}
-                <div className="space-y-3">
                   <Label className="text-base font-semibold">¿Trabajas en alguna institución de salud particular o pública?</Label>
                   <RadioGroup value={answers.trabajoSalud} onValueChange={(value) => updateAnswer("trabajoSalud", value)}>
                     {["Sí", "No"].map(opt => (
@@ -406,9 +427,11 @@ const InitialTest = () => {
                     ))}
                   </RadioGroup>
                 </div>
+                )}
+
 
                 {/* Actividad profesional en salud */}
-                {answers.trabajoSalud === "Sí" && (
+                {answers.estudiosSalud === "Sí" && (
                   <div className="space-y-3">
                     <Label className="text-base font-semibold">¿Qué descripción se ajusta mejor a tu actividad profesional en salud?</Label>
                     <RadioGroup value={answers.actividadSalud} onValueChange={(value) => updateAnswer("actividadSalud", value)}>
@@ -434,7 +457,7 @@ const InitialTest = () => {
                     className="w-full gradient-primary transition-quirona hover:opacity-90"
                     size="lg"
                   >
-                    Completar test e ir al inicio
+                    Pasar al siguiente test
                   </Button>
                 </div>
               </form>
