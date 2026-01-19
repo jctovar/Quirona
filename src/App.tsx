@@ -13,6 +13,7 @@ import Register from "./pages/Register";
 import InitialQuestion from "./pages/InitialQuestion";
 import PreEducation from "./pages/PreEducation";
 import InitialTest from "./pages/InitialTest";
+import SemanticNetworkTest from "./pages/SemanticNetworkTest";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/initial-question" element={<InitialQuestion />} />
           <Route path="/pre-education" element={<PreEducation />} />
           <Route path="/initial-test" element={<InitialTest />} />
+          <Route path="/semantic-network-test" element={<SemanticNetworkTest />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

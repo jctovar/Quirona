@@ -84,8 +84,8 @@ const InitialTest = () => {
     console.log("Respuestas del test:", answers);
     // Nota: Aquí podrías añadir una validación para asegurar que todos los campos requeridos tengan valor.
 
-    toast.success("Test completado. ¡Bienvenida a tu aprendizaje!");
-    setTimeout(() => navigate("/dashboard"), 1500);
+    toast.success("Test completado. ¡Continuemos con el siguiente cuestionario!");
+    setTimeout(() => navigate("/semantic-network-test"), 1500);
   };
 
   return (
