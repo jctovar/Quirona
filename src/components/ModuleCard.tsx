@@ -5,11 +5,12 @@ import { LucideIcon } from "lucide-react";
 interface ModuleCardProps {
   title: string;
   description: string;
+  author?: string;
   icon: LucideIcon;
   onClick: () => void;
 }
 
-export const ModuleCard = ({ title, description, icon: Icon, onClick }: ModuleCardProps) => {
+export const ModuleCard = ({ title, description, author, icon: Icon, onClick }: ModuleCardProps) => {
   return (
     <Card className="group hover:shadow-quirona transition-quirona cursor-pointer border-2 hover:border-primary">
       <CardHeader>
@@ -17,6 +18,11 @@ export const ModuleCard = ({ title, description, icon: Icon, onClick }: ModuleCa
           <Icon className="w-6 h-6 text-white" />
         </div>
         <CardTitle className="text-xl">{title}</CardTitle>
+        {author && (
+          <p className="text-sm text-muted-foreground">
+            Autor principal: {author}
+          </p>
+        )}
         <CardDescription className="text-base">{description}</CardDescription>
       </CardHeader>
       <CardContent>
