@@ -14,14 +14,19 @@ const Dashboard = () => {
     setTimeout(() => navigate("/"), 1000);
   };
 
-  const handleModuleClick = (moduleName: string) => {
-    toast.info(`Módulo: ${moduleName} (próximamente disponible)`);
+  const handleModuleClick = (moduleName: string, moduleIndex: number) => {
+    if (moduleIndex === 0) {
+      navigate("/module-1");
+    } else {
+      toast.info(`Módulo: ${moduleName} (próximamente disponible)`);
+    }
   };
 
   const modules = [
     {
-      title: "Introducción a la ginecología preventiva",
+      title: "Ginecología Preventiva",
       description: "Aprende los conceptos básicos sobre salud ginecológica y la importancia de la prevención en tu bienestar.",
+      author: "Javier Darío Ríos Castillo",
       icon: BookOpen,
     },
     {
@@ -71,8 +76,9 @@ const Dashboard = () => {
                   key={index}
                   title={module.title}
                   description={module.description}
+                  author={module.author}
                   icon={module.icon}
-                  onClick={() => handleModuleClick(module.title)}
+                  onClick={() => handleModuleClick(module.title, index)}
                 />
               ))}
             </div>
