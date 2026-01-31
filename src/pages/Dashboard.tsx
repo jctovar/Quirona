@@ -26,6 +26,7 @@ const Dashboard = () => {
     {
       title: "Ginecología preventiva",
       description: "Aprende los conceptos básicos sobre salud ginecológica y la importancia de la prevención en tu bienestar.",
+      author: "Javier Darío Ríos Castillo",
       icon: BookOpen,
     },
     {

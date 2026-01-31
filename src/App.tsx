@@ -40,6 +40,7 @@ const App = () => (
           <Route path="/initial-test" element={<InitialTest />} />
           <Route path="/semantic-network-test" element={<SemanticNetworkTest />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/module-1" element={<Module1Story />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/module-1" element={<Module1Story />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
