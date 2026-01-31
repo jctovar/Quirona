@@ -16,6 +16,7 @@ import InitialTest from "./pages/InitialTest";
 import SemanticNetworkTest from "./pages/SemanticNetworkTest";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import Module1Story from "./pages/Module1Story";  
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/semantic-network-test" element={<SemanticNetworkTest />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/module-1" element={<Module1Story />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
