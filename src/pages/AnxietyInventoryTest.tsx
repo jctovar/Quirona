@@ -133,7 +133,7 @@ const AnxietyInventoryTest = () => {
   };
 
   const handleNext = () => {
-    navigate("/dashboard");
+    navigate("/assertiveness-scale");
   };
 
   return (
