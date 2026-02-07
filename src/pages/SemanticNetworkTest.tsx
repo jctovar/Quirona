@@ -156,7 +156,7 @@ const SemanticNetworkTest = () => {
       exercise2: exercise2Ranked
     });
     toast.success("¡Cuestionario completado exitosamente!");
-    setTimeout(() => navigate("/dashboard"), 1500);
+    setTimeout(() => navigate("/anxiety-inventory"), 1500);
   };
 
   const formatWordsList = (words: string[]) => {
@@ -527,7 +527,7 @@ const SemanticNetworkTest = () => {
                   className="w-full gradient-primary"
                   size="lg"
                 >
-                  Finalizar cuestionario
+                  Pasar al siguiente cuestionario
                 </Button>
               </div>
             )}
