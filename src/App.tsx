@@ -14,6 +14,7 @@ import InitialQuestion from "./pages/InitialQuestion";
 import PreEducation from "./pages/PreEducation";
 import InitialTest from "./pages/InitialTest";
 import SemanticNetworkTest from "./pages/SemanticNetworkTest";
+import AnxietyInventoryTest from "./pages/AnxietyInventoryTest";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Module1Story from "./pages/Module1Story";  
@@ -39,10 +40,10 @@ const App = () => (
           <Route path="/pre-education" element={<PreEducation />} />
           <Route path="/initial-test" element={<InitialTest />} />
           <Route path="/semantic-network-test" element={<SemanticNetworkTest />} />
+          <Route path="/anxiety-inventory" element={<AnxietyInventoryTest />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/module-1" element={<Module1Story />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/module-1" element={<Module1Story />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
