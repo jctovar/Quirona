@@ -44,7 +44,7 @@ const AdverseExperiencesTest = () => {
   };
 
   const handleNext = () => {
-    navigate("/dashboard");
+    navigate("/general-health");
   };
 
   return (
