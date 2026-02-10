@@ -16,6 +16,9 @@ import InitialTest from "./pages/InitialTest";
 import SemanticNetworkTest from "./pages/SemanticNetworkTest";
 import AnxietyInventoryTest from "./pages/AnxietyInventoryTest";
 import AssertivenessScaleTest from "./pages/AssertivenessScaleTest";
+import AdverseExperiencesTest from "./pages/AdverseExperiencesTest";
+import GeneralHealthTest from "./pages/GeneralHealthTest";
+import Derivacion from "./pages/Derivacion";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Module1Story from "./pages/Module1Story";  
@@ -43,6 +46,9 @@ const App = () => (
           <Route path="/semantic-network-test" element={<SemanticNetworkTest />} />
           <Route path="/anxiety-inventory" element={<AnxietyInventoryTest />} />
           <Route path="/assertiveness-scale" element={<AssertivenessScaleTest />} />
+          <Route path="/adverse-experiences" element={<AdverseExperiencesTest />} />
+          <Route path="/general-health" element={<GeneralHealthTest />} />
+          <Route path="/derivacion" element={<Derivacion />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/module-1" element={<Module1Story />} />
           <Route path="/profile" element={<Profile />} />

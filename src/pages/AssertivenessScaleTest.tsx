@@ -121,7 +121,7 @@ const AssertivenessScaleTest = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const handleNext = () => {
-    navigate("/dashboard");
+    navigate("/adverse-experiences");
   };
   let globalIndex = 0;
   return (
@@ -247,7 +247,7 @@ const AssertivenessScaleTest = () => {
                   className="w-full gradient-primary"
                   size="lg"
                 >
-                  Continuar al panel principal
+                  Continuar al siguiente cuestionario
                 </Button>
               </div>
             )}
