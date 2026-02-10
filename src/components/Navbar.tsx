@@ -69,7 +69,7 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo grande */}
           <Link to="/" className="flex-shrink-0">
-            <img src={logo} alt="Quirona Logo" className="h-40 md:h-45 w-auto" />
+            <img src={logo} alt="Quirona Logo" className="h-56 md:h-90 w-90" />
           </Link>
 
           {/* Menú Desktop */}
