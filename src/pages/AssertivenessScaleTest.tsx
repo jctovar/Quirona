@@ -121,7 +121,7 @@ const AssertivenessScaleTest = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const handleNext = () => {
-    navigate("/dashboard");
+    navigate("/adverse-experiences");
   };
   let globalIndex = 0;
   return (
