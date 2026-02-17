@@ -20,8 +20,10 @@ import AdverseExperiencesTest from "./pages/AdverseExperiencesTest";
 import GeneralHealthTest from "./pages/GeneralHealthTest";
 import Derivacion from "./pages/Derivacion";
 import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
-import Module1Story from "./pages/Module1Story";  
+import Profile from "./pages/Profile";  
+import Module1Story from "./pages/Module1Story";
+import Module1Introduction from "./pages/Module1Introduction";
+import Module1Quiz from "./pages/Module1Quiz";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +53,8 @@ const App = () => (
           <Route path="/derivacion" element={<Derivacion />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/module-1" element={<Module1Story />} />
+          <Route path="/module-1-intro" element={<Module1Introduction />} />
+          <Route path="/module-1-quiz" element={<Module1Quiz />} />
           <Route path="/profile" element={<Profile />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

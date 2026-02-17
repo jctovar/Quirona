@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { PlayCircle, Heart, Stethoscope, Users, HandHeart } from "lucide-react";
+import bienvenidaVideo from "@/assets/bienvenidaQuirona.mp4";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -207,12 +208,15 @@ const Register = () => {
               </CardHeader>
               
               <CardContent className="space-y-6">
-                <div className="aspect-video bg-gradient-to-br from-primary/20 to-secondary/20 rounded-lg flex items-center justify-center">
-                  <div className="text-center space-y-4">
-                    <PlayCircle className="w-20 h-20 mx-auto text-primary" />
-                    <p className="text-muted-foreground">Video informativo sobre violencia ginecológica</p>
-                    <p className="text-sm text-muted-foreground">(Aquí se mostraría el video educativo)</p>
-                  </div>
+                <div className="rounded-lg overflow-hidden bg-black">
+                  <video 
+                    controls 
+                    className="w-full max-h-[500px]"
+                    controlsList="nodownload"
+                  >
+                    <source src={bienvenidaVideo} type="video/mp4" />
+                    Tu navegador no soporta el elemento de video
+                  </video>
                 </div>
 
                 <Button 
