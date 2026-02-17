@@ -12,7 +12,7 @@ const Module1Story = () => {
       setShowQuestions(true);
     } else {
       // Navigate to the next section (placeholder for now)
-      navigate("/dashboard");
+      navigate("/module-1-intro");
     }
   };
   return (
