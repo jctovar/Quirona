@@ -103,7 +103,7 @@ const Module1Feedback = () => {
                   </Button>
                 )}
                 <Button
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => navigate("/module-1-closure")}
                   className="gradient-primary text-white px-8 py-5 text-lg"
                 >
                   Continuar
