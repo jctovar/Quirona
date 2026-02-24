@@ -91,10 +91,10 @@ const Module1Quiz = () => {
                     Tus respuestas han sido registradas. Continuaremos explorando estos temas a lo largo del módulo.
                   </p>
                   <Button
-                    onClick={() => navigate("/dashboard")}
+                    onClick={() => navigate("/module-1-visit")}
                     className="gradient-primary text-white px-8 py-6 text-lg mt-4"
                   >
-                    Continuar al panel principal
+                    Continuar a la siguiente sección
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </div>
