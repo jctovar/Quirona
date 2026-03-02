@@ -9,7 +9,96 @@ import { ArrowRight } from "lucide-react";
 const Module1Closure = () => {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<"questions" | "story">("questions");
+  const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState({ fear: "", phrase: "", advice: "" });
+  const [fontSizeClass, setFontSizeClass] = useState("text-base");
+
+  const storyPages = [
+    (
+      <div>
+        <h1 className="text-3xl font-bold text-center mb-8 text-primary">
+          Ximena y Sofía: Resolución
+        </h1>
+        <div className="space-y-6 text-foreground leading-relaxed">
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            –...y por eso hermanita, no es necesario que te hagan una revisión de tus partes íntimas en la primera consulta.
+          </p>
+          <p>
+            Sofía se estira en su silla después de acabarse su helado doble de queso con zarzamora, y haber hablado de todo lo que ella se enteró después de mucho tiempo sobre cómo es una primera consulta ginecológica.
+          </p>
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – Eso sí, nunca olvides que lo más importante para la salud es prevenir, y eso empieza no solo con tus elecciones, sino también con la información que recibes.
+          </p>
+        </div>
+      </div>
+    ),
+    (
+      <div>
+        <div className="space-y-6 text-foreground leading-relaxed">
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – ¡Ay hermana! jejejeje (risa) pues yo qué iba a saber si nunca de los nunca nos platican de esto en la escuela. Ayer me la pasé viendo en mi teléfono reels de "ChikChok" sobre remedios caseros para dolores menstruales, y no sé qué tantos tés y hierbas te recomiendan. Hasta vi uno de usar ajo para tratar las infecciones vaginales.
+          </p>
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – Aguas con eso Xime, esas publicaciones no son serias, y menos se van a hacer responsables si te pasa algo así.
+          </p>
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – Oye, ¿y a ti te tomó mucho tiempo empezar a ir al ginecólogo?
+          </p>
+        </div>
+      </div>
+    ),
+    (
+      <div>
+        <div className="space-y-6 text-foreground leading-relaxed">
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – ¡Uy sí hermana! Ojalá no hubiera sido así, pero yo empecé a ir solo cuando una infección me tumbó por varios días. ¿Ves que mi mamá siempre nos dice que es mejor ir al médico? De ahí lo aprendí: por hacerle caso a mi tía, yo también pensaba que era normal que mi period doliera. Me dijo que era por estar haciendo más ejercicio, y no fui al médico. Yo tenía como 19 años.
+          </p>
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – De algo me acuerdo.
+          </p>
+        </div>
+      </div>
+    ),
+    (
+      <div>
+        <div className="space-y-6 text-foreground leading-relaxed">
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – De ahí también aprendí que no es raro que a las mujeres se nos juzgue por querer saber más sobre su cuerpo y el sexo. Pero eso no es malo, más bien, la gente que tiene telarañas en la cabeza espera que no preguntemos y no conozcamos de esos temas. Es por eso que te quiero llevar con esta ginecóloga, aparte de que es bien linda, te deja hacer las preguntas que tú quieras, porque sabe que sentir confianza es bien importante para cuando una va a la consulta.
+          </p>
+        </div>
+      </div>
+    ),
+    (
+      <div>
+        <div className="space-y-6 text-foreground leading-relaxed">
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – Ahora sí ya quiero ir, pero entonces lo de Rosanna ¿por qué le habrá dolido tanto?
+          </p>
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – Pues no sé hermana, la verdad es que por lo que te contó, no la trataron bien, eso puede pasar, a mí me pasó. Por eso es súper importante que sepas que es normal que pase y que no es normal que pase en una consulta ginecológica, cómo debe comportarse el médico o la médica, y que tengan las condiciones adecuadas.
+          </p>
+        </div>
+      </div>
+    ),
+    (
+      <div>
+        <div className="space-y-6 text-foreground leading-relaxed">
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – Me imagino que a donde vamos está bien ¿verdad?
+          </p>
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – ¡Claro! pero igual te cuento después sobre qué debes esperar de una consulta ginecológica respetuosa y de calidad. Y ya vámonos porque mi mamá ya me llamó...
+          </p>
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – ¿Le digo de lo que pasó y de lo que platicamos?
+          </p>
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+            – Sí, no te preocupes, ella ya sabe también.
+          </p>
+        </div>
+      </div>
+    ),
+  ];
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -73,67 +162,65 @@ const Module1Closure = () => {
           ) : (
             <Card className="border-2 shadow-quirona">
               <CardContent className="p-8 md:p-12">
-                <div className="prose prose-lg max-w-none">
-                  <h1 className="text-3xl font-bold text-center mb-8 text-primary">
-                    Ximena y Sofía: Resolución
-                  </h1>
-                  <div className="space-y-6 text-foreground leading-relaxed">
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      –...y por eso hermanita, no es necesario que te hagan una revisión de tus partes íntimas en la primera consulta.
-                    </p>
-                    <p>
-                      Sofía se estira en su silla después de acabarse su helado doble de queso con zarzamora, y haber hablado de todo lo que ella se enteró después de mucho tiempo sobre cómo es una primera consulta ginecológica.
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – Eso sí, nunca olvides que lo más importante para la salud es prevenir, y eso empieza no solo con tus elecciones, sino también con la información que recibes.
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – ¡Ay hermana! jejejeje (risa) pues yo qué iba a saber si nunca de los nunca nos platican de esto en la escuela. Ayer me la pasé viendo en mi teléfono reels de "ChikChok" sobre remedios caseros para dolores menstruales, y no sé qué tantos tés y hierbas te recomiendan. Hasta vi uno de usar ajo para tratar las infecciones vaginales.
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – Aguas con eso Xime, esas publicaciones no son serias, y menos se van a hacer responsables si te pasa algo así.
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – Oye, ¿y a ti te tomó mucho tiempo empezar a ir al ginecólogo?
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – ¡Uy sí hermana! Ojalá no hubiera sido así, pero yo empecé a ir solo cuando una infección me tumbó por varios días. ¿Ves que mi mamá siempre nos dice que es mejor ir al médico? De ahí lo aprendí: por hacerle caso a mi tía, yo también pensaba que era normal que mi periodo doliera. Me dijo que era por estar haciendo más ejercicio, y no fui al médico. Yo tenía como 19 años.
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – De algo me acuerdo.
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – De ahí también aprendí que no es raro que a las mujeres se nos juzgue por querer saber más sobre su cuerpo y el sexo. Pero eso no es malo, más bien, la gente que tiene telarañas en la cabeza espera que no preguntemos y no conozcamos de esos temas. Es por eso que te quiero llevar con esta ginecóloga, aparte de que es bien linda, te deja hacer las preguntas que tú quieras, porque sabe que sentir confianza es bien importante para cuando una va a la consulta.
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – Ahora sí ya quiero ir, pero entonces lo de Rosanna ¿por qué le habrá dolido tanto?
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – Pues no sé hermana, la verdad es que por lo que te contó, no la trataron bien, eso puede pasar, a mí me pasó. Por eso es súper importante que sepas que es normal que pase y que no es normal que pase en una consulta ginecológica, cómo debe comportarse el médico o la médica, y que tengan las condiciones adecuadas.
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – Me imagino que a donde vamos está bien ¿verdad?
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – ¡Claro! pero igual te cuento después sobre qué debes esperar de una consulta ginecológica respetuosa y de calidad. Y ya vámonos porque mi mamá ya me llamó...
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – ¿Le digo de lo que pasó y de lo que platicamos?
-                    </p>
-                    <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-                      – Sí, no te preocupes, ella ya sabe también.
-                    </p>
+                {/* accessibility controls */}
+                <div className="mb-6">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <label htmlFor="font-size" className="text-sm">
+                      Tamaño de letra:
+                    </label>
+                    <select
+                      id="font-size"
+                      value={fontSizeClass}
+                      onChange={(e) => setFontSizeClass(e.target.value)}
+                      className="border rounded px-2 py-1 text-sm"
+                    >
+                      <option value="text-base">Normal</option>
+                      <option value="text-lg">Grande</option>
+                      <option value="text-xl">Muy grande</option>
+                    </select>
                   </div>
                 </div>
-                <div className="flex justify-center mt-10">
-                  <Button
-                    onClick={() => navigate("/dashboard")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
-                  >
-                    Finalizar módulo
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Button>
+                <div className={`prose prose-lg max-w-none ${fontSizeClass}`}>
+                  <div key={page} className="transition-transform duration-300">
+                    {storyPages[page]}
+                  </div>
+
+                  <div className="flex items-center justify-between mt-8">
+                    <div className="flex items-center">
+                      <Button
+                        onClick={() => setPage((p) => Math.max(0, p - 1))}
+                        disabled={page === 0}
+                        className="mr-3"
+                      >
+                        Anterior
+                      </Button>
+
+                      <Button
+                        onClick={() => setPage((p) => Math.min(p + 1, storyPages.length - 1))}
+                        disabled={page === storyPages.length - 1}
+                      >
+                        Siguiente
+                      </Button>
+                    </div>
+
+                    <div className="text-sm text-muted-foreground">
+                      Página {page + 1} / {storyPages.length}
+                    </div>
+                  </div>
                 </div>
+
+                {/* show finish button only on last page */}
+                {page === storyPages.length - 1 && (
+                  <div className="flex justify-center mt-10">
+                    <Button
+                      onClick={() => navigate("/dashboard")}
+                      className="gradient-primary text-white px-8 py-6 text-lg"
+                    >
+                      Finalizar módulo
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
