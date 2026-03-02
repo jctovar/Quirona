@@ -43,33 +43,39 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
       
       {/* Contenedor principal del header */}
       <div className="bg-background border-b border-border">
-        {/* Fila superior: email y redes sociales */}
-        <div className="container mx-auto px-4 py-2 flex items-center justify-between border-b border-border/50">
-          <div className="flex items-center gap-2 text-primary">
-            <Mail className="w-4 h-4" />
-            <a href="mailto:quirona@iztacala.unam.mx" className="text-lg font-medium hover:underline">
-              quirona@iztacala.unam.mx
-            </a>
+        {/* Fila superior: email y redes sociales (oculta cuando hay sesión) */}
+        {!isAuthenticated && (
+          <div className="container mx-auto px-4 py-2 flex items-center justify-between border-b border-border/50">
+            <div className="flex items-center gap-2 text-primary">
+              <Mail className="w-4 h-4" />
+              <a href="mailto:quirona@iztacala.unam.mx" className="text-lg font-medium hover:underline">
+                quirona@iztacala.unam.mx
+              </a>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-semibold text-primary mr-2">SÍGUENOS</span>
+              <a href="#" className="text-primary hover:opacity-80 transition-all">
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a href="#" className="text-primary hover:opacity-80 transition-all">
+                <Instagram className="w-5 h-5" />
+              </a>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-semibold text-primary mr-2">SÍGUENOS</span>
-            <a href="#" className="text-primary hover:opacity-80 transition-all">
-              <Facebook className="w-5 h-5" />
-            </a>
-            <a href="#" className="text-primary hover:opacity-80 transition-all">
-              <Instagram className="w-5 h-5" />
-            </a>
-          </div>
-        </div>
+        )}
 
         {/* Línea decorativa primary */}
         <div className="h-0.5 bg-primary"></div>
 
         {/* Fila principal: logo y navegación */}
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className={`container mx-auto px-4 ${isAuthenticated ? "py-2" : "py-4"} flex items-center justify-between`}>
           {/* Logo grande */}
           <Link to="/" className="flex-shrink-0">
-            <img src={logo} alt="Quirona Logo" className="h-56 md:h-90 w-90" />
+            <img
+              src={logo}
+              alt="Quirona Logo"
+              className={isAuthenticated ? "h-24 md:h-40 w-40" : "h-56 md:h-90 w-90"}
+            />
           </Link>
 
           {/* Menú Desktop */}

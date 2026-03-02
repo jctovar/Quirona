@@ -9,6 +9,9 @@ const Module1Story = () => {
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
 
+  // user preferences for accessibility
+  const [fontSizeClass, setFontSizeClass] = useState("text-base");
+
   const pages = [
     (
       <div>
@@ -167,14 +170,34 @@ const Module1Story = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
+      <Navbar isAuthenticated />
 
       <div className="pt-96 pb-16 px-4">
-        <div className="container mx-auto max-w-3xl">
+        <div className="container mx-auto max-w-full">
           <Card className="border-2 shadow-quirona">
             <CardContent className="p-8 md:p-12">
+              {/* accessibility controls */}
+              {!showQuestions && (
+                <div className="mb-6">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <label htmlFor="font-size" className="text-sm">
+                      Tamaño de letra:
+                    </label>
+                    <select
+                      id="font-size"
+                      value={fontSizeClass}
+                      onChange={(e) => setFontSizeClass(e.target.value)}
+                      className="border rounded px-2 py-1 text-sm"
+                    >
+                      <option value="text-base">Normal</option>
+                      <option value="text-lg">Grande</option>
+                      <option value="text-xl">Muy grande</option>
+                    </select>
+                  </div>
+                </div>
+              )}
               {!showQuestions ? (
-                <div className="prose prose-lg max-w-none">
+                <div className={`prose prose-lg max-w-none ${fontSizeClass}`}>
                   <div key={page} className="transition-transform duration-300">
                     {pages[page]}
                   </div>
@@ -203,7 +226,7 @@ const Module1Story = () => {
                   </div>
                 </div>
               ) : (
-                <div className="text-center space-y-8">
+                <div className={`text-center space-y-8 ${fontSizeClass}`}>
                   <h2 className="text-2xl font-bold text-primary">
                     Preguntas reflexivas:
                   </h2>
@@ -218,12 +241,15 @@ const Module1Story = () => {
                 </div>
               )}
 
-              <div className="flex justify-center mt-10">
-                <Button onClick={handleContinue} className="gradient-primary text-white px-8 py-6 text-lg">
-                  {showQuestions ? "Continuar a la siguiente sección" : page === pages.length - 1 ? "Ver preguntas" : "Continuar"}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </div>
+              {/* show continue button only on last page or when questions visible */}
+              {(!showQuestions && page === pages.length - 1) || showQuestions ? (
+                <div className="flex justify-center mt-10">
+                  <Button onClick={handleContinue} className="gradient-primary text-white px-8 py-6 text-lg">
+                    {showQuestions ? "Continuar a la siguiente sección" : "Ver preguntas"}
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </div>
+              ) : null}
             </CardContent>
           </Card>
         </div>

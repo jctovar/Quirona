@@ -47,9 +47,9 @@ const Module1Visit = () => {
   const [known, setKnown] = useState<Record<number, boolean>>({});
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
+      <Navbar isAuthenticated />
       <div className="pt-96 pb-16 px-4">
-        <div className="container mx-auto max-w-3xl space-y-12">
+        <div className="container mx-auto max-w-full">
           {/* Intro */}
           <ScrollReveal>
             <Card className="border-2 shadow-quirona">
