@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { TestMenu } from "@/components/TestMenu";
+import { markTestCompleted } from "@/lib/testProgress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -102,6 +104,7 @@ const ScaleItem = ({ number, text, value, onChange }: ScaleItemProps) => (
 );
 const AssertivenessScaleTest = () => {
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(true);
   const [phase, setPhase] = useState<Phase>("intro");
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const updateAnswer = (globalIndex: number, value: number) => {
@@ -116,17 +119,28 @@ const AssertivenessScaleTest = () => {
       return;
     }
     console.log("Assertiveness Scale Results:", answers);
-    toast.success("¡Escala completada exitosamente!");
+    markTestCompleted("assertiveness");
+    toast.success("¡Escala completada exitosamente! Vuelve al menú para el siguiente test.");
     setPhase("complete");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const handleNext = () => {
-    navigate("/adverse-experiences");
+    setShowMenu(true);
+    setPhase("intro");
   };
   let globalIndex = 0;
+  if (showMenu) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+        <Navbar isAuthenticated />
+        <TestMenu currentTest="assertiveness" onStart={() => setShowMenu(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
+      <Navbar isAuthenticated />
       <main className="container mx-auto pt-96 pb-8 px-4">
         <Card className="max-w-3xl mx-auto">
           <CardHeader className="text-center">
@@ -248,6 +262,13 @@ const AssertivenessScaleTest = () => {
                   size="lg"
                 >
                   Continuar al siguiente cuestionario
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setShowMenu(true)}
+                >
+                  Regresar al menú de test
                 </Button>
               </div>
             )}

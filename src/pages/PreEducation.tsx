@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
+import { TestMenu } from "@/components/TestMenu";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -6,10 +8,20 @@ import { BookOpen, PlayCircle } from "lucide-react";
 
 const PreEducation = () => {
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(true);
+
+  if (showMenu) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+        <Navbar isAuthenticated />
+        <TestMenu onStart={() => setShowMenu(false)} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
+      <Navbar isAuthenticated />
       
       <div className="pt-96 pb-16 px-4">
         <div className="container mx-auto max-w-3xl">

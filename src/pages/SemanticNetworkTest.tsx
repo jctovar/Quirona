@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { TestMenu } from "@/components/TestMenu";
+import { markTestCompleted } from "@/lib/testProgress";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -85,6 +87,7 @@ const DraggableList = ({ items, onReorder, stimulusWord }: DraggableListProps) =
 
 const SemanticNetworkTest = () => {
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(true);
   const [phase, setPhase] = useState<Phase>("training-intro");
   
   // Training state
@@ -155,8 +158,12 @@ const SemanticNetworkTest = () => {
       exercise1: exercise1Ranked,
       exercise2: exercise2Ranked
     });
-    toast.success("¡Cuestionario completado exitosamente!");
-    setTimeout(() => navigate("/anxiety-inventory"), 1500);
+    markTestCompleted("semantic-network");
+    toast.success("¡Cuestionario completado exitosamente! Vuelve al menú para continuar.");
+    setTimeout(() => {
+      setShowMenu(true);
+      setPhase("training-intro");
+    }, 500);
   };
 
   const formatWordsList = (words: string[]) => {
@@ -166,9 +173,18 @@ const SemanticNetworkTest = () => {
     return words.slice(0, -1).join(", ") + " y " + words[words.length - 1];
   };
 
+  if (showMenu) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+        <Navbar isAuthenticated />
+        <TestMenu currentTest="semantic-network" onStart={() => setShowMenu(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
+      <Navbar isAuthenticated />
       
       <main className="container mx-auto pt-96 pb-8 px-4">
         <Card className="max-w-3xl mx-auto">

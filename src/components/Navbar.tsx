@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { Button } from "./ui/button";
 import { User, Menu, Mail, Facebook, Instagram } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,10 +24,18 @@ interface NavbarProps {
 export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarProps) => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+  const [auth, setAuth] = useState(isAuthenticated);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      const saved = localStorage.getItem("isAuthenticated");
+      setAuth(saved === "true");
+    }
+  }, [isAuthenticated]);
+
   const isActive = (path: string) => location.pathname === path;
 
-  const menuItems = !isAuthenticated ? [
+  const menuItems = !auth ? [
     { to: "/quienes-somos", label: "¿Quiénes somos?" },
     { to: "/contenidos", label: "Contenidos" },
     { to: "/preguntas", label: "Preguntas frecuentes" },
@@ -117,7 +125,14 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
                   <DropdownMenuItem asChild>
                     <Link to="/profile">Configuración</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={onLogout} className="text-destructive">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      localStorage.removeItem("isAuthenticated");
+                      setAuth(false);
+                      onLogout?.();
+                    }}
+                    className="text-destructive"
+                  >
                     Cerrar sesión
                   </DropdownMenuItem>
                 </DropdownMenuContent>

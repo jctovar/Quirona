@@ -1,11 +1,14 @@
 import { Navbar } from "@/components/Navbar";
+import { TestMenu } from "@/components/TestMenu";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2, XCircle } from "lucide-react";
 
 const InitialQuestion = () => {
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(true);
 
   const handleAnswer = (hasExperience: boolean) => {
     if (hasExperience) {
@@ -15,9 +18,17 @@ const InitialQuestion = () => {
     }
   };
 
+  if (showMenu) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+        <Navbar isAuthenticated />
+        <TestMenu onStart={() => setShowMenu(false)} />
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
+      <Navbar isAuthenticated />
       
       <div className="pt-96 pb-16 px-4">
         <div className="container mx-auto max-w-2xl">

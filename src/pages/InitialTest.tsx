@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
+import { TestMenu } from "@/components/TestMenu";
+import { markTestCompleted } from "@/lib/testProgress";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -40,6 +42,7 @@ interface AnswersState {
 
 const InitialTest = () => {
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(true);
   // 2. Inicialización del estado con valores predeterminados (incluyendo todos los campos)
   const [answers, setAnswers] = useState<AnswersState>({
     edad: [18], // Inicializado como array de números para el Slider
@@ -86,13 +89,23 @@ const InitialTest = () => {
     console.log("Respuestas del test:", answers);
     // Nota: Aquí podrías añadir una validación para asegurar que todos los campos requeridos tengan valor.
 
-    toast.success("Test completado. ¡Pasemos al siguiente cuestionario!");
-    setTimeout(() => navigate("/semantic-network-test"), 1500);
+    markTestCompleted("initial-test");
+    toast.success("Test completado. Vuelve al menú para seguir con el siguiente cuestionario.");
+    setShowMenu(true);
   };
+
+  if (showMenu) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+        <Navbar isAuthenticated />
+        <TestMenu currentTest="initial-test" onStart={() => setShowMenu(false)} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
+      <Navbar isAuthenticated />
       
       <div className="pt-96 pb-16 px-4">
         <div className="container mx-auto max-w-3xl">
@@ -461,6 +474,15 @@ const InitialTest = () => {
                   </Button>
                 </div>
               </form>
+              <div className="mt-4">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setShowMenu(true)}
+                >
+                  Regresar al menú de test
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

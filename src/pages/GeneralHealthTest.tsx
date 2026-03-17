@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { TestMenu } from "@/components/TestMenu";
+import { markTestCompleted } from "@/lib/testProgress";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -53,6 +55,7 @@ const miniQuestions = [
 ];
 const GeneralHealthTest = () => {
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(true);
   const [phase, setPhase] = useState<Phase>("intro");
   const [ghqAnswers, setGhqAnswers] = useState<Record<number, string>>({});
   const [miniAnswers, setMiniAnswers] = useState<Record<number, string>>({});
@@ -81,13 +84,23 @@ const GeneralHealthTest = () => {
     }
     console.log("GHQ-30 Results:", ghqAnswers);
     console.log("MINI Results:", miniAnswers);
-    toast.success("¡Cuestionario completado exitosamente!");
+    markTestCompleted("general-health");
+    toast.success("¡Cuestionario completado exitosamente! Vuelve al menú para el siguiente test.");
     setPhase("complete");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  if (showMenu) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+        <Navbar isAuthenticated />
+        <TestMenu currentTest="general-health" onStart={() => setShowMenu(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
+      <Navbar isAuthenticated />
       <main className="container mx-auto pt-96 pb-8 px-4">
         <Card className="max-w-3xl mx-auto">
           <CardHeader className="text-center">
@@ -198,6 +211,13 @@ const GeneralHealthTest = () => {
                 </p>
                 <Button onClick={() => navigate("/dashboard")} className="w-full gradient-primary" size="lg">
                   Continuar al panel principal
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setShowMenu(true)}
+                >
+                  Regresar al menú de test
                 </Button>
               </div>
             )}

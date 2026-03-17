@@ -28,6 +28,7 @@ import Module1Visit from "./pages/Module1Visit";
 import Module1Game from "./pages/Module1Game";
 import Module1Feedback from "./pages/Module1Feedback";
 import Module1Closure from "./pages/Module1Closure";
+import Module2Story from "./pages/Module2Story";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -63,6 +64,7 @@ const App = () => (
           <Route path="/module-1-game" element={<Module1Game />} />
           <Route path="/module-1-feedback" element={<Module1Feedback />} />
           <Route path="/module-1-closure" element={<Module1Closure />} />
+          <Route path="/module-2" element={<Module2Story />} />
           <Route path="/profile" element={<Profile />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -31,6 +31,7 @@ const Login = () => {
     // --- SIMULACIÓN DE INICIO DE SESIÓN EXITOSO (SIN BACKEND) ---
 
     // 2. Simulación de éxito
+    localStorage.setItem("isAuthenticated", "true");
     toast.success("¡Bienvenida a QUIRONA! (Simulación de éxito)");
     
     // 3. Redirección

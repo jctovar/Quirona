@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { TestMenu } from "@/components/TestMenu";
+import { markTestCompleted } from "@/lib/testProgress";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -90,6 +92,7 @@ const QuestionItem = ({ number, text, options, value, onChange }: QuestionItemPr
 );
 const AnxietyInventoryTest = () => {
   const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(true);
   const [phase, setPhase] = useState<Phase>("state-intro");
   const [stateAnswers, setStateAnswers] = useState<Record<number, string>>({});
   const [traitAnswers, setTraitAnswers] = useState<Record<number, string>>({});
@@ -115,16 +118,27 @@ const AnxietyInventoryTest = () => {
       return;
     }
     console.log("Anxiety Inventory Results:", { stateAnswers, traitAnswers });
-    toast.success("¡Inventario completado exitosamente!");
+    markTestCompleted("anxiety");
+    toast.success("¡Inventario completado exitosamente! Vuelve al menú para el siguiente test.");
     setPhase("complete");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const handleNext = () => {
-    navigate("/assertiveness-scale");
+    setShowMenu(true);
+    setPhase("state-intro");
   };
+  if (showMenu) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+        <Navbar isAuthenticated />
+        <TestMenu currentTest="anxiety" onStart={() => setShowMenu(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar />
+      <Navbar isAuthenticated />
       <main className="container mx-auto pt-96 pb-8 px-4">
         <Card className="max-w-3xl mx-auto">
           <CardHeader className="text-center">
@@ -266,6 +280,13 @@ const AnxietyInventoryTest = () => {
                   size="lg"
                 >
                   Pasar al siguiente test
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setShowMenu(true)}
+                >
+                  Regresar al menú de test
                 </Button>
               </div>
             )}

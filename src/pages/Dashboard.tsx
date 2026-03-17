@@ -15,10 +15,12 @@ const Dashboard = () => {
   };
 
   const handleModuleClick = (moduleName: string, moduleIndex: number) => {
-    if(moduleIndex === 0) {
+    if (moduleIndex === 0) {
       navigate("/module-1");
+    } else if (moduleIndex === 1) {
+      navigate("/module-2");
     } else {
-    toast.info(`Módulo: ${moduleName} (próximamente disponible)`);
+      toast.info(`Módulo: ${moduleName} (próximamente disponible)`);
     }
   };
 
@@ -30,8 +32,9 @@ const Dashboard = () => {
       icon: BookOpen,
     },
     {
-      title: "Estándares de atención",
+      title: "Estándares de atención en consulta ginecológica",
       description: "Conoce qué esperar de una consulta ginecológica de calidad, respetuosa y centrada en tus necesidades.",
+      author: "Aline Gonzalez Castro",
       icon: Shield,
     },
     {
