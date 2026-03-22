@@ -99,7 +99,7 @@ export const TestMenu = ({ currentTest, onStart }: TestMenuProps) => {
                   ¡Todo listo! Ir a los módulos
                 </Button>
                 {!allCompleted && (
-                  <p className="text-xs text-muted-foreground text-center">Completa todos los tests para desbloquear el acceso al dashboard.</p>
+                  <p className="text-xs text-muted-foreground text-center">Completa todos los tests para desbloquear el acceso a los módulos.</p>
                 )}
               </div>
             </CardContent>

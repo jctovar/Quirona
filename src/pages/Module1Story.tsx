@@ -173,7 +173,7 @@ const Module1Story = () => {
       <Navbar isAuthenticated />
 
       <div className="pt-96 pb-16 px-4">
-        <div className="container mx-auto max-w-full">
+        <div className="container mx-auto max-w-3x2">
           <Card className="border-2 shadow-quirona">
             <CardContent className="p-8 md:p-12">
               {/* accessibility controls */}
