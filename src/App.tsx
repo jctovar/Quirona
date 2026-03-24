@@ -44,6 +44,13 @@ import Module3Representation from "./pages/Module3Representation";
 import Module3Game from "./pages/Module3Game";
 import Module3Feedback from "./pages/Module3Feedback";
 import Module3Closure from "./pages/Module3Closure";
+import Module4Story from "./pages/Module4Story";
+import Module4Introduction from "./pages/Module4Introduction";
+import Module4Quiz from "./pages/Module4Quiz";
+import Module4Visit from "./pages/Module4Visit";
+import Module4Game from "./pages/Module4Game";
+import Module4Feedback from "./pages/Module4Feedback";
+import Module4Closure from "./pages/Module4Closure";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -94,6 +101,13 @@ const App = () => (
           <Route path="/module-3-game" element={<Module3Game />} />
           <Route path="/module-3-feedback" element={<Module3Feedback />} />
           <Route path="/module-3-closure" element={<Module3Closure />} />
+          <Route path="/module-4" element={<Module4Story />} />
+          <Route path="/module-4-intro" element={<Module4Introduction />} />
+          <Route path="/module-4-quiz" element={<Module4Quiz />} />
+          <Route path="/module-4-visit" element={<Module4Visit />} />
+          <Route path="/module-4-game" element={<Module4Game />} />
+          <Route path="/module-4-feedback" element={<Module4Feedback />} />
+          <Route path="/module-4-closure" element={<Module4Closure />} />
           <Route path="/profile" element={<Profile />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

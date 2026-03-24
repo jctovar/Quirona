@@ -21,7 +21,9 @@ const Dashboard = () => {
       navigate("/module-2");
     }else if (moduleIndex === 2) {
       navigate("/module-3");
-    } else {
+    } else if (moduleIndex === 3) {
+      navigate("/module-4");
+    }else {
       toast.info(`Módulo: ${moduleName} (próximamente disponible)`);
     }
   };
@@ -46,8 +48,9 @@ const Dashboard = () => {
       icon: Heart,
     },
     {
-      title: "Respuestas ante la violencia ginecológica",
+      title: "Responder a la violencia ginecológica",
       description: "Descubre los recursos y acciones que puedes tomar si experimentas violencia ginecológica.",
+      author: "Alfonso Mendoza",
       icon: Users,
     },
   ];
@@ -60,7 +63,7 @@ const Dashboard = () => {
         onLogout={handleLogout}
       />
       
-      <div className="pt-96 pb-16 px-4">
+      <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto">
           {/* Hero section */}
           <div className="text-center mb-12">
