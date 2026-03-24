@@ -40,7 +40,7 @@ const Module2Visit = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
-      <div className="pt-96 pb-16 px-4">
+      <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           {/* Intro */}
           <ScrollReveal>

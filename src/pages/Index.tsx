@@ -66,7 +66,7 @@ const Index = () => {
       <Navbar />
       
       {/* Carrusel de actualizaciones - debajo del header */}
-      <section className="pt-96 md:pt-[26rem] pb-8 px-4 bg-muted/30">
+      <section className="pt-48 md:pt-[26rem] pb-8 px-4 bg-muted/30">
         <div className="container mx-auto">
           <Carousel
             opts={{

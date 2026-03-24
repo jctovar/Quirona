@@ -19,6 +19,8 @@ const Dashboard = () => {
       navigate("/module-1");
     } else if (moduleIndex === 1) {
       navigate("/module-2");
+    }else if (moduleIndex === 2) {
+      navigate("/module-3");
     } else {
       toast.info(`Módulo: ${moduleName} (próximamente disponible)`);
     }
@@ -38,8 +40,9 @@ const Dashboard = () => {
       icon: Shield,
     },
     {
-      title: "Violencia ginecológica",
+      title: "¿Qué es la violencia ginecológica?",
       description: "Identifica situaciones de violencia ginecológica y aprende a reconocer tus derechos como paciente.",
+      author:"Javier Darío Ríos Castillo",
       icon: Heart,
     },
     {
