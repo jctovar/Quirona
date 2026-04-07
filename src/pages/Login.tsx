@@ -6,11 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { supabase } from "@/supabaseClient"; // 1. Importamos la conexión
 
 const Login = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // Estado para deshabilitar el botón mientras carga
   const [formData, setFormData] = useState({
-    username: "",
+    username: "", // Usaremos este campo como el email
     password: "",
   });
 
@@ -18,24 +20,43 @@ const Login = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // Función modificada: Ahora es sincrónica y solo simula el éxito.
-  const handleSubmit = (e: React.FormEvent) => {
+  // 2. Función convertida a ASYNC para esperar la respuesta de Supabase
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 1. Validación de Frontend
+    // Validación de Frontend
     if (!formData.username || !formData.password) {
       toast.error("Por favor ingresa tu correo y contraseña.");
       return;
     }
 
-    // --- SIMULACIÓN DE INICIO DE SESIÓN EXITOSO (SIN BACKEND) ---
+    setLoading(true);
 
-    // 2. Simulación de éxito
-    localStorage.setItem("isAuthenticated", "true");
-    toast.success("¡Bienvenida a QUIRONA! (Simulación de éxito)");
-    
-    // 3. Redirección
-    setTimeout(() => navigate("/initial-question"), 1000);
+    // 3. LLAMADA REAL A SUPABASE
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: formData.username, // Pasamos el 'username' del estado como email
+      password: formData.password,
+    });
+
+    if (error) {
+      // Manejo de errores comunes
+      if (error.message === "Email not confirmed") {
+        toast.error("Por favor, confirma tu correo electrónico para poder entrar.");
+      } else if (error.message === "Invalid login credentials") {
+        toast.error("El correo o la contraseña son incorrectos.");
+      } else {
+        toast.error(error.message);
+      }
+      setLoading(false);
+      return;
+    }
+
+    // 4. Si llegamos aquí, el inicio de sesión fue exitoso
+    if (data.user) {
+      toast.success("¡Bienvenida de nuevo a QUIRONA!");
+      // Quitamos el localStorage manual, Supabase gestiona la sesión por nosotros
+      setTimeout(() => navigate("/initial-question"), 1000);
+    }
   };
 
   return (
@@ -58,7 +79,7 @@ const Login = () => {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="username">Usuario</Label>
+                  <Label htmlFor="username">Correo electrónico</Label>
                   <Input
                     id="username"
                     type="email"
@@ -87,8 +108,12 @@ const Login = () => {
                   </Link>
                 </div>
 
-                <Button type="submit" className="w-full h-11 gradient-primary transition-quirona hover:opacity-90">
-                  Iniciar sesión
+                <Button 
+                  type="submit" 
+                  disabled={loading} // Evita múltiples clics
+                  className="w-full h-11 gradient-primary transition-quirona hover:opacity-90"
+                >
+                  {loading ? "Verificando..." : "Iniciar sesión"}
                 </Button>
 
                 <div className="text-center text-sm text-muted-foreground">

@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { PlayCircle, Heart, Stethoscope, Users, HandHeart } from "lucide-react";
 import bienvenidaVideo from "@/assets/bienvenidaQuirona.mp4";
 import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/supabaseClient"; // supabase
 import {
   Dialog,
   DialogContent,
@@ -82,24 +83,40 @@ const Register = () => {
     toast.success("¡Excelente! Ahora completa tu registro");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!acceptedPrivacy) {
-      toast.error("Debes aceptar el aviso de privacidad para continuar");
+      toast.error("Debes aceptar el aviso de privacidad");
       return;
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       toast.error("Las contraseñas no coinciden");
       return;
     }
-    
-    console.log("Datos de registro listos:", formData);
-    
-    toast.success("¡Registro exitoso! Redirigiendo a la verificación de email. (Simulación)");
-    
-    setTimeout(() => navigate("/Login"), 1500); 
+
+    // ENVIAMOS TODO EN UN SOLO PASO
+    const { data, error } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: {
+        // Estos datos viajan "escondidos" y el Trigger los atrapa
+        data: {
+          username: formData.username,
+          nationality: formData.nationality,
+          tutorEmail1: formData.tutorEmail1,
+          tutorEmail2: formData.tutorEmail2,
+        }
+      }
+    });
+
+    if (error) {
+      toast.error("Error: " + error.message);
+    } else {
+      toast.success("¡Registro iniciado! Revisa tu correo para confirmar tu cuenta.");
+      setTimeout(() => navigate("/Login"), 3000);
+    }
   };
 
   const handleAcceptPrivacy = () => {

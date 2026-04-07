@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
+import { supabase } from "@/supabaseClient";
+
 type Phase = "intro" | "questions" | "complete";
 interface Section {
   header: string;
@@ -107,27 +109,58 @@ const AssertivenessScaleTest = () => {
   const [showMenu, setShowMenu] = useState(true);
   const [phase, setPhase] = useState<Phase>("intro");
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [isSaving, setIsSaving] = useState(false);
   const updateAnswer = (globalIndex: number, value: number) => {
     setAnswers((prev) => ({ ...prev, [globalIndex]: value }));
   };
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const answeredCount = Object.keys(answers).length;
+    
+    // Validación obligatoria: totalItems es 21
     if (answeredCount < totalItems) {
       toast.error(
         `Por favor responde todas las preguntas. Faltan ${totalItems - answeredCount} por contestar.`
       );
       return;
     }
-    console.log("Assertiveness Scale Results:", answers);
-    markTestCompleted("assertiveness");
-    toast.success("¡Escala completada exitosamente! Vuelve al menú para el siguiente test.");
-    setPhase("complete");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    setIsSaving(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No se encontró sesión activa");
+
+      // Convertimos el objeto Record<number, number> en un arreglo ordenado [ans1, ans2, ... ans21]
+      const answersArray = Array.from({ length: totalItems }, (_, i) => answers[i]);
+
+      const { error } = await supabase
+        .from('assertiveness_scale_responses')
+        .upsert({
+          id: user.id,
+          answers: answersArray,
+          is_completed: true,
+          updated_at: new Date()
+        });
+
+      if (error) throw error;
+
+      toast.success("¡Escala guardada con éxito!");
+      markTestCompleted("assertiveness");
+      setPhase("complete");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (error: any) {
+      toast.error("Error al guardar: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
+
   const handleNext = () => {
-    setShowMenu(true);
-    setPhase("intro");
+    // Redirigimos a la pantalla de inicio de tests (donde está el menú)
+    navigate("/initial-question");
   };
+  
   let globalIndex = 0;
   if (showMenu) {
     return (

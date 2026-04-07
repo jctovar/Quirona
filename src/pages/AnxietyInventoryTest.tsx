@@ -8,6 +8,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
+import { supabase } from "@/supabaseClient";
+
 type Phase = "state-intro" | "state-questions" | "trait-intro" | "trait-questions" | "complete";
 const stateQuestions = [
   "Me siento calmada.",
@@ -96,6 +98,8 @@ const AnxietyInventoryTest = () => {
   const [phase, setPhase] = useState<Phase>("state-intro");
   const [stateAnswers, setStateAnswers] = useState<Record<number, string>>({});
   const [traitAnswers, setTraitAnswers] = useState<Record<number, string>>({});
+  const [isSaving, setIsSaving] = useState(false);
+
   const updateStateAnswer = (index: number, value: string) => {
     setStateAnswers((prev) => ({ ...prev, [index]: value }));
   };
@@ -111,22 +115,53 @@ const AnxietyInventoryTest = () => {
     setPhase("trait-intro");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const handleTraitSubmit = () => {
+
+  // --- FUNCIÓN FINAL CON SUPABASE ---
+  const handleTraitSubmit = async () => {
     const unanswered = traitQuestions.filter((_, i) => !traitAnswers[i]);
     if (unanswered.length > 0) {
       toast.error(`Por favor responde todas las preguntas. Faltan ${unanswered.length} por contestar.`);
       return;
     }
-    console.log("Anxiety Inventory Results:", { stateAnswers, traitAnswers });
-    markTestCompleted("anxiety");
-    toast.success("¡Inventario completado exitosamente! Vuelve al menú para el siguiente test.");
-    setPhase("complete");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No se encontró sesión activa");
+
+      // Convertimos los objetos de respuestas en arreglos ordenados de números
+      const stateArray = stateQuestions.map((_, i) => parseInt(stateAnswers[i]));
+      const traitArray = traitQuestions.map((_, i) => parseInt(traitAnswers[i]));
+
+      const { error } = await supabase
+        .from('anxiety_inventory_responses')
+        .upsert({
+          id: user.id,
+          state_answers: stateArray,
+          trait_answers: traitArray,
+          is_completed: true,
+          updated_at: new Date()
+        });
+
+      if (error) throw error;
+
+      toast.success("¡Inventario guardado con éxito!");
+      markTestCompleted("anxiety");
+      setPhase("complete");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (error: any) {
+      toast.error("Error al guardar: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
-  const handleNext = () => {
-    setShowMenu(true);
-    setPhase("state-intro");
+
+  // Redirigir a la pantalla de menú de tests como en los anteriores
+  const handleFinalNext = () => {
+    navigate("/initial-question");
   };
+
   if (showMenu) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -134,6 +169,10 @@ const AnxietyInventoryTest = () => {
         <TestMenu currentTest="anxiety" onStart={() => setShowMenu(false)} />
       </div>
     );
+  }
+
+  function handleNext(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    throw new Error("Function not implemented.");
   }
 
   return (

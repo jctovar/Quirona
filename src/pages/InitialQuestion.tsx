@@ -5,16 +5,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { supabase } from "@/supabaseClient"; 
+import { toast } from "sonner"; 
 
 const InitialQuestion = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false); // Estado para el bloqueo
 
-  const handleAnswer = (hasExperience: boolean) => {
-    if (hasExperience) {
-      navigate("/initial-test");
-    } else {
-      navigate("/pre-education");
+  const handleAnswer = async (hasExperience: boolean) => {
+    setIsUpdating(true); // Empezamos a cargar
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({ has_experience: hasExperience })
+          .eq('id', user.id);
+
+        if (error) throw error;
+      }
+
+      if (hasExperience) {
+        navigate("/initial-test");
+      } else {
+        navigate("/pre-education");
+      }
+    } catch (error: any) {
+      toast.error("Error al guardar: " + error.message);
+    } finally {
+      setIsUpdating(false); // Terminamos de cargar (pase lo que pase)
     }
   };
 
@@ -26,6 +48,7 @@ const InitialQuestion = () => {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -48,14 +71,13 @@ const InitialQuestion = () => {
                 <p className="text-xl font-semibold mb-2">
                   ¿Has tenido alguna experiencia con una consulta ginecológica?
                 </p>
-                <p className="text-muted-foreground">
-                  Tu respuesta nos ayudará a ofrecerte el contenido más adecuado para ti
-                </p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
+                {/* BOTÓN SÍ: Aquí agregamos el disabled */}
                 <Button
                   onClick={() => handleAnswer(true)}
+                  disabled={isUpdating} 
                   variant="outline"
                   className="h-auto py-8 flex-col gap-4 hover:border-primary hover:bg-primary/5 transition-quirona"
                   size="lg"
@@ -64,13 +86,15 @@ const InitialQuestion = () => {
                   <div>
                     <div className="font-bold text-lg">Sí, he tenido</div>
                     <div className="text-sm text-muted-foreground font-normal">
-                      Comenzar con evaluación inicial
+                      {isUpdating ? "Guardando..." : "Comenzar con evaluación inicial"}
                     </div>
                   </div>
                 </Button>
 
+                {/* BOTÓN NO: Aquí también */}
                 <Button
                   onClick={() => handleAnswer(false)}
+                  disabled={isUpdating}
                   variant="outline"
                   className="h-auto py-8 flex-col gap-4 hover:border-secondary hover:bg-secondary/5 transition-quirona"
                   size="lg"
@@ -79,15 +103,11 @@ const InitialQuestion = () => {
                   <div>
                     <div className="font-bold text-lg">No, aún no</div>
                     <div className="text-sm text-muted-foreground font-normal">
-                      Ver contenido preparatorio
+                      {isUpdating ? "Guardando..." : "Ver contenido preparatorio"}
                     </div>
                   </div>
                 </Button>
               </div>
-
-              <p className="text-sm text-center text-muted-foreground">
-                No hay respuestas correctas o incorrectas, ambas opciones son válidas
-              </p>
             </CardContent>
           </Card>
         </div>

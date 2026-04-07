@@ -8,6 +8,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
+import { supabase } from "@/supabaseClient";
+
 type Phase = "intro" | "questions" | "complete";
 const questions = [
   "¿Alguno de tus padres u otros adultos en su casa te ofendían, te insultaban, te menospreciaban o te humillaban con frecuencia, o actuaban de tal forma que tenías miedo de que te fueran a lastimar físicamente?",
@@ -26,25 +28,56 @@ const AdverseExperiencesTest = () => {
   const [showMenu, setShowMenu] = useState(true);
   const [phase, setPhase] = useState<Phase>("intro");
   const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [isSaving, setIsSaving] = useState(false);
+
   const updateAnswer = (index: number, value: string) => {
     setAnswers((prev) => ({ ...prev, [index]: value }));
   };
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const unanswered = questions.filter((_, i) => !answers[i]);
+    
     if (unanswered.length > 0) {
       toast.error(`Por favor responde todas las preguntas. Faltan ${unanswered.length} por contestar.`);
       return;
     }
-    console.log("Adverse Experiences Results:", answers);
-    markTestCompleted("adverse-experiences");
-    toast.success("¡Cuestionario completado exitosamente! Vuelve al menú para el siguiente test.");
-    setPhase("complete");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    setIsSaving(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No se encontró sesión activa.");
+
+      // Convertimos el objeto de respuestas en un arreglo [ "si", "no", ... ]
+      const answersArray = questions.map((_, i) => answers[i]);
+
+      const { error } = await supabase
+        .from('adverse_experiences_responses')
+        .upsert({
+          id: user.id,
+          answers: answersArray,
+          is_completed: true,
+          updated_at: new Date()
+        });
+
+      if (error) throw error;
+
+      toast.success("¡Cuestionario guardado con éxito!");
+      markTestCompleted("adverse-experiences");
+      setPhase("complete");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (error: any) {
+      toast.error("Error al guardar: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
+
   const handleNext = () => {
-    setShowMenu(true);
-    setPhase("intro");
+    // Redirección obligatoria al menú principal de tests
+    navigate("/initial-question");
   };
+
   if (showMenu) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -119,10 +152,11 @@ const AdverseExperiencesTest = () => {
                 ))}
                 <Button
                   onClick={handleSubmit}
+                  disabled={isSaving}
                   className="w-full gradient-primary"
                   size="lg"
                 >
-                  Finalizar cuestionario
+                  {isSaving ? "Guardando respuestas..." : "Finalizar cuestionario"}
                 </Button>
               </div>
             )}

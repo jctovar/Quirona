@@ -8,6 +8,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
+import { supabase } from "@/supabaseClient";
+
 type Phase = "intro" | "ghq" | "mini" | "complete";
 interface GHQItem {
   question: string;
@@ -59,6 +61,7 @@ const GeneralHealthTest = () => {
   const [phase, setPhase] = useState<Phase>("intro");
   const [ghqAnswers, setGhqAnswers] = useState<Record<number, string>>({});
   const [miniAnswers, setMiniAnswers] = useState<Record<number, string>>({});
+  const [isSaving, setIsSaving] = useState(false);
   const updateGhq = (i: number, v: string) => setGhqAnswers((p) => ({ ...p, [i]: v }));
   const updateMini = (i: number, v: string) => setMiniAnswers((p) => ({ ...p, [i]: v }));
   const handleGhqSubmit = () => {
@@ -70,33 +73,57 @@ const GeneralHealthTest = () => {
     setPhase("mini");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const handleMiniSubmit = () => {
+  const handleMiniSubmit = async () => {
     const missing = miniQuestions.filter((_, i) => miniAnswers[i] === undefined);
     if (missing.length > 0) {
       toast.error(`Faltan ${missing.length} preguntas por contestar.`);
       return;
     }
-    // Check suicide risk: any "si" answer → derivation
-    const hasRisk = Object.values(miniAnswers).some((v) => v === "si");
-    if (hasRisk) {
-      navigate("/derivacion");
-      return;
+
+    setIsSaving(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Sesión no encontrada");
+
+      // 1. Detectar Riesgo
+      const hasRisk = Object.values(miniAnswers).some((v) => v === "si");
+
+      // 2. Preparar datos
+      const ghqArray = ghqItems.map((_, i) => parseInt(ghqAnswers[i]));
+      const miniArray = miniQuestions.map((_, i) => miniAnswers[i]);
+
+      // 3. Guardar en Supabase
+      const { error } = await supabase
+        .from('general_health_responses')
+        .upsert({
+          id: user.id,
+          ghq_answers: ghqArray,
+          mini_answers: miniArray,
+          sent_to_derivation: hasRisk,
+          is_completed: true,
+          updated_at: new Date()
+        });
+
+      if (error) throw error;
+
+      // 4. Lógica de Navegación Condicional
+      if (hasRisk) {
+        // Redirección de la que no se puede regresar (replace: true)
+        navigate("/derivacion", { replace: true });
+      } else {
+        toast.success("¡Evaluación de salud completada!");
+        markTestCompleted("general-health");
+        setPhase("complete");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+    } catch (error: any) {
+      toast.error("Error al guardar: " + error.message);
+    } finally {
+      setIsSaving(false);
     }
-    console.log("GHQ-30 Results:", ghqAnswers);
-    console.log("MINI Results:", miniAnswers);
-    markTestCompleted("general-health");
-    toast.success("¡Cuestionario completado exitosamente! Vuelve al menú para el siguiente test.");
-    setPhase("complete");
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  if (showMenu) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-        <Navbar isAuthenticated />
-        <TestMenu currentTest="general-health" onStart={() => setShowMenu(false)} />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -190,8 +217,8 @@ const GeneralHealthTest = () => {
                     </RadioGroup>
                   </div>
                 ))}
-                <Button onClick={handleMiniSubmit} className="w-full gradient-primary" size="lg">
-                  Finalizar cuestionario
+                <Button onClick={handleMiniSubmit} disabled={isSaving} className="w-full gradient-primary" size="lg">
+                  {isSaving ? "Guardando..." : "Finalizar cuestionario"}
                 </Button>
               </div>
             )}
@@ -215,7 +242,7 @@ const GeneralHealthTest = () => {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => setShowMenu(true)}
+                  onClick={() => navigate("/initial-question")}
                 >
                   Regresar al menú de test
                 </Button>

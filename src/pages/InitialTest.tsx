@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
-import { ClipboardCheck } from "lucide-react";
+import { ClipboardCheck, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/supabaseClient";
 
 // 1. Definición del tipo seguro para el estado de respuestas
 interface AnswersState {
@@ -43,6 +44,7 @@ interface AnswersState {
 const InitialTest = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   // 2. Inicialización del estado con valores predeterminados (incluyendo todos los campos)
   const [answers, setAnswers] = useState<AnswersState>({
     edad: [18], // Inicializado como array de números para el Slider
@@ -84,25 +86,105 @@ const InitialTest = () => {
     setAnswers(prev => ({ ...prev, [key]: value } as AnswersState));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Respuestas del test:", answers);
-    // Nota: Aquí podrías añadir una validación para asegurar que todos los campos requeridos tengan valor.
 
-    markTestCompleted("initial-test");
-    toast.success("Test completado. Vuelve al menú para seguir con el siguiente cuestionario.");
-    setShowMenu(true);
+    // --- 1. LISTA DE CAMPOS OBLIGATORIOS ---
+    // Estos son los nombres de las variables en tu estado 'answers'
+    const camposObligatorios: (keyof AnswersState)[] = [
+      "genero", "sexoNacer", "orientacion", "estado", "estudios", 
+      "trasfondo", "afromexicana", "indigena", "lenguaIndigena", 
+      "estudiosJefe", "banos", "autos", "internet", 
+      "trabajadores", "cuartos", "consultaGine", "estudiosSalud"
+    ];
+
+    // --- 2. VALIDACIÓN GENERAL ---
+    for (const campo of camposObligatorios) {
+      if (answers[campo] === undefined || answers[campo] === "") {
+        toast.error("Por favor, responde todas las preguntas antes de continuar.");
+        return; // Detiene la función si falta algo
+      }
+    }
+
+    // --- 3. VALIDACIONES CONDICIONALES ---
+    // (Preguntas que solo son obligatorias si se respondió "Sí" o "Otra" en la anterior)
+    
+    if (answers.orientacion === "Otra" && !answers.orientacionOtra?.trim()) {
+      toast.error("Por favor, especifica tu orientación sexual.");
+      return;
+    }
+
+    if (answers.lenguaIndigena === "Sí" && !answers.cualLengua?.trim()) {
+      toast.error("Por favor, escribe qué lengua indígena hablas.");
+      return;
+    }
+
+    if (answers.estudiosSalud === "Sí") {
+      if (!answers.trabajoSalud || !answers.actividadSalud) {
+        toast.error("Por favor, completa la información sobre tu área de salud.");
+        return;
+      }
+    }
+
+    // --- 4. GUARDADO EN BASE DE DATOS ---
+    setIsSaving(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) throw new Error("No se encontró una sesión activa.");
+
+      const { error } = await supabase
+        .from('initial_test_responses')
+        .upsert({
+          id: user.id,
+          edad: answers.edad[0], // Extraemos el número del array del Slider
+          genero: answers.genero,
+          sexo_nacer: answers.sexoNacer,
+          orientacion: answers.orientacion,
+          orientacion_otra: answers.orientacionOtra,
+          estado: answers.estado,
+          estudios: answers.estudios,
+          trasfondo: answers.trasfondo,
+          afromexicana: answers.afromexicana,
+          indigena: answers.indigena,
+          lengua_indigena: answers.lenguaIndigena,
+          cual_lengua: answers.cualLengua,
+          estudios_jefe: answers.estudiosJefe,
+          banos: answers.banos,
+          autos: answers.autos,
+          internet: answers.internet,
+          trabajadores: answers.trabajadores,
+          cuartos: answers.cuartos,
+          consulta_gine: answers.consultaGine,
+          estudios_salud: answers.estudiosSalud,
+          areas_salud: answers.areasSalud,
+          trabajo_salud: answers.trabajoSalud,
+          actividad_salud: answers.actividadSalud,
+          is_completed: true,
+          updated_at: new Date()
+        });
+
+      if (error) throw error;
+
+      // --- 5. ÉXITO Y REDIRECCIÓN ---
+      toast.success("¡Test completado con éxito!");
+
+      try {
+        markTestCompleted("initial-test");
+      } catch (err) {
+        console.warn("No se pudo actualizar el progreso localmente, pero se guardó en la nube.");
+      }
+
+      // Navegamos al siguiente test
+      navigate("/semantic-network-test");
+
+    } catch (error: any) {
+      toast.error("Error al guardar: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
-
-  if (showMenu) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-        <Navbar isAuthenticated />
-        <TestMenu currentTest="initial-test" onStart={() => setShowMenu(false)} />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -163,6 +245,14 @@ const InitialTest = () => {
                       <Label htmlFor="sexo-no" className="font-normal cursor-pointer">Prefiero no decir</Label>
                     </div>
                   </RadioGroup>
+                  {answers.sexoNacer && answers.sexoNacer !== "mujer" && (
+                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4 rounded-lg flex gap-3 mt-3 animate-in fade-in slide-in-from-top-2">
+                      <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
+                        <strong>Nota Informativa:</strong> Actualmente, los contenidos y materiales educativos de la plataforma QUIRONA han sido diseñados específicamente para el sexo femenino. Agradecemos tu interés y comprensión.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Orientación sexual */}
@@ -467,20 +557,24 @@ const InitialTest = () => {
                 <div className="pt-4">
                   <Button 
                     type="submit"
+                    disabled={isSaving}
                     className="w-full gradient-primary transition-quirona hover:opacity-90"
                     size="lg"
                   >
-                    Pasar al siguiente test
+                    {isSaving ? "Guardando..." : "Pasar al siguiente test"}
                   </Button>
                 </div>
               </form>
               <div className="mt-4">
                 <Button
+                  type="button"
                   variant="outline"
                   className="w-full"
-                  onClick={() => setShowMenu(true)}
-                >
-                  Regresar al menú de test
+                  onClick={() => {
+                  navigate("/initial-question");
+                }}
+              >
+                Regresar al menú de test
                 </Button>
               </div>
             </CardContent>
