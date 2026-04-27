@@ -3,9 +3,11 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowRight, Clock, CheckCircle, XCircle } from "lucide-react";
+import { ArrowRight, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import cerebroImg from "@/assets/cerebro.jpg";
+import { supabase } from "@/supabaseClient"; // Importación de Supabase
+import { updateProgress } from "@/lib/progressHelper";
 const phrases = [
   { id: 1, text: '"Vas al ginecólogo si hiciste algo indebido"', correct: false },
   { id: 2, text: '"Puedes ir a consulta ginecológica para informarte"', correct: true },
@@ -46,6 +48,8 @@ const Module1Game = () => {
   const [accepted, setAccepted] = useState<number[]>([]);
   const [rejected, setRejected] = useState<number[]>([]);
   const [draggedId, setDraggedId] = useState<number | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
   const startGame = useCallback(() => {
     const shuffled = shuffleArray(phrases);
     setQueue(shuffled.slice(MAX_VISIBLE));
@@ -119,22 +123,46 @@ const Module1Game = () => {
     });
     return correct;
   };
-  // Ensure at least one correct phrase is visible
-  useEffect(() => {
-    if (phase !== "playing") return;
-    const hasCorrect = visible.some((v) => v.correct);
-    if (!hasCorrect && queue.length > 0) {
-      const correctIdx = queue.findIndex((q) => q.correct);
-      if (correctIdx >= 0) {
-        setQueue((prev) => {
-          const newQ = [...prev];
-          const [correctPhrase] = newQ.splice(correctIdx, 1);
-          setVisible((v) => [...v, correctPhrase]);
-          return newQ;
+  const handleFinishGame = async () => {
+    setIsSaving(true);
+    const score = getScore();
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No hay sesión activa");
+
+      // 1. Guardamos el score en la tabla del módulo 1
+      const { error: saveError } = await supabase
+        .from('module_1_responses')
+        .upsert({
+          id: user.id,
+          game_score: score,
+          updated_at: new Date()
         });
-      }
+
+      if (saveError) throw saveError;
+
+      // 2. Actualizamos el progreso total (m1_game)
+      await updateProgress("m1_game");
+
+      // 3. Navegamos a la retroalimentación
+      navigate("/module-1-feedback", { 
+        state: { 
+          score, 
+          accepted, 
+          rejected, 
+          attempts: prevAttempts + 1 
+        } 
+      });
+
+    } catch (error: any) {
+      console.error("Error al guardar juego:", error);
+      // Navegamos aunque falle la red para no arruinar la experiencia
+      navigate("/module-1-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });
+    } finally {
+      setIsSaving(false);
     }
-  }, [visible, queue, phase]);
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -244,18 +272,31 @@ const Module1Game = () => {
               <CardContent className="p-8 md:p-12 text-center space-y-6">
                 <h2 className="text-2xl font-bold text-primary">¡Tiempo terminado!</h2>
                 <p className="text-muted-foreground text-lg">
-                  Clasificaste {accepted.length + rejected.length} de {phrases.length} frases.
+                  Lograste clasificar <strong>{accepted.length + rejected.length}</strong> frases en el tiempo límite.
                 </p>
-                <Button
-                  onClick={() => {
-                    const score = getScore();
-                    navigate("/module-1-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });
-                  }}
-                  className="gradient-primary text-white px-8 py-6 text-lg"
-                >
-                  Ver retroalimentación
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
+                <div className="bg-muted/30 p-4 rounded-lg inline-block">
+                   <p className="text-sm font-medium">Aciertos calculados:</p>
+                   <p className="text-4xl font-bold text-primary">{getScore()}</p>
+                </div>
+                <div className="pt-6">
+                  <Button
+                    onClick={handleFinishGame}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-8 text-xl shadow-lg hover:scale-105 transition-transform"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                        Guardando resultados...
+                      </>
+                    ) : (
+                      <>
+                        Ver mi retroalimentación
+                        <ArrowRight className="ml-2 w-6 h-6" />
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}

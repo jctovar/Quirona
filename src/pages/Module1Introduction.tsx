@@ -3,9 +3,12 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone } from "lucide-react";
+import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/supabaseClient"; // Importamos supabase
+import { updateProgress } from "@/lib/progressHelper"; // Importamos el helper
+import { toast } from "sonner";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -67,8 +70,49 @@ const myths = [
 const Module1Introduction = () => {
   const navigate = useNavigate();
   const [heardMyths, setHeardMyths] = useState<Record<number, boolean>>({});
+  const [isSaving, setIsSaving] = useState(false);
   const toggleMyth = (index: number) => {
     setHeardMyths((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+
+const handleContinue = async () => {
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No se encontró sesión de usuario");
+
+      // 1. Guardamos las respuestas de los mitos
+      // Guardamos el objeto heardMyths tal cual en la columna intro_phrases
+      const finalizedAnswers = myths.reduce((acc, _, index) => {
+        acc[index] = heardMyths[index] || false;
+        return acc;
+      }, {} as Record<number, boolean>);
+
+      const { error: saveError } = await supabase
+        .from('module_1_responses')
+        .upsert({
+          id: user.id,
+          intro_phrases: finalizedAnswers,
+          updated_at: new Date()
+        });
+
+      if (saveError) throw saveError;
+
+      // 2. Actualizamos el progreso usando el Helper
+      // El helper se encarga de sumar 1 paso más y calcular el %
+      await updateProgress("m1_intro");
+
+      // 3. Navegamos al siguiente paso
+      navigate("/module-1-quiz");
+
+    } catch (error: any) {
+      console.error("Error:", error);
+      toast.error("Hubo un problema al guardar tu progreso.");
+      // Opcional: navigate igualmente para no trabar el flujo
+      navigate("/module-1-quiz");
+    } finally {
+      setIsSaving(false);
+    }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -185,11 +229,21 @@ const Module1Introduction = () => {
                 </p>
                 <div className="flex justify-center mt-10">
                   <Button
-                    onClick={() => navigate("/module-1-quiz")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
+                    onClick={handleContinue}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform"
                   >
-                    Continuar con la siguiente sección
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Guardando...
+                      </>
+                    ) : (
+                      <>
+                        Continuar con la siguiente sección
+                        <ArrowRight className="ml-2 w-6 h-6" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>

@@ -5,13 +5,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2, BookCheck} from "lucide-react";
+import { supabase } from "@/supabaseClient"; // Importamos supabase
+import { updateProgress } from "@/lib/progressHelper";
+import { toast } from "sonner";
+
 const Module1Closure = () => {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<"questions" | "story">("questions");
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState({ fear: "", phrase: "", advice: "" });
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
+  const [isSaving, setIsSaving] = useState(false);
 
   const storyPages = [
     (
@@ -99,6 +104,58 @@ const Module1Closure = () => {
       </div>
     ),
   ];
+
+// --- FUNCIÓN 1: GUARDAR RESPUESTAS ABIERTAS ---
+  const handleSaveAnswers = async () => {
+    // Validación: que al menos hayan escrito algo
+    if (!answers.fear.trim() || !answers.phrase.trim() || !answers.advice.trim()) {
+      toast.error("Por favor, comparte tus reflexiones antes de continuar.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No hay sesión activa");
+
+      const { error } = await supabase
+        .from('module_1_responses')
+        .upsert({
+          id: user.id,
+          closure_answers: answers, // Guardamos el objeto con las 3 respuestas
+          updated_at: new Date()
+        });
+
+      if (error) throw error;
+
+      setPhase("story"); // Pasamos a la historia final
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error: any) {
+      console.error("Error al guardar cierre:", error);
+      toast.error("Hubo un error al guardar tus respuestas.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // --- FUNCIÓN 2: FINALIZAR MÓDULO Y ACTUALIZAR PROGRESO ---
+  const handleFinalizeModule = async () => {
+    setIsSaving(true);
+    try {
+      // Marcamos la última parte del Módulo 1 (m1_closure)
+      // El helper recalculará el % y lo subirá al 25% (o 28% si es exacto)
+      await updateProgress("m1_closure");
+      
+      toast.success("¡Felicidades! Has completado el Módulo 1.");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error al finalizar módulo:", error);
+      navigate("/dashboard");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -150,11 +207,13 @@ const Module1Closure = () => {
                 </div>
                 <div className="flex justify-center pt-4">
                   <Button
-                    onClick={() => setPhase("story")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
+                    onClick={handleSaveAnswers}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform"
                   >
+                    {isSaving ? <Loader2 className="animate-spin mr-2" /> : null}
                     Continuar
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <ArrowRight className="ml-2 w-6 h-6" />
                   </Button>
                 </div>
               </CardContent>
@@ -213,11 +272,13 @@ const Module1Closure = () => {
                 {page === storyPages.length - 1 && (
                   <div className="flex justify-center mt-10">
                     <Button
-                      onClick={() => navigate("/dashboard")}
-                      className="gradient-primary text-white px-8 py-6 text-lg"
+                      onClick={handleFinalizeModule}
+                      disabled={isSaving}
+                      className="gradient-primary text-white px-12 py-8 text-xl shadow-xl hover:scale-105 transition-transform"
                     >
-                      Finalizar módulo
-                      <ArrowRight className="ml-2 w-5 h-5" />
+                      {isSaving ? <Loader2 className="animate-spin mr-2" /> : null}
+                      Finalizar Módulo 1
+                      <ArrowRight className="ml-2 w-6 h-6" />
                     </Button>
                   </div>
                 )}

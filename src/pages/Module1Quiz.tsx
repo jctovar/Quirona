@@ -5,8 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/supabaseClient"; 
+import { updateProgress } from "@/lib/progressHelper";
+
 const statements = [
   "Un examen pélvico es una exploración física en la que se evalúan los órganos reproductores femeninos para verificar su estado de salud.",
   "Cuando una joven como Ximena va a una primera consulta ginecológica, siempre debe realizarse un examen pélvico.",
@@ -18,13 +21,45 @@ const Module1Quiz = () => {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
   const allAnswered = Object.keys(answers).length === statements.length;
-  const handleSubmit = () => {
+  
+  const handleSubmit = async () => {
     if (!allAnswered) {
       toast.error("Por favor responde todas las afirmaciones antes de continuar.");
       return;
     }
-    setSubmitted(true);
+
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No se encontró sesión de usuario");
+
+      // 1. Guardamos las respuestas en la columna 'quiz_answers'
+      const { error: saveError } = await supabase
+        .from('module_1_responses')
+        .upsert({
+          id: user.id,
+          quiz_answers: answers,
+          updated_at: new Date()
+        });
+
+      if (saveError) throw saveError;
+
+      // 2. Actualizamos el progreso global (m1_quiz)
+      // Esto sumará un paso más y actualizará el % en la tabla 'user_progress'
+      await updateProgress("m1_quiz");
+
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (error: any) {
+      console.error("Error:", error);
+      toast.error("Hubo un error al enviar tus respuestas.");
+    } finally {
+      setIsSaving(false);
+    }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -73,11 +108,20 @@ const Module1Quiz = () => {
                   <div className="flex justify-center mt-10">
                     <Button
                       onClick={handleSubmit}
-                      className="gradient-primary text-white px-8 py-6 text-lg"
-                      disabled={!allAnswered}
+                      disabled={!allAnswered || isSaving}
+                      className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform"
                     >
-                      Enviar respuestas
-                      <ArrowRight className="ml-2 w-5 h-5" />
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          Enviar respuestas
+                          <ArrowRight className="ml-2 w-6 h-6" />
+                        </>
+                      )}
                     </Button>
                   </div>
                 </>

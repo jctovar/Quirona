@@ -4,10 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { supabase } from "@/supabaseClient"; // Agregado
+import { toast } from "sonner"; // Para feedback visual
+import { updateProgress } from "@/lib/progressHelper";
+
 const Module1Story = () => {
   const navigate = useNavigate();
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // user preferences for accessibility
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
@@ -155,16 +160,28 @@ const Module1Story = () => {
       </div>
     ),
   ];
+  const completeActivity = async () => {
+    setIsProcessing(true);
+    
+    // Llamamos al helper para que haga el trabajo sucio en la DB
+    await updateProgress("m1_story"); 
 
+    // Pase lo que pase, avanzamos
+    navigate("/module-1-intro");
+    setIsProcessing(false);
+  };
   const handleContinue = () => {
     if (showQuestions) {
-      navigate("/module-1-intro");
+      // En lugar de navigate directo, llamamos a la función de progreso
+      completeActivity();
       return;
     }
+    
     if (page < pages.length - 1) {
       setPage((p) => p + 1);
     } else {
       setShowQuestions(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 

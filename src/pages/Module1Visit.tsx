@@ -5,11 +5,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { supabase } from "@/supabaseClient"; // Importación de Supabase
+import { updateProgress } from "@/lib/progressHelper"; // Importación del Helper
+import { toast } from "sonner";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
 }
+
 const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -23,6 +27,9 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
+
+
+
   return (
     <div
       ref={ref}
@@ -45,6 +52,47 @@ const visitPoints = [
 const Module1Visit = () => {
   const navigate = useNavigate();
   const [known, setKnown] = useState<Record<number, boolean>>({});
+  const [isSaving, setIsSaving] = useState(false);
+
+const handleContinue = async () => {
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No se encontró sesión de usuario");
+
+      // Normalizamos: si no está marcado, guardamos como 'false'
+      const finalizedVisitAnswers = visitPoints.reduce((acc, _, index) => {
+        acc[index] = known[index] || false;
+        return acc;
+      }, {} as Record<number, boolean>);
+
+      // 1. Guardamos en la columna 'visit_answers'
+      const { error: saveError } = await supabase
+        .from('module_1_responses')
+        .upsert({
+          id: user.id,
+          visit_answers: finalizedVisitAnswers,
+          updated_at: new Date()
+        });
+
+      if (saveError) throw saveError;
+
+      // 2. Actualizamos el progreso global (m1_visit)
+      await updateProgress("m1_visit");
+
+      // 3. Navegamos al juego
+      navigate("/module-1-game");
+
+    } catch (error: any) {
+      console.error("Error:", error);
+      toast.error("Hubo un error al guardar tu avance.");
+      // Opcional: navegar de todos modos
+      navigate("/module-1-game");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -110,11 +158,21 @@ const Module1Visit = () => {
                 </div>
                 <div className="flex justify-center mt-10">
                   <Button
-                    onClick={() => navigate("/module-1-game")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
+                    onClick={handleContinue}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform"
                   >
-                    Continuar con la siguiente sección
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Guardando...
+                      </>
+                    ) : (
+                      <>
+                        Continuar con la siguiente sección
+                        <ArrowRight className="ml-2 w-6 h-6" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>
