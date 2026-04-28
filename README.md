@@ -1,4 +1,4 @@
-🌸 Proyecto Quirona Empower Her
+🌸 Proyecto Quirona
 
 Bienvenida al repositorio del proyecto Quirona Empower Her.
 Este documento te guiará paso a paso para instalar las herramientas necesarias, clonar el repositorio y ejecutar el proyecto correctamente en tu computadora.
