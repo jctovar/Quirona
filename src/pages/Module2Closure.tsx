@@ -5,17 +5,72 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
+import { supabase } from "@/supabaseClient"; // Importación necesaria
+import { updateProgress } from "@/lib/progressHelper"; // Importación necesaria
+import { toast } from "sonner";
+
 const Module2Closure = () => {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<"questions" | "story">("questions");
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState({ fear: "", phrase: "", advice: "" });
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
+  const [isSaving, setIsSaving] = useState(false);
+
+  // --- FUNCIÓN 1: GUARDAR REFLEXIONES ---
+  const handleSaveQuestions = async () => {
+    // Verificamos que no envíen campos vacíos
+    if (!answers.fear.trim() || !answers.phrase.trim() || !answers.advice.trim()) {
+      toast.error("Por favor, responde todas las preguntas para continuar.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No hay sesión activa");
+
+      const { error } = await supabase
+        .from('module_2_responses')
+        .upsert({
+          id: user.id,
+          closure_answers: answers,
+          updated_at: new Date()
+        });
+
+      if (error) throw error;
+
+      setPhase("story");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error: any) {
+      console.error("Error:", error);
+      toast.error("Hubo un error al guardar tus respuestas.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // --- FUNCIÓN 2: FINALIZAR MÓDULO ---
+  const handleFinalizeModule = async () => {
+    setIsSaving(true);
+    try {
+      // Marcamos el paso final del módulo 2
+      await updateProgress("m2_closure");
+      
+      toast.success("¡Módulo 2 completado con éxito!");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error al finalizar:", error);
+      navigate("/dashboard");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const storyPages = [
     (
-      <div>
+      <div className="animate-in fade-in duration-700">
         <h1 className="text-3xl font-bold text-center mb-8 text-primary">
           Resolución
         </h1>
@@ -36,7 +91,7 @@ const Module2Closure = () => {
       </div>
     ),
     (
-      <div>
+      <div className="animate-in fade-in duration-700">
         <div className="space-y-6 text-foreground leading-relaxed">
           <p>
             Maricela asintió, un poco más tranquila, y concluyó:
@@ -50,13 +105,13 @@ const Module2Closure = () => {
         </div>
       </div>
     ),
-    
-    ];
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
       <div className="pt-48 pb-16 px-4">
-        <div className="container mx-auto max-w-3x2">
+        <div className="container mx-auto max-w-3xl"> {/* Ajustado a 3xl */}
           {phase === "questions" ? (
             <Card className="border-2 shadow-quirona">
               <CardContent className="p-8 md:p-12 space-y-8">
@@ -69,11 +124,11 @@ const Module2Closure = () => {
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <Label className="text-base font-semibold">
-                      Si tu fueras la amiga de Maricela ¿Cuál sería la primera alerta que le harías ver?
+                      Si tú fueras la amiga de Maricela ¿Cuál sería la primera alerta que le harías ver?
                     </Label>
                     <Textarea
                       placeholder="Escribe tu respuesta aquí..."
-                      className="min-h-[120px]"
+                      className="min-h-[120px] border-muted focus:ring-primary"
                       value={answers.fear}
                       onChange={(e) => setAnswers({ ...answers, fear: e.target.value })}
                     />
@@ -84,18 +139,18 @@ const Module2Closure = () => {
                     </Label>
                     <Textarea
                       placeholder="Escribe tu respuesta aquí..."
-                      className="min-h-[120px]"
+                      className="min-h-[120px] border-muted focus:ring-primary"
                       value={answers.phrase}
                       onChange={(e) => setAnswers({ ...answers, phrase: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-base font-semibold">
-                      Si tu estuvieras en el papel de Maricela ¿Qué es lo que harías?
+                      Si tú estuvieras en el papel de Maricela ¿Qué es lo que harías?
                     </Label>
                     <Textarea
                       placeholder="Escribe tu respuesta aquí..."
-                      className="min-h-[120px]"
+                      className="min-h-[120px] border-muted focus:ring-primary"
                       value={answers.advice}
                       onChange={(e) => setAnswers({ ...answers, advice: e.target.value })}
                     />
@@ -103,11 +158,13 @@ const Module2Closure = () => {
                 </div>
                 <div className="flex justify-center pt-4">
                   <Button
-                    onClick={() => setPhase("story")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
+                    onClick={handleSaveQuestions}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform"
                   >
-                    Continuar
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    {isSaving ? <Loader2 className="animate-spin mr-2" /> : null}
+                    Continuar a la historia
+                    <ArrowRight className="ml-2 w-6 h-6" />
                   </Button>
                 </div>
               </CardContent>
@@ -115,33 +172,37 @@ const Module2Closure = () => {
           ) : (
             <Card className="border-2 shadow-quirona">
               <CardContent className="p-8 md:p-12">
-                {/* accessibility controls */}
-                <div className="mb-6">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <label htmlFor="font-size" className="text-sm">
+                <div className="mb-6 flex justify-between items-center border-b pb-4">
+                  <div className="flex items-center space-x-2">
+                    <label htmlFor="font-size" className="text-sm font-medium text-muted-foreground">
                       Tamaño de letra:
                     </label>
                     <select
                       id="font-size"
                       value={fontSizeClass}
                       onChange={(e) => setFontSizeClass(e.target.value)}
-                      className="border rounded px-2 py-1 text-sm"
+                      className="border rounded px-2 py-1 text-sm bg-background"
                     >
                       <option value="text-base">Normal</option>
                       <option value="text-lg">Grande</option>
                       <option value="text-xl">Muy grande</option>
                     </select>
                   </div>
+                  <CheckCircle2 className="text-primary w-6 h-6" />
                 </div>
-                <div className={`prose prose-lg max-w-none ${fontSizeClass}`}>
-                  <div key={page} className="transition-transform duration-300">
+                <div className={`prose prose-pink max-w-none ${fontSizeClass}`}>
+                  <div key={page}>
                     {storyPages[page]}
                   </div>
 
-                  <div className="flex items-center justify-between mt-8">
+                  <div className="flex items-center justify-between mt-12 pt-6 border-t">
                     <div className="flex items-center">
                       <Button
-                        onClick={() => setPage((p) => Math.max(0, p - 1))}
+                        variant="outline"
+                        onClick={() => {
+                          setPage((p) => Math.max(0, p - 1));
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
                         disabled={page === 0}
                         className="mr-3"
                       >
@@ -149,28 +210,32 @@ const Module2Closure = () => {
                       </Button>
 
                       <Button
-                        onClick={() => setPage((p) => Math.min(p + 1, storyPages.length - 1))}
+                        onClick={() => {
+                          setPage((p) => Math.min(p + 1, storyPages.length - 1));
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
                         disabled={page === storyPages.length - 1}
                       >
                         Siguiente
                       </Button>
                     </div>
 
-                    <div className="text-sm text-muted-foreground">
-                      Página {page + 1} / {storyPages.length}
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Página {page + 1} de {storyPages.length}
                     </div>
                   </div>
                 </div>
 
-                {/* show finish button only on last page */}
                 {page === storyPages.length - 1 && (
-                  <div className="flex justify-center mt-10">
+                  <div className="flex justify-center mt-12 animate-in slide-in-from-bottom-4 duration-1000">
                     <Button
-                      onClick={() => navigate("/dashboard")}
-                      className="gradient-primary text-white px-8 py-6 text-lg"
+                      onClick={handleFinalizeModule}
+                      disabled={isSaving}
+                      className="gradient-primary text-white px-12 py-8 text-xl shadow-xl hover:scale-105 transition-transform"
                     >
-                      Finalizar módulo
-                      <ArrowRight className="ml-2 w-5 h-5" />
+                      {isSaving ? <Loader2 className="animate-spin mr-2" /> : null}
+                      Finalizar Módulo 2
+                      <ArrowRight className="ml-2 w-6 h-6" />
                     </Button>
                   </div>
                 )}
@@ -182,4 +247,5 @@ const Module2Closure = () => {
     </div>
   );
 };
+
 export default Module2Closure;

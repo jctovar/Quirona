@@ -3,11 +3,14 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader, Loader2} from "lucide-react";
+import { updateProgress } from "@/lib/progressHelper";
+
 const Module2Story = () => {
   const navigate = useNavigate();
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // user preferences for accessibility
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
@@ -28,8 +31,8 @@ const Module2Story = () => {
           <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
             —No te preocupes, Mary. ¿Todo bien?
           </p>
-           <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-           —Sí, todo bien. Solo que tuve cita con el doctor para darle seguimiento a una infección que tuve, y me mandaron a prevención, me obligaron a hacerme un Papanicolau. Por eso me retrasé.
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+          —Sí, todo bien. Solo que tuve cita con el doctor para darle seguimiento a una infección que tuve, y me mandaron a prevención, me obligaron a hacerme un Papanicolau. Por eso me retrasé.
           </p>
         </div>
       </div>
@@ -69,15 +72,33 @@ const Module2Story = () => {
     ),
   ];
 
+  const completeActivity = async () => {
+    setIsProcessing(true);
+    try {
+      // Llamamos al helper para marcar m2_story
+      // El helper recalculará automáticamente el % basado en los 30 pasos totales
+      await updateProgress("m2_story");
+      navigate("/module-2-intro");
+    } catch (error) {
+      console.error("Error al guardar progreso:", error);
+      // Navegamos de todos modos para no bloquear a la usuaria
+      navigate("/module-2-intro");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleContinue = () => {
     if (showQuestions) {
-      navigate("/module-2-intro");
+      completeActivity();
       return;
     }
     if (page < pages.length - 1) {
       setPage((p) => p + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       setShowQuestions(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -149,22 +170,29 @@ const Module2Story = () => {
 
                     <p className="text-foreground">¿Tú qué hubieras hecho?</p>
 
-                     <p className="text-foreground">¿Tú sabes identificar cuando algo no te gusta?</p>
+                    <p className="text-foreground">¿Tú sabes identificar cuando algo no te gusta?</p>
 
                     <p className="text-foreground font-semibold text-primary">¿Que sientes físicamente cuando algo no te gusta?</p>
                   </div>
                 </div>
               )}
 
-              {/* show continue button only on last page or when questions visible */}
-              {(!showQuestions && page === pages.length - 1) || showQuestions ? (
-                <div className="flex justify-center mt-10">
-                  <Button onClick={handleContinue} className="gradient-primary text-white px-8 py-6 text-lg">
-                    {showQuestions ? "Continuar a la siguiente sección" : "Ver preguntas"}
-                    <ArrowRight className="ml-2 w-5 h-5" />
+              {((!showQuestions && page === pages.length - 1) || showQuestions) && (
+                <div className="flex justify-center mt-12">
+                  <Button 
+                    onClick={handleContinue} 
+                    disabled={isProcessing}
+                    className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform"
+                  >
+                    {isProcessing ? (
+                      <Loader2 className="mr-2 animate-spin" />
+                    ) : (
+                      showQuestions ? "Continuar al Módulo 2" : "Ver preguntas"
+                    )}
+                    {!isProcessing && <ArrowRight className="ml-2 w-6 h-6" />}
                   </Button>
                 </div>
-              ) : null}
+              )}
             </CardContent>
           </Card>
         </div>

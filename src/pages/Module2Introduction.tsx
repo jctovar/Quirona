@@ -3,7 +3,8 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone} from "lucide-react";
+import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone, Loader2} from "lucide-react";
+import { updateProgress } from "@/lib/progressHelper";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
@@ -56,9 +57,20 @@ const myths = [
 ];
 const Module2Introduction = () => {
   const navigate = useNavigate();
-  const [heardMyths, setHeardMyths] = useState<Record<number, boolean>>({});
-  const toggleMyth = (index: number) => {
-    setHeardMyths((prev) => ({ ...prev, [index]: !prev[index] }));
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const handleContinue = async () => {
+    setIsSaving(true);
+    try {
+      // Marcamos m2_intro en la tabla de progreso
+      await updateProgress("m2_intro");
+      navigate("/module-2-quiz");
+    } catch (error) {
+      console.error("Error al guardar progreso:", error);
+      navigate("/module-2-quiz");
+    } finally {
+      setIsSaving(false);
+    }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -162,7 +174,7 @@ const Module2Introduction = () => {
             
           ))}
           {/* Tus sentimientos de incomodidad, nervios o incluso desconfianza son válidos */}
-           <ScrollReveal>
+          <ScrollReveal>
             <Card className="border-2 shadow-quirona">
               <CardContent className="p-8 md:p-12">
                 <h2 className="text-2xl font-bold mb-6 text-primary">
@@ -188,11 +200,21 @@ const Module2Introduction = () => {
                 </p>
                 <div className="flex justify-center mt-10">
                   <Button
-                    onClick={() => navigate("/module-2-quiz")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
+                    onClick={handleContinue}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform"
                   >
-                    Continuar con la siguiente sección
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Guardando progreso...
+                      </>
+                    ) : (
+                      <>
+                        Continuar con la siguiente sección
+                        <ArrowRight className="ml-2 w-6 h-6" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>

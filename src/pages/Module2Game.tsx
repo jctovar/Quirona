@@ -3,8 +3,10 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowRight, Clock, CheckCircle, XCircle } from "lucide-react";
+import { ArrowRight, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/supabaseClient"; // Importación de Supabase
+import { updateProgress } from "@/lib/progressHelper";
 import consultorioImg from "@/assets/consultorio.png";
 const phrases = [
   { id: 1, text: 'Área para cambiarte', correct: true },
@@ -45,6 +47,7 @@ const Module2Game = () => {
   const [accepted, setAccepted] = useState<number[]>([]);
   const [rejected, setRejected] = useState<number[]>([]);
   const [draggedId, setDraggedId] = useState<number | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const startGame = useCallback(() => {
     const shuffled = shuffleArray(phrases);
     setQueue(shuffled.slice(MAX_VISIBLE));
@@ -117,6 +120,47 @@ const Module2Game = () => {
       if (!p?.correct) correct++;
     });
     return correct;
+  };
+  // --- FUNCIÓN PARA GUARDAR RESULTADOS Y PROGRESO ---
+  const handleFinishGame = async () => {
+    setIsSaving(true);
+    const score = getScore();
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No hay sesión activa");
+
+      // 1. Guardamos el score en la tabla del módulo 2
+      const { error: saveError } = await supabase
+        .from('module_2_responses')
+        .upsert({
+          id: user.id,
+          game_score: score,
+          updated_at: new Date()
+        });
+
+      if (saveError) throw saveError;
+
+      // 2. Actualizamos el progreso total (m2_game)
+      await updateProgress("m2_game");
+
+      // 3. Navegamos a la retroalimentación
+      navigate("/module-2-feedback", { 
+        state: { 
+          score, 
+          accepted, 
+          rejected, 
+          attempts: prevAttempts + 1 
+        } 
+      });
+
+    } catch (error: any) {
+      console.error("Error al guardar resultados del juego:", error);
+      // Navegamos de todos modos para no interrumpir el flujo
+      navigate("/module-2-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });
+    } finally {
+      setIsSaving(false);
+    }
   };
   // Ensure at least one correct phrase is visible
   useEffect(() => {
@@ -239,22 +283,40 @@ const Module2Game = () => {
             </div>
           )}
           {phase === "done" && (
-            <Card className="border-2 shadow-quirona">
+            <Card className="border-2 shadow-quirona animate-in zoom-in-95 duration-500">
               <CardContent className="p-8 md:p-12 text-center space-y-6">
-                <h2 className="text-2xl font-bold text-primary">¡Tiempo terminado!</h2>
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                   <CheckCircle className="w-10 h-10 text-primary" />
+                </div>
+                <h2 className="text-3xl font-bold text-primary">¡Sesión terminada!</h2>
                 <p className="text-muted-foreground text-lg">
-                  Clasificaste {accepted.length + rejected.length} de {phrases.length} frases.
+                  Clasificaste <strong>{accepted.length + rejected.length}</strong> elementos del consultorio.
                 </p>
-                <Button
-                  onClick={() => {
-                    const score = getScore();
-                    navigate("/module-2-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });
-                  }}
-                  className="gradient-primary text-white px-8 py-6 text-lg"
-                >
-                  Ver retroalimentación
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
+                
+                <div className="bg-muted/30 p-4 rounded-lg inline-block">
+                   <p className="text-sm font-medium">Puntuación obtenida:</p>
+                   <p className="text-4xl font-bold text-primary">{getScore()}</p>
+                </div>
+
+                <div className="pt-6">
+                  <Button
+                    onClick={handleFinishGame}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-8 text-xl shadow-lg hover:scale-105 transition-transform"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                        Guardando resultados...
+                      </>
+                    ) : (
+                      <>
+                        Ver mi retroalimentación
+                        <ArrowRight className="ml-2 w-6 h-6" />
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}

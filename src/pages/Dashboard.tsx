@@ -1,29 +1,75 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { ModuleCard } from "@/components/ModuleCard";
-import { BookOpen, Shield, Heart, Users } from "lucide-react";
+import { BookOpen, Shield, Heart, Users, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { supabase } from "@/supabaseClient";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [username] = useState("Usuario"); // Simulated username
+  const [username, setUsername] = useState("Usuario");
+  const [overallProgress, setOverallProgress] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  const handleLogout = () => {
-    toast.success("Sesión cerrada correctamente");
-    setTimeout(() => navigate("/"), 1000);
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        
+        // 1. Obtener el usuario actual
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          navigate("/");
+          return;
+        }
+
+        // Intentar obtener el nombre del usuario desde metadata
+        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || "Usuario";
+        setUsername(name);
+
+        // 2. Consultar el progreso en la tabla user_progress
+        const { data: progressData, error: progressError } = await supabase
+          .from('user_progress')
+          .select('progress_percentage')
+          .eq('id', user.id)
+          .single();
+
+        if (progressError && progressError.code !== 'PGRST116') {
+          console.error("Error al obtener progreso:", progressError);
+        }
+
+        // 3. Actualizar el estado con el porcentaje real de la base de datos
+        if (progressData) {
+          setOverallProgress(progressData.progress_percentage || 0);
+        }
+
+      } catch (error) {
+        console.error("Error en la carga del Dashboard:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      toast.success("Sesión cerrada correctamente");
+      navigate("/");
+    } else {
+      toast.error("Error al cerrar sesión");
+    }
   };
 
   const handleModuleClick = (moduleName: string, moduleIndex: number) => {
-    if (moduleIndex === 0) {
-      navigate("/module-1");
-    } else if (moduleIndex === 1) {
-      navigate("/module-2");
-    }else if (moduleIndex === 2) {
-      navigate("/module-3");
-    } else if (moduleIndex === 3) {
-      navigate("/module-4");
-    }else {
+    const routes = ["/module-1", "/module-2", "/module-3", "/module-4"];
+    if (routes[moduleIndex]) {
+      navigate(routes[moduleIndex]);
+    } else {
       toast.info(`Módulo: ${moduleName} (próximamente disponible)`);
     }
   };
@@ -44,7 +90,7 @@ const Dashboard = () => {
     {
       title: "¿Qué es la violencia ginecológica?",
       description: "Identifica situaciones de violencia ginecológica y aprende a reconocer tus derechos como paciente.",
-      author:"Javier Darío Ríos Castillo",
+      author: "Javier Darío Ríos Castillo",
       icon: Heart,
     },
     {
@@ -54,6 +100,14 @@ const Dashboard = () => {
       icon: Users,
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -65,7 +119,7 @@ const Dashboard = () => {
       
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto">
-          {/* Hero section */}
+          {/* Bienvenida */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
               ¡Hola, {username}!
@@ -76,7 +130,7 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* Módulos */}
+          {/* Grid de Módulos */}
           <div className="max-w-6xl mx-auto">
             <h2 className="text-2xl font-bold mb-6">Módulos educativos</h2>
             <div className="grid md:grid-cols-2 gap-6">
@@ -93,18 +147,30 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Progress section (placeholder) */}
+          {/* SECCIÓN DE PROGRESO CONECTADA */}
           <div className="max-w-6xl mx-auto mt-12">
             <div className="bg-card rounded-2xl p-8 shadow-quirona border-2">
-              <h3 className="text-xl font-bold mb-4">Tu progreso</h3>
-              <div className="flex items-center gap-4">
-                <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full gradient-primary w-0 transition-all duration-500" />
-                </div>
-                <span className="text-sm font-medium text-muted-foreground">0%</span>
+              <div className="flex justify-between items-end mb-4">
+                <h3 className="text-xl font-bold">Tu progreso general</h3>
+                <span className="text-2xl font-bold text-primary">{overallProgress}%</span>
               </div>
-              <p className="text-sm text-muted-foreground mt-3">
-                Comienza tu primer módulo para empezar tu aprendizaje
+              
+              <div className="relative w-full h-4 bg-muted rounded-full overflow-hidden border">
+                {/* IMPORTANTE: Se eliminó la clase 'w-0' para que el style 
+                  tenga control total sobre el ancho 
+                */}
+                <div 
+                  className="h-full gradient-primary transition-all duration-1000 ease-out" 
+                  style={{ width: `${overallProgress}%` }}
+                />
+              </div>
+
+              <p className="text-sm text-muted-foreground mt-4 italic">
+                {overallProgress === 0 
+                  ? "Comienza tu primer módulo para ver tu progreso aquí." 
+                  : overallProgress === 100 
+                  ? "¡Felicidades! Has completado todos los módulos."
+                  : "Sigue así, estás cada vez más cerca de completar tu formación."}
               </p>
             </div>
           </div>

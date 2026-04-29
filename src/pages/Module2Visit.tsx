@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { updateProgress } from "@/lib/progressHelper";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
@@ -36,7 +37,22 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
 };
 const Module2Visit = () => {
   const navigate = useNavigate();
-  const [known, setKnown] = useState<Record<number, boolean>>({});
+  const [isSaving, setIsSaving] = useState(false);
+
+  // --- FUNCIÓN DE PROGRESO ---
+  const handleContinue = async () => {
+    setIsSaving(true);
+    try {
+      // Marcamos la cuarta parte del Módulo 2 (m2_visit)
+      await updateProgress("m2_visit");
+      navigate("/module-2-game");
+    } catch (error) {
+      console.error("Error al guardar progreso:", error);
+      navigate("/module-2-game");
+    } finally {
+      setIsSaving(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -131,13 +147,18 @@ const Module2Visit = () => {
           {/* Closing */}
           <ScrollReveal>
             
-                <div className="flex justify-center mt-10">
+                <div className="flex justify-center mt-12">
                   <Button
-                    onClick={() => navigate("/module-2-game")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
+                    onClick={handleContinue}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform"
                   >
-                    Continuar con la siguiente sección
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    {isSaving ? (
+                      <Loader2 className="mr-2 animate-spin" />
+                    ) : (
+                      "Continuar con la siguiente sección"
+                    )}
+                    {!isSaving && <ArrowRight className="ml-2 w-6 h-6" />}
                   </Button>
                 </div>
           </ScrollReveal>

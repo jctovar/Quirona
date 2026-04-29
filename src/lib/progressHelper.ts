@@ -1,53 +1,41 @@
 import { supabase } from "@/supabaseClient";
 
-// Definimos todas las partes de los 4 módulos (7 por módulo = 28 total)
-const TOTAL_STEPS = 28;
-
 export const updateProgress = async (columnName: string) => {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("No hay sesión de usuario");
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
 
-    // 1. Primero, marcamos la actividad actual como completada
-    const { error: updateError } = await supabase
+  // 1. Primero marcamos la actividad actual como completada
+  const { data: currentProgress } = await supabase
+    .from('user_progress')
+    .upsert({ id: user.id, [columnName]: true })
+    .select()
+    .single();
+
+  // 2. Traemos TODA la fila para contar cuántas columnas están en 'true'
+  const { data: fullRow } = await supabase
+    .from('user_progress')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  if (fullRow) {
+    // Definimos qué columnas cuentan para el progreso (M1 y M2)
+    const progressColumns = [
+      'm1_story', 'm1_intro', 'm1_quiz', 'm1_visit', 'm1_game', 'm1_feedback', 'm1_closure',
+      'm2_story', 'm2_intro', 'm2_quiz1', 'm2_visit', 'm2_game', 'm2_feedback', 'm2_quiz2', 'm2_closure'
+    ];
+
+    // Contamos cuántas de esas columnas son 'true'
+    const completedCount = progressColumns.filter(col => fullRow[col] === true).length;
+    
+    // Calculamos el porcentaje (basado en el total de pasos de los 4 módulos, aprox 30)
+    const TOTAL_STEPS = 30; 
+    const newPercentage = Math.round((completedCount / TOTAL_STEPS) * 100);
+
+    // 3. Actualizamos el porcentaje final en la base de datos
+    await supabase
       .from('user_progress')
-      .upsert({ 
-        user_id: user.id, 
-        [columnName]: true,
-        updated_at: new Date()
-      });
-
-    if (updateError) throw updateError;
-
-    // 2. Obtenemos el registro actualizado para contar cuántos 'true' hay
-    const { data: progress, error: fetchError } = await supabase
-      .from('user_progress')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-
-    if (fetchError) throw fetchError;
-
-    // 3. Contamos cuántas columnas de progreso son 'true'
-    // Filtramos las columnas que empiezan con 'm' (m1_story, m2_quiz, etc.)
-    const completedSteps = Object.keys(progress).filter(key => 
-      key.startsWith('m') && progress[key] === true
-    ).length;
-
-    // 4. Calculamos el porcentaje total
-    const newPercentage = Math.round((completedSteps / TOTAL_STEPS) * 100);
-
-    // 5. Guardamos el nuevo porcentaje total
-    const { error: finalError } = await supabase
-      .from('user_progress')
-      .update({ total_percentage: newPercentage })
-      .eq('user_id', user.id);
-
-    if (finalError) throw finalError;
-
-    return { success: true, percentage: newPercentage };
-  } catch (error) {
-    console.error("Error en el helper de progreso:", error);
-    return { success: false, error };
+      .update({ progress_percentage: newPercentage })
+      .eq('id', user.id);
   }
 };

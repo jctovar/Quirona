@@ -5,8 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, Loader2} from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/supabaseClient";
+import { updateProgress } from "@/lib/progressHelper";
+
 const statements = [
   "La privacidad es un derecho que hace que una consulta sea más segura.",
   "El consentimiento implica que no sólo estás informada, sino que también estás convencida de querer realizarte un procedimiento médico.",
@@ -18,13 +21,44 @@ const Module2Quiz = () => {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const allAnswered = Object.keys(answers).length === statements.length;
-  const handleSubmit = () => {
+
+  // --- FUNCIÓN DE GUARDADO Y PROGRESO ---
+  const handleSubmit = async () => {
     if (!allAnswered) {
       toast.error("Por favor responde todas las afirmaciones antes de continuar.");
       return;
     }
-    setSubmitted(true);
+
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No hay sesión activa");
+
+      // 1. Guardamos las respuestas en la tabla del Módulo 2
+      const { error: saveError } = await supabase
+        .from('module_2_responses')
+        .upsert({
+          id: user.id,
+          quiz1_answers: answers,
+          updated_at: new Date()
+        });
+
+      if (saveError) throw saveError;
+
+      // 2. Actualizamos el progreso global (m2_quiz1)
+      await updateProgress("m2_quiz1");
+
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (error: any) {
+      console.error("Error al guardar quiz:", error);
+      toast.error("Hubo un problema al registrar tus respuestas.");
+    } finally {
+      setIsSaving(false);
+    }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -73,11 +107,20 @@ const Module2Quiz = () => {
                   <div className="flex justify-center mt-10">
                     <Button
                       onClick={handleSubmit}
-                      className="gradient-primary text-white px-8 py-6 text-lg"
-                      disabled={!allAnswered}
+                      className="gradient-primary text-white px-10 py-7 text-lg shadow-lg"
+                      disabled={!allAnswered || isSaving}
                     >
-                      Enviar respuestas
-                      <ArrowRight className="ml-2 w-5 h-5" />
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          Enviar respuestas
+                          <ArrowRight className="ml-2 w-6 h-6" />
+                        </>
+                      )}
                     </Button>
                   </div>
                 </>
