@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Star } from "lucide-react";
+import { supabase } from "@/supabaseClient";
+import { updateProgress } from "@/lib/progressHelper";
+import { Loader2 } from "lucide-react";
 
 const questions = [
   {
@@ -95,6 +98,7 @@ const violenceGroups = [
 
 const Module3Game = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const [phase, setPhase] = useState<"intro" | "playing" | "feedback" | "done">("intro");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [step, setStep] = useState<"yesno" | "group">("yesno");
@@ -132,6 +136,30 @@ const Module3Game = () => {
 
   const currentQuestion = questions[questionIndex];
 
+  const saveGameResults = async (finalPoints: number) => {
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // 1. Guardamos el puntaje (game_score) en la tabla del módulo 3
+      await supabase
+        .from('module_3_responses')
+        .upsert({ 
+          id: user.id, 
+          game_score: finalPoints,
+          updated_at: new Date() 
+        });
+
+      // 2. Marcamos m3_game como completado en el progreso general
+      await updateProgress("m3_game");
+    } catch (error) {
+      console.error("Error al guardar resultados del juego:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const finishQuestion = (secondCriterion: boolean, firstCriterionParam?: boolean, userResponseParam?: boolean, groupAnswerParam?: string) => {
     const firstCriterionValue = firstCriterionParam !== undefined ? firstCriterionParam : firstCriterionCorrect;
     // Para preguntas que NO son violencia (shouldBeYes = false), solo se necesita el primer criterio
@@ -160,6 +188,7 @@ const Module3Game = () => {
     if (nextIndex >= questions.length) {
       setPhase("feedback");
       // Increment play count
+      saveGameResults(totalCorrect ? points + 1 : points);
       const newCount = playCount + 1;
       localStorage.setItem('module3PlayCount', newCount.toString());
       setPlayCount(newCount);
@@ -343,7 +372,12 @@ const Module3Game = () => {
                   <Button onClick={startGame} className="bg-blue-600 text-white hover:bg-blue-700 px-8">
                     Jugar otra vez
                   </Button>
-                  <Button onClick={() => navigate("/module-3-feedback")} className="bg-gray-500 text-white hover:bg-gray-600 px-8">
+                  <Button 
+                    onClick={() => navigate("/module-3-feedback")} 
+                    disabled={isSaving}
+                    className="bg-gray-500 text-white hover:bg-gray-600 px-8"
+                  >
+                    {isSaving ? <Loader2 className="animate-spin mr-2" /> : null}
                     Ir a retroalimentación
                   </Button>
                 </div>

@@ -3,9 +3,10 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone } from "lucide-react";
+import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { updateProgress } from "@/lib/progressHelper";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -66,9 +67,23 @@ const myths = [
 ];
 const Module3Introduction = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const [heardMyths, setHeardMyths] = useState<Record<number, boolean>>({});
   const toggleMyth = (index: number) => {
     setHeardMyths((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+const handleContinue = async () => {
+    setIsSaving(true);
+    try {
+      // Guardamos m3_intro en user_progress
+      await updateProgress("m3_intro");
+      navigate("/module-3-quiz");
+    } catch (error) {
+      console.error("Error al guardar progreso:", error);
+      navigate("/module-3-quiz");
+    } finally {
+      setIsSaving(false);
+    }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -156,12 +171,14 @@ const Module3Introduction = () => {
                     Toma en cuenta que no todas ni todos los trabajadores de consultorios, clínicas y hospitales llevarán a cabo actos de violencia ginecológica. Muchos profesionales harán lo necesario para tu bienestar físico, mental y emocional, y además harán lo necesario para que te sientas segura y cómoda. Si aprendes a identificar los actos de violencia ginecológica podrás diferenciar los lugares donde tu bienestar, tus derechos y tu dignidad sean lo más importante de los espacios en los que no te cuidan, y esto te permitirá construir una relación de confianza con tu médico.</p>
                 <div className="flex justify-center mt-10">
                   <Button
-                    onClick={() => navigate("/module-3-quiz")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
-                  >
-                    Continuar con la siguiente sección
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Button>
+                  onClick={handleContinue}
+                  disabled={isSaving}
+                  className="gradient-primary text-white px-12 py-8 text-xl shadow-xl hover:scale-105 transition-transform"
+                >
+                  {isSaving ? <Loader2 className="animate-spin mr-2" /> : null}
+                  Continuar al Quiz del Módulo
+                  <ArrowRight className="ml-2 w-6 h-6" />
+                </Button>
                 </div>
               </CardContent>
             </Card>
@@ -172,3 +189,7 @@ const Module3Introduction = () => {
   );
 };
 export default Module3Introduction;
+function setIsSaving(arg0: boolean) {
+  throw new Error("Function not implemented.");
+}
+

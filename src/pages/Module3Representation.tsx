@@ -6,6 +6,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { updateProgress } from "@/lib/progressHelper";
+import { Loader2 } from "lucide-react";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
@@ -36,7 +38,22 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
 };
 const Module3Representation = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const [known, setKnown] = useState<Record<number, boolean>>({});
+  const handleContinue = async () => {
+  setIsSaving(true);
+  try {
+    // Marcamos m3_feedback en el progreso
+    await updateProgress("m3_representation");
+    navigate("/module-3-game");
+  } catch (error) {
+    console.error("Error al guardar progreso:", error);
+    navigate("/module-3-game");
+  } finally {
+    setIsSaving(false);
+  }
+};
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -151,26 +168,33 @@ const Module3Representation = () => {
           </ScrollReveal>
     
           {/* Closing */}
-         <ScrollReveal>
-                     <Card className="border-2 shadow-quirona">
-                       <CardContent className="p-8 md:p-12">
-                         <div className="space-y-4 text-foreground leading-relaxed">
-                           <p>
-                             <strong>Ninguno de estos actos es justificable de ninguna manera, es decir, no hay razón válida alguna para que se te trate de esta manera.</strong>Algunas personas podrían intentar justificarlas pidiendo comprensión para el personal de salud, ya que son profesionales que constantemente están bajo presión y cansancio. Esto tampoco exime su responsabilidad profesional, ya que el mal trato que ellos puedan recibir,<strong>no debe depositarse en el paciente.</strong>
-                           </p>
-                         </div>
-                         <div className="flex justify-center mt-10">
-                           <Button
-                             onClick={() => navigate("/module-3-game")}
-                             className="gradient-primary text-white px-8 py-6 text-lg"
-                           >
-                             Continuar con la siguiente sección
-                             <ArrowRight className="ml-2 w-5 h-5" />
-                           </Button>
-                         </div>
-                       </CardContent>
-                     </Card>
-                   </ScrollReveal>
+        <ScrollReveal>
+                    <Card className="border-2 shadow-quirona">
+                      <CardContent className="p-8 md:p-12">
+                        <div className="space-y-4 text-foreground leading-relaxed">
+                          <p>
+                            <strong>Ninguno de estos actos es justificable de ninguna manera, es decir, no hay razón válida alguna para que se te trate de esta manera.</strong>Algunas personas podrían intentar justificarlas pidiendo comprensión para el personal de salud, ya que son profesionales que constantemente están bajo presión y cansancio. Esto tampoco exime su responsabilidad profesional, ya que el mal trato que ellos puedan recibir,<strong>no debe depositarse en el paciente.</strong>
+                          </p>
+                        </div>
+                        <div className="flex justify-center mt-10">
+                          <Button
+                            onClick={handleContinue}
+                            disabled={isSaving}
+                            className="gradient-primary text-white px-8 py-5 text-lg"
+                          >
+                            {isSaving ? (
+                              <Loader2 className="animate-spin mr-2" />
+                            ) : (
+                              <>
+                                Continuar
+                                <ArrowRight className="ml-2 w-5 h-5" />
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </ScrollReveal>
         </div>
       </div>
     </div>

@@ -6,12 +6,59 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { supabase } from "@/supabaseClient";
+import { updateProgress } from "@/lib/progressHelper";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 const Module3Closure = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const [phase, setPhase] = useState<"questions" | "story">("questions");
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState({ fear: "", phrase: "", advice: "" });
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
+  const handleFinishQuestions = async () => {
+    // Validamos que no estén vacías
+    if (!answers.fear || !answers.phrase || !answers.advice) {
+      toast.error("Por favor, comparte tus reflexiones antes de continuar.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from('module_3_responses')
+          .upsert({
+            id: user.id,
+            feedback_responses: answers, // Guardamos el objeto con las 3 respuestas
+            updated_at: new Date()
+          });
+      }
+      setPhase("story");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("No se pudieron guardar tus respuestas, pero puedes continuar.");
+      setPhase("story");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCompleteModule = async () => {
+    setIsSaving(true);
+    try {
+      await updateProgress("m3_closure");
+      toast.success("¡Módulo 3 completado con éxito!");
+      navigate("/dashboard");
+    } catch (error) {
+      navigate("/dashboard");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const storyPages = [
     (
@@ -168,10 +215,12 @@ const Module3Closure = () => {
                 </div>
                 <div className="flex justify-center pt-4">
                   <Button
-                    onClick={() => setPhase("story")}
+                    onClick={handleFinishQuestions}
+                    disabled={isSaving}
                     className="gradient-primary text-white px-8 py-6 text-lg"
                   >
-                    Continuar
+                    {isSaving ? <Loader2 className="animate-spin mr-2" /> : null}
+                    Continuar a la resolución
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </div>
@@ -231,9 +280,11 @@ const Module3Closure = () => {
                 {page === storyPages.length - 1 && (
                   <div className="flex justify-center mt-10">
                     <Button
-                      onClick={() => navigate("/dashboard")}
+                      onClick={handleCompleteModule}
+                      disabled={isSaving}
                       className="gradient-primary text-white px-8 py-6 text-lg"
                     >
+                      {isSaving ? <Loader2 className="animate-spin mr-2" /> : null}
                       Finalizar módulo
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>

@@ -3,11 +3,14 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { updateProgress } from "@/lib/progressHelper";
+
 const Module3Story = () => {
   const navigate = useNavigate();
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
 
   // user preferences for accessibility
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
@@ -133,15 +136,28 @@ const Module3Story = () => {
     ),
   ];
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (showQuestions) {
-      navigate("/module-3-intro");
+      setIsSaving(true);
+      try {
+        // Marcamos m3_story en la base de datos
+        await updateProgress("m3_story");
+        navigate("/module-3-intro");
+      } catch (error) {
+        console.error("Error al guardar progreso:", error);
+        navigate("/module-3-intro");
+      } finally {
+        setIsSaving(false);
+      }
       return;
     }
+
     if (page < pages.length - 1) {
       setPage((p) => p + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       setShowQuestions(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -217,15 +233,21 @@ const Module3Story = () => {
                 </div>
               )}
 
-              {/* show continue button only on last page or when questions visible */}
-              {(!showQuestions && page === pages.length - 1) || showQuestions ? (
+              {((page === pages.length - 1) || showQuestions) && (
                 <div className="flex justify-center mt-10">
-                  <Button onClick={handleContinue} className="gradient-primary text-white px-8 py-6 text-lg">
-                    {showQuestions ? "Continuar a la siguiente sección" : "Ver preguntas"}
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                  <Button 
+                    onClick={handleContinue} 
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform"
+                  >
+                    {isSaving ? (
+                      <Loader2 className="animate-spin mr-2" />
+                    ) : null}
+                    {showQuestions ? "Continuar a la siguiente sección" : "Ver reflexiones"}
+                    {!isSaving && <ArrowRight className="ml-2 w-6 h-6" />}
                   </Button>
                 </div>
-              ) : null}
+              )}
             </CardContent>
           </Card>
         </div>

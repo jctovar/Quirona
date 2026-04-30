@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useState } from "react"; 
+import { updateProgress } from "@/lib/progressHelper";
+import { Loader2 } from "lucide-react";
 const correctAnswers: Record<number, { text: string; violenceType: string }> = {
   1: { text: 'El médico revisa tus resultados y comenta en tono de desaprobación: "Con tantas parejas, no me sorprende que tengas esta infección; deberías tener más respeto por ti misma".', violenceType: "Violencias psicológicas y de subordinación" },
   2: { text: 'Al solicitar una ligadura de trompas, la doctora te responde "Es un desperdicio; eres joven y vas a cambiar de opinión porque tu destino natural es ser madre".', violenceType: "Violencias psicológicas y de subordinación" },
@@ -19,8 +22,23 @@ const correctAnswers: Record<number, { text: string; violenceType: string }> = {
   13: { text: 'Solicitas tu expediente para una segunda opinión y la ginecóloga te dice que "se extravió".', violenceType: "No es violencia ginecológica" },
   14: { text: 'El consultorio no está lo suficientemente equipado. La ginecóloga te pide que esperes en bata en un pasillo donde transitan otras personas.', violenceType: "No es violencia ginecológica" },
 };
+
 const Module3Feedback = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
+  const handleContinue = async () => {
+  setIsSaving(true);
+  try {
+    // Marcamos m3_feedback en el progreso
+    await updateProgress("m3_feedback");
+    navigate("/module-3-closure");
+  } catch (error) {
+    console.error("Error al guardar progreso:", error);
+    navigate("/module-3-closure");
+  } finally {
+    setIsSaving(false);
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -34,11 +52,18 @@ const Module3Feedback = () => {
                 A continuación encontrarás las respuestas correctas para identificar situaciones de violencia ginecológica.
               </p>
               <Button
-                onClick={() => navigate("/module-3-closure")}
+                onClick={handleContinue}
+                disabled={isSaving}
                 className="gradient-primary text-white px-8 py-5 text-lg"
               >
-                Continuar
-                <ArrowRight className="ml-2 w-5 h-5" />
+                {isSaving ? (
+                  <Loader2 className="animate-spin mr-2" />
+                ) : (
+                  <>
+                    Continuar
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </>
+                )}
               </Button>
             </CardContent>
           </Card>

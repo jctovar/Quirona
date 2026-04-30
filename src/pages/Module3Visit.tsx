@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react"; // Importamos Loader2
+import { updateProgress } from "@/lib/progressHelper";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
@@ -36,7 +37,21 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
 };
 const Module3Visit = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const [known, setKnown] = useState<Record<number, boolean>>({});
+  const handleContinue = async () => {
+    setIsSaving(true);
+    try {
+      // Guardamos el paso 4 del Módulo 3
+      await updateProgress("m3_visit");
+      navigate("/module-3-representation"); // Siguiente sección
+    } catch (error) {
+      console.error("Error al guardar progreso:", error);
+      navigate("/module-3-representation");
+    } finally {
+      setIsSaving(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -81,7 +96,7 @@ const Module3Visit = () => {
 
               {/* Right Column - List of Examples/Points */}
               <div className="space-y-4">
-                <Card className="border-2 shadow-quirona h-full">
+                <Card className="border-2 shadow-quirona h-full shadow-none h-full bg-muted/20">
                   <CardContent className="p-8 md:p-12">
                     <div className="space-y-4 text-foreground leading-relaxed">
                     <h3 className="text-xl font-bold text-primary px-4">
@@ -109,7 +124,7 @@ const Module3Visit = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left Column - Informative Text */}
               <div className="space-y-6">
-                <Card className="border-2 shadow-quirona h-full">
+                <Card className="border-2 shadow-quirona h-full shadow-none h-full bg-muted/20">
                   <CardContent className="p-8 md:p-12">
                     <div className="space-y-4 text-foreground leading-relaxed">
                       <br />
@@ -172,7 +187,7 @@ const Module3Visit = () => {
 
               {/* Right Column - List of Examples/Points */}
               <div className="space-y-4">
-                <Card className="border-2 shadow-quirona h-full">
+                <Card className="border-2 shadow-quirona h-full shadow-none h-full bg-muted/20">
                   <CardContent className="p-8 md:p-12">
                     <div className="space-y-4 text-foreground leading-relaxed"><br />
                       <p className="text-base italic text-muted-foreground">
@@ -197,7 +212,7 @@ const Module3Visit = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left Column - Informative Text */}
               <div className="space-y-6">
-                <Card className="border-2 shadow-quirona h-full">
+                <Card className="border-2 shadow-quirona h-full shadow-none h-full bg-muted/20">
                   <CardContent className="p-8 md:p-12">
                     <div className="space-y-4 text-foreground leading-relaxed">
                       <br /><br />
@@ -260,8 +275,8 @@ const Module3Visit = () => {
 
               {/* Right Column - List of Examples/Points */}
               <div className="space-y-4">
-                <Card className="border-2 shadow-quirona h-full">
-                  <CardContent className="p-8 md:p-12">
+                <Card className="border-2 shadow-quirona h-full shadow-none h-full bg-muted/20">
+                  <CardContent className="p-8 md:p-12 ">
                     <div className="space-y-4 text-foreground leading-relaxed">
                      <br />
                       <p className="text-base italic text-muted-foreground">
@@ -293,11 +308,18 @@ const Module3Visit = () => {
                 </div>
                 <div className="flex justify-center mt-10">
                   <Button
-                    onClick={() => navigate("/module-3-representation")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
+                    onClick={handleContinue}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-12 py-8 text-xl shadow-xl hover:scale-105 transition-transform"
                   >
-                    Continuar con la siguiente sección
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    {isSaving ? (
+                      <Loader2 className="animate-spin mr-2" />
+                    ) : (
+                      <>
+                        Continuar con la siguiente sección
+                        <ArrowRight className="ml-2 w-6 h-6" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>
