@@ -6,6 +6,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { updateProgress } from "@/lib/progressHelper";
+import { Loader2 } from "lucide-react";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
@@ -36,7 +38,22 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
 };
 const Module4Visit = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const [known, setKnown] = useState<Record<number, boolean>>({});
+
+  const handleContinue = async () => {
+  setIsSaving(true);
+  try {
+    // Marcamos m4_visit en la base de datos
+    await updateProgress("m4_visit");
+    navigate("/module-4-game");
+  } catch (error) {
+    console.error("Error al guardar progreso:", error);
+    navigate("/module-4-game");
+  } finally {
+    setIsSaving(false);
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -208,11 +225,21 @@ const Module4Visit = () => {
             
                 <div className="flex justify-center mt-10">
                   <Button
-                    onClick={() => navigate("/module-4-game")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
+                    onClick={handleContinue}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform"
                   >
-                    Continuar con la siguiente sección
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2" />
+                        Guardando...
+                      </>
+                    ) : (
+                      <>
+                        Continuar con la siguiente sección
+                        <ArrowRight className="ml-2 w-6 h-6" />
+                      </>
+                    )}
                   </Button>
                 </div>
           </ScrollReveal>

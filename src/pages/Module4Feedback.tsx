@@ -5,6 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight, Star, RotateCcw } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { updateProgress } from "@/lib/progressHelper";
+import { Loader2 } from "lucide-react";
+
 const feedbackData: Record<number, string> = {
   1: "No asertiva: Te minimiza y te calla. Preguntar no es ser intensa: es participar y cuidarte.",
   2: "Asertiva: Protege tu privacidad y establece una regla clara: nadie entra al consultorio sin tu autorización.",
@@ -52,6 +55,7 @@ const correctInside = [1, 3, 5, 7, 9, 11, 13, 15, 18, 19];
 const correctOutside = [2, 4, 6, 8, 10, 12, 14, 16, 17];
 const Module4Feedback = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const location = useLocation();
   const state = location.state as { score?: number; accepted?: number[]; rejected?: number[]; attempts?: number } | null;
   const score = state?.score ?? 0;
@@ -60,6 +64,20 @@ const Module4Feedback = () => {
   const attempts = state?.attempts ?? 1;
   const stars = score <= 5 ? 1 : score <= 10 ? 2 : 3;
   const canRetry = attempts < 3;
+
+  const handleContinue = async () => {
+    setIsSaving(true);
+    try {
+      await updateProgress("m4_feedback");
+      navigate("/module-4-closure");
+    } catch (error) {
+      console.error("Error al guardar progreso:", error);
+      navigate("/module-4-closure");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
@@ -96,9 +114,11 @@ const Module4Feedback = () => {
                   </Button>
                 )}
                 <Button
-                  onClick={() => navigate("/module-4-closure")}
+                  onClick={handleContinue}
+                  disabled={isSaving}
                   className="gradient-primary text-white px-8 py-5 text-lg"
                 >
+                  {isSaving ? <Loader2 className="animate-spin mr-2" /> : null}
                   Continuar
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
@@ -111,7 +131,7 @@ const Module4Feedback = () => {
               <h2 className="text-2xl font-bold text-primary mb-6">
                 Revisemos cada frase:
               </h2>
-              <ScrollArea className="max-h-[600px]">
+              <ScrollArea className="h-[700px] w-full rounded-md border p-4 bg-white/50">
                 <div className="space-y-6 pr-4">
                   {Object.keys(phraseTexts)
                     .map(Number)
@@ -122,43 +142,45 @@ const Module4Feedback = () => {
                       const userRejected = rejected.includes(id);
                       const userCorrect = isCorrectInside ? userAccepted : userRejected;
                       const unanswered = !userAccepted && !userRejected;
+                      
                       return (
                         <div
                           key={id}
-                          className={`p-5 rounded-xl border-2 ${
+                          className={`p-6 rounded-xl border-2 transition-colors ${
                             unanswered
                               ? "border-muted bg-muted/20"
                               : userCorrect
-                              ? "border-emerald-300 bg-emerald-50/50"
-                              : "border-destructive/30 bg-destructive/5"
+                              ? "border-primary/30 bg-primary/10" // MORADO CLARO (Correcto)
+                              : "border-primary bg-primary/30"    // MORADO MÁS FUERTE (Incorrecto)
                           }`}
                         >
-                          <div className="flex items-start gap-3 mb-2">
+                          <div className="flex items-start gap-3 mb-3">
                             <span
-                              className={`text-xs font-bold px-2 py-1 rounded ${
+                              className={`text-xs font-bold px-3 py-1 rounded-full ${
                                 isCorrectInside
-                                  ? "bg-emerald-100 text-emerald-700"
-                                  : "bg-red-100 text-red-700"
+                                  ? "bg-primary text-white" 
+                                  : "bg-destructive text-white"
                               }`}
                             >
-                              {isCorrectInside ? "QUÉDATE" : "FUERA"}
+                              {isCorrectInside ? "ASERTIVA" : "NO ASERTIVA"}
                             </span>
+                            
                             {!unanswered && (
                               <span
-                                className={`text-xs font-bold px-2 py-1 rounded ${
+                                className={`text-xs font-bold px-3 py-1 rounded-full ${
                                   userCorrect
-                                    ? "bg-emerald-100 text-emerald-700"
-                                    : "bg-red-100 text-red-700"
+                                    ? "bg-green-100 text-green-700 border border-green-300"
+                                    : "bg-red-100 text-red-700 border border-red-300"
                                 }`}
                               >
-                                {userCorrect ? "✓ Correcto" : "✗ Incorrecto"}
+                                {userCorrect ? "✓ Tu respuesta fue correcta" : "✗ Tu respuesta fue incorrecta"}
                               </span>
                             )}
                           </div>
-                          <p className="font-medium text-foreground mb-2">
+                          <p className="font-semibold text-foreground text-lg mb-2">
                             {phraseTexts[id]}
                           </p>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
+                          <p className={`text-sm leading-relaxed ${userCorrect ? "text-muted-foreground" : "text-foreground font-medium"}`}>
                             {feedbackData[id]}
                           </p>
                         </div>

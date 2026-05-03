@@ -3,9 +3,10 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone} from "lucide-react";
+import { ArrowRight, Loader2, BookOpen, Heart, Shield, MessageCircle, Smartphone} from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { updateProgress } from "@/lib/progressHelper";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -56,9 +57,24 @@ const myths = [
 ];
 const Module4Introduction = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const [heardMyths, setHeardMyths] = useState<Record<number, boolean>>({});
   const toggleMyth = (index: number) => {
     setHeardMyths((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  // --- FUNCIÓN PARA GUARDAR PROGRESO ---
+  const handleContinue = async () => {
+    setIsSaving(true);
+    try {
+      await updateProgress("m4_intro");
+      navigate("/module-4-quiz"); // Ruta al quiz del módulo 4
+    } catch (error) {
+      console.error("Error al guardar progreso:", error);
+      navigate("/module-4-quiz");
+    } finally {
+      setIsSaving(false);
+    }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
@@ -129,11 +145,18 @@ const Module4Introduction = () => {
               <CardContent className="p-8 md:p-12">
                 <div className="flex justify-center mt-10">
                   <Button
-                    onClick={() => navigate("/module-4-quiz")}
-                    className="gradient-primary text-white px-8 py-6 text-lg"
+                    onClick={handleContinue}
+                    disabled={isSaving}
+                    className="gradient-primary text-white px-10 py-7 text-xl shadow-xl hover:scale-105 transition-transform"
                   >
-                    Continuar con la siguiente sección
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    {isSaving ? (
+                      <Loader2 className="animate-spin mr-2" />
+                    ) : (
+                      <>
+                        Continuar con la siguiente sección
+                        <ArrowRight className="ml-2 w-6 h-6" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>

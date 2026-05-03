@@ -6,12 +6,65 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { supabase } from "@/supabaseClient";
+import { updateProgress } from "@/lib/progressHelper";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
 const Module4Closure = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const [phase, setPhase] = useState<"questions" | "story">("questions");
   const [page, setPage] = useState(0);
-  const [answers, setAnswers] = useState({ fear: "", phrase: "", advice: "" });
+  const [answers, setAnswers] = useState({ 
+    fear: "", 
+    phrase: "", 
+    response_no_exp: "", 
+    response_pain: "" 
+  });
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
+
+  const handleFinishQuestions = async () => {
+    // Validación básica
+    if (Object.values(answers).some(a => !a.trim())) {
+      toast.error("Por favor, comparte tus reflexiones en todos los campos.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from('module_4_responses')
+          .upsert({
+            id: user.id,
+            closure_answers: answers, // Guardamos las 4 respuestas abiertas
+            updated_at: new Date()
+          });
+      }
+      setPhase("story");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      console.error("Error:", error);
+      setPhase("story");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCompleteModule = async () => {
+    setIsSaving(true);
+    try {
+      await updateProgress("m4_closure");
+      toast.success("¡Felicidades! Has completado el programa formativo.");
+      navigate("/dashboard");
+    } catch (error) {
+      navigate("/dashboard");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const storyPages = [
     (
@@ -339,9 +392,8 @@ const Module4Closure = () => {
                     </Label>
                     <Textarea
                       placeholder="Escribe tu respuesta aquí..."
-                      className="min-h-[120px]"
-                      value={answers.advice}
-                      onChange={(e) => setAnswers({ ...answers, advice: e.target.value })}
+                      value={answers.response_no_exp}
+                      onChange={(e) => setAnswers({ ...answers, response_no_exp: e.target.value })}
                     />
                   </div>
                   <div className="space-y-2">
@@ -350,18 +402,18 @@ const Module4Closure = () => {
                     </Label>
                     <Textarea
                       placeholder="Escribe tu respuesta aquí..."
-                      className="min-h-[120px]"
-                      value={answers.advice}
-                      onChange={(e) => setAnswers({ ...answers, advice: e.target.value })}
+                      value={answers.response_pain}
+                      onChange={(e) => setAnswers({ ...answers, response_pain: e.target.value })}
                     />
                   </div>
                 </div>
                 <div className="flex justify-center pt-4">
                   <Button
-                    onClick={() => setPhase("story")}
+                    onClick={handleFinishQuestions}
+                    disabled={isSaving}
                     className="gradient-primary text-white px-8 py-6 text-lg"
                   >
-                    Continuar
+                    {isSaving ? <Loader2 className="animate-spin mr-2" /> : "Continuar"}
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </div>
@@ -421,10 +473,11 @@ const Module4Closure = () => {
                 {page === storyPages.length - 1 && (
                   <div className="flex justify-center mt-10">
                     <Button
-                      onClick={() => navigate("/dashboard")}
+                      onClick={handleCompleteModule}
+                      disabled={isSaving}
                       className="gradient-primary text-white px-8 py-6 text-lg"
                     >
-                      Finalizar módulo
+                      {isSaving ? <Loader2 className="animate-spin mr-2" /> : "Finalizar módulo"}
                       <ArrowRight className="ml-2 w-5 h-5" />
                     </Button>
                   </div>

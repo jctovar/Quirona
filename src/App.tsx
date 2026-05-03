@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import QuienesSomos from "./pages/QuienesSomos";
+import FinalTest1 from "./pages/FinalTest1";
 import Preguntas from "./pages/Preguntas";
 import Contenidos from "./pages/Contenidos";
 import Trabajos from "./pages/Trabajos";
@@ -109,6 +110,7 @@ const App = () => (
           <Route path="/module-4-feedback" element={<Module4Feedback />} />
           <Route path="/module-4-closure" element={<Module4Closure />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/final-test-1" element={<FinalTest1 />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -6,6 +6,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowRight, Clock, CheckCircle, XCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import sillaImg from "@/assets/silla.jpg";
+import { supabase } from "@/supabaseClient";
+import { updateProgress } from "@/lib/progressHelper";
+import { Loader2 } from "lucide-react";
+
 const phrases = [
   { id: 1, text: '“Perdón por molestar, mejor no pregunto para no verme intensa.”', correct: true },
   { id: 2, text: '“Necesito que cierren la puerta y que nadie entre sin mi consentimiento.”', correct: false },
@@ -43,6 +47,7 @@ const Module4Game = () => {
   const prevAttempts = (location.state as { attempts?: number } | null)?.attempts ?? 0;
   const [phase, setPhase] = useState<"intro" | "playing" | "done">("intro");
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME);
+  const [isSaving, setIsSaving] = useState(false);
   const [queue, setQueue] = useState<typeof phrases>([]);
   const [visible, setVisible] = useState<typeof phrases>([]);
   const [accepted, setAccepted] = useState<number[]>([]);
@@ -120,6 +125,43 @@ const Module4Game = () => {
       if (!p?.correct) correct++;
     });
     return correct;
+  };
+  const handleFinishGame = async () => {
+    setIsSaving(true);
+    const score = getScore();
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // 1. Guardamos el score en la tabla del Módulo 4
+        await supabase
+          .from('module_4_responses')
+          .upsert({
+            id: user.id,
+            game_score: score,
+            updated_at: new Date()
+          });
+      }
+
+      // 2. Marcamos m4_game en el progreso
+      await updateProgress("m4_game");
+
+      // 3. Navegamos al feedback pasando los datos
+      navigate("/module-4-feedback", { 
+        state: { 
+          score, 
+          accepted, 
+          rejected, 
+          attempts: prevAttempts + 1 
+        } 
+      });
+    } catch (error) {
+      console.error("Error al guardar juego:", error);
+      // Navegamos de todos modos para no bloquear a la usuaria
+      navigate("/module-4-feedback");
+    } finally {
+      setIsSaving(false);
+    }
   };
   // Ensure at least one correct phrase is visible
   useEffect(() => {
@@ -249,14 +291,21 @@ const Module4Game = () => {
                   Clasificaste {accepted.length + rejected.length} de {phrases.length} frases.
                 </p>
                 <Button
-                  onClick={() => {
-                    const score = getScore();
-                    navigate("/module-4-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });
-                  }}
+                  onClick={handleFinishGame}
+                  disabled={isSaving}
                   className="gradient-primary text-white px-8 py-6 text-lg"
                 >
-                  Ver retroalimentación
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="animate-spin mr-2" />
+                      Guardando...
+                    </>
+                  ) : (
+                    <>
+                      Ver retroalimentación
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>

@@ -4,8 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { updateProgress } from "@/lib/progressHelper";
+import { Loader2 } from "lucide-react";
+
 const Module4Story = () => {
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
 
@@ -34,8 +38,8 @@ const Module4Story = () => {
           <p>
             Fernanda dejó su pan en el plato.
           </p>
-           <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
-           —¿Pensando en qué? ¿Te pasó algo?
+          <p className="italic text-muted-foreground pl-4 border-l-4 border-primary/30">
+          —¿Pensando en qué? ¿Te pasó algo?
           </p>
         </div>
       </div>
@@ -137,15 +141,28 @@ const Module4Story = () => {
     ),
   ];
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (showQuestions) {
-      navigate("/module-4-intro");
+      setIsSaving(true);
+      try {
+        // Marcamos el primer paso del Módulo 4
+        await updateProgress("m4_story");
+        navigate("/module-4-intro");
+      } catch (error) {
+        console.error("Error al guardar progreso:", error);
+        navigate("/module-4-intro");
+      } finally {
+        setIsSaving(false);
+      }
       return;
     }
+    
     if (page < pages.length - 1) {
       setPage((p) => p + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" }); // Mejor UX
     } else {
       setShowQuestions(true);
+      window.scrollTo({ top: 0, behavior: "smooth" }); // Mejor UX
     }
   };
 
@@ -225,9 +242,14 @@ const Module4Story = () => {
               {/* show continue button only on last page or when questions visible */}
               {(!showQuestions && page === pages.length - 1) || showQuestions ? (
                 <div className="flex justify-center mt-10">
-                  <Button onClick={handleContinue} className="gradient-primary text-white px-8 py-6 text-lg">
+                  <Button 
+                    onClick={handleContinue} 
+                    disabled={isSaving} // Se desactiva si está guardando
+                    className="gradient-primary text-white px-8 py-6 text-lg"
+                  >
+                    {isSaving && <Loader2 className="animate-spin mr-2" />}
                     {showQuestions ? "Continuar a la siguiente sección" : "Ver preguntas"}
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    {!isSaving && <ArrowRight className="ml-2 w-5 h-5" />}
                   </Button>
                 </div>
               ) : null}

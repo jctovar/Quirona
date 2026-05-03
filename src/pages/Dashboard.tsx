@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { ModuleCard } from "@/components/ModuleCard";
-import { BookOpen, Shield, Heart, Users, Loader2 } from "lucide-react";
+import { BookOpen, Shield, Heart, Users, Loader2, ArrowRight, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/supabaseClient";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button"; // Corregido el import de Button
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("Usuario");
   const [overallProgress, setOverallProgress] = useState(0);
+  const [progressRecord, setProgressRecord] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,31 +20,34 @@ const Dashboard = () => {
       try {
         setLoading(true);
         
-        // 1. Obtener el usuario actual
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
-        if (userError || !user) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
           navigate("/");
           return;
         }
 
-        // Intentar obtener el nombre del usuario desde metadata
-        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || "Usuario";
-        setUsername(name);
+        // 1. OBTENER NOMBRE DESDE TABLA PROFILES
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.username) {
+          setUsername(profile.username);
+        } else {
+          setUsername(user.user_metadata?.full_name || user.email?.split('@')[0] || "Usuario");
+        }
 
-        // 2. Consultar el progreso en la tabla user_progress
-        const { data: progressData, error: progressError } = await supabase
+        // 2. CONSULTAR PROGRESO DETALLADO
+        const { data: progressData } = await supabase
           .from('user_progress')
-          .select('progress_percentage')
+          .select('*')
           .eq('id', user.id)
           .single();
 
-        if (progressError && progressError.code !== 'PGRST116') {
-          console.error("Error al obtener progreso:", progressError);
-        }
-
-        // 3. Actualizar el estado con el porcentaje real de la base de datos
         if (progressData) {
+          setProgressRecord(progressData);
           setOverallProgress(progressData.progress_percentage || 0);
         }
 
@@ -55,6 +61,56 @@ const Dashboard = () => {
     fetchUserData();
   }, [navigate]);
 
+  // LÓGICA DE REANUDACIÓN: Determina a qué ruta enviar según el progreso
+  const getResumeRoute = (moduleNum: number) => {
+    if (!progressRecord) return `/module-${moduleNum}-story`;
+
+    const p = progressRecord;
+    if (moduleNum === 1) {
+      if (!p.m1_story) return '/module-1';
+      if (!p.m1_intro) return '/module-1-intro';
+      if (!p.m1_quiz) return '/module-1-quiz';
+      if (!p.m1_visit) return '/module-1-visit';
+      if (!p.m1_game) return '/module-1-game';
+      if (!p.m1_feedback) return '/module-1-feedback';
+      if (!p.m1_closure) return '/module-1-closure';
+      return '/module-1';
+    }
+    if (moduleNum === 2) {
+      if (!p.m2_story) return '/module-2';
+      if (!p.m2_intro) return '/module-2-intro';
+      if (!p.m2_quiz1) return '/module-2-quiz-1';
+      if (!p.m2_visit) return '/module-2-visit';
+      if (!p.m2_game) return '/module-2-game';
+      if (!p.m2_feedback) return '/module-2-feedback';
+      if (!p.m2_quiz2) return '/module-2-quiz-2';
+      if (!p.m2_closure) return '/module-2-closure';
+      return '/module-2';
+    }
+    if (moduleNum === 3) {
+      if (!p.m3_story) return '/module-3';
+      if (!p.m3_intro) return '/module-3-intro';
+      if (!p.m3_quiz) return '/module-3-quiz';
+      if (!p.m3_visit) return '/module-3-visit';
+      if (!p.m3_representation) return '/module-3-representation';
+      if (!p.m3_game) return '/module-3-game';
+      if (!p.m3_feedback) return '/module-3-feedback';
+      if (!p.m3_closure) return '/module-3-closure';
+      return '/module-3';
+    }
+    if (moduleNum === 4) {
+      if (!p.m4_story) return '/module-4';
+      if (!p.m4_intro) return '/module-4-intro';
+      if (!p.m4_quiz) return '/module-4-quiz';
+      if (!p.m4_visit) return '/module-4-visit';
+      if (!p.m4_game) return '/module-4-game';
+      if (!p.m4_feedback) return '/module-4-feedback';
+      if (!p.m4_closure) return '/module-4-closure';
+      return '/module-4';
+    }
+    return `/module-${moduleNum}-story`;
+  };
+
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
@@ -65,12 +121,20 @@ const Dashboard = () => {
     }
   };
 
-  const handleModuleClick = (moduleName: string, moduleIndex: number) => {
-    const routes = ["/module-1", "/module-2", "/module-3", "/module-4"];
-    if (routes[moduleIndex]) {
-      navigate(routes[moduleIndex]);
+  const handleModuleClick = (index: number) => {
+    // Verificar si el módulo está desbloqueado
+    const moduleNum = index + 1;
+    let isUnlocked = false;
+
+    if (moduleNum === 1) isUnlocked = true;
+    if (moduleNum === 2) isUnlocked = progressRecord?.m1_closure === true;
+    if (moduleNum === 3) isUnlocked = progressRecord?.m2_closure === true;
+    if (moduleNum === 4) isUnlocked = progressRecord?.m3_closure === true;
+
+    if (isUnlocked) {
+      navigate(getResumeRoute(moduleNum));
     } else {
-      toast.info(`Módulo: ${moduleName} (próximamente disponible)`);
+      toast.warning("Este módulo está bloqueado. Debes completar el anterior primero.");
     }
   };
 
@@ -80,26 +144,36 @@ const Dashboard = () => {
       description: "Aprende los conceptos básicos sobre salud ginecológica y la importancia de la prevención en tu bienestar.",
       author: "Javier Darío Ríos Castillo",
       icon: BookOpen,
+      isUnlocked: true,
+      isCompleted: progressRecord?.m1_closure === true,
     },
     {
       title: "Estándares de atención en consulta ginecológica",
       description: "Conoce qué esperar de una consulta ginecológica de calidad, respetuosa y centrada en tus necesidades.",
       author: "Aline Gonzalez Castro",
       icon: Shield,
+      isUnlocked: progressRecord?.m1_closure === true,
+      isCompleted: progressRecord?.m2_closure === true,
     },
     {
       title: "¿Qué es la violencia ginecológica?",
       description: "Identifica situaciones de violencia ginecológica y aprende a reconocer tus derechos como paciente.",
       author: "Javier Darío Ríos Castillo",
       icon: Heart,
+      isUnlocked: progressRecord?.m2_closure === true,
+      isCompleted: progressRecord?.m3_closure === true,
     },
     {
       title: "Responder a la violencia ginecológica",
       description: "Descubre los recursos y acciones que puedes tomar si experimentas violencia ginecológica.",
       author: "Alfonso Mendoza",
       icon: Users,
+      isUnlocked: progressRecord?.m3_closure === true,
+      isCompleted: progressRecord?.m4_closure === true,
     },
   ];
+
+  const allModulesCompleted = progressRecord?.m4_closure === true;
 
   if (loading) {
     return (
@@ -111,11 +185,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar 
-        isAuthenticated 
-        username={username}
-        onLogout={handleLogout}
-      />
+      <Navbar isAuthenticated username={username} onLogout={handleLogout} />
       
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto">
@@ -135,49 +205,101 @@ const Dashboard = () => {
             <h2 className="text-2xl font-bold mb-6">Módulos educativos</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {modules.map((module, index) => (
-                <ModuleCard
-                  key={index}
-                  title={module.title}
-                  description={module.description}
-                  author={module.author}
-                  icon={module.icon}
-                  onClick={() => handleModuleClick(module.title, index)}
-                />
+                <div key={index} className={!module.isUnlocked ? "opacity-60 grayscale-[0.5]" : ""}>
+                  <ModuleCard
+                    title={module.title}
+                    description={module.description}
+                    author={module.author}
+                    icon={module.icon}
+                    onClick={() => handleModuleClick(index)}
+                  />
+                  {!module.isUnlocked && (
+                    <div className="flex items-center gap-2 mt-2 ml-2 text-xs text-muted-foreground font-medium">
+                      <Lock className="w-3 h-3" /> Contenido bloqueado
+                    </div>
+                  )}
+                  {module.isCompleted && (
+                    <div className="flex items-center gap-2 mt-2 ml-2 text-xs text-green-600 font-medium">
+                      <CheckCircle className="w-3 h-3" /> Módulo completado
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
 
-          {/* SECCIÓN DE PROGRESO CONECTADA */}
+          {/* PROGRESO GENERAL */}
           <div className="max-w-6xl mx-auto mt-12">
             <div className="bg-card rounded-2xl p-8 shadow-quirona border-2">
               <div className="flex justify-between items-end mb-4">
                 <h3 className="text-xl font-bold">Tu progreso general</h3>
                 <span className="text-2xl font-bold text-primary">{overallProgress}%</span>
               </div>
-              
               <div className="relative w-full h-4 bg-muted rounded-full overflow-hidden border">
-                {/* IMPORTANTE: Se eliminó la clase 'w-0' para que el style 
-                  tenga control total sobre el ancho 
-                */}
                 <div 
                   className="h-full gradient-primary transition-all duration-1000 ease-out" 
                   style={{ width: `${overallProgress}%` }}
                 />
               </div>
-
               <p className="text-sm text-muted-foreground mt-4 italic">
                 {overallProgress === 0 
                   ? "Comienza tu primer módulo para ver tu progreso aquí." 
-                  : overallProgress === 100 
+                  : overallProgress >= 100 
                   ? "¡Felicidades! Has completado todos los módulos."
                   : "Sigue así, estás cada vez más cerca de completar tu formación."}
               </p>
             </div>
           </div>
+
+          {/* TEST FINAL */}
+          {allModulesCompleted && (
+            <div className="max-w-6xl mx-auto mt-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+              <h2 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+                <span className="bg-primary text-white p-1 rounded-lg">✨</span>
+                Etapa Final: Evaluaciones de Cierre
+              </h2>
+              <Card className="border-2 border-primary/30 shadow-xl bg-gradient-to-r from-primary/5 to-transparent">
+                <CardContent className="p-8">
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold text-primary">¡Felicidades por completar los 4 módulos!</h3>
+                      <p className="text-muted-foreground max-w-md">
+                        Has recorrido todo el programa formativo. Ahora, te invitamos a realizar 3 breves ejercicios finales para consolidar lo aprendido.
+                      </p>
+                    </div>
+                    <Button 
+                      onClick={() => navigate("/final-test-1")}
+                      className="gradient-primary text-white px-10 py-7 text-lg shadow-lg hover:scale-105 transition-transform shrink-0"
+                    >
+                      Comenzar Evaluaciones
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
+
+// Componente local auxiliar para el icono de candado que faltaba en los imports
+const Lock = ({ className }: { className?: string }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
 
 export default Dashboard;
