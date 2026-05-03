@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import QuienesSomos from "./pages/QuienesSomos";
 import FinalTest1 from "./pages/FinalTest1";
+import FinalTest2 from "./pages/FinalTest2";
+import FinalTest3 from "./pages/FinalTest3";
 import Preguntas from "./pages/Preguntas";
 import Contenidos from "./pages/Contenidos";
 import Trabajos from "./pages/Trabajos";
@@ -111,6 +113,9 @@ const App = () => (
           <Route path="/module-4-closure" element={<Module4Closure />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/final-test-1" element={<FinalTest1 />} />
+          <Route path="/final-test-2" element={<FinalTest2 />} />
+          <Route path="/final-test-3" element={<FinalTest3 />} />
+          
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

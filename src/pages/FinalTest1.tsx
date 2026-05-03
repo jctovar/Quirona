@@ -10,9 +10,9 @@ import { toast } from "sonner";
 import { Reorder } from "framer-motion"; // Librería ideal para listas arrastrables
 
 const FinalTest1 = () => {
-  const navigate = useNavigate();
-  const [page, setPage] = useState(1);
-  const [isSaving, setIsSaving] = useState(false);
+    const navigate = useNavigate();
+    const [page, setPage] = useState(1);
+    const [isSaving, setIsSaving] = useState(false);
 
   // Estados para Ejercicio 1
   const [words1, setWords1] = useState<string[]>(Array(10).fill(""));
