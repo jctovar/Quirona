@@ -1,11 +1,14 @@
 import { Outlet } from "react-router-dom";
-import { NavbarInvestigador }  from "@/components/NavbarInvestigador";
+import { Navbar } from "@/components/Navbar";
 
-export default function ResearcherLayout() {
+const ResearcherLayout = () => {
   return (
     <>
-      <NavbarInvestigador />
+      {/* 🔥 IMPORTANTE */}
+      <Navbar isAuthenticated username="Investigador" />
       <Outlet />
     </>
   );
-}
+};
+
+export default ResearcherLayout;
