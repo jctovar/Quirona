@@ -226,6 +226,25 @@ const InitialTest = () => {
                       <Label htmlFor="gen-no" className="font-normal cursor-pointer">Prefiero no decir</Label>
                     </div>
                   </RadioGroup>
+                  {answers.genero === "hombre" && (
+                    <div className="bg-black-50 dark:bg-black-950/30 border border-black-200 dark:border-black-800 p-4 rounded-lg flex gap-3 mt-3 animate-in fade-in slide-in-from-top-2">
+                      <AlertCircle className="h-5 w-5 text-black-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-black-900 dark:text-black-200">Aviso importante</p>
+                        <p className="text-sm text-black-800 dark:text-black-300">Queremos ser muy claros desde el inicio, porque creemos que la honestidad es la base de cualquier espacio de cuidado.</p>
+                        <p className="text-sm text-black-800 dark:text-black-300">Este proyecto se encuentra en una fase inicial. Los contenidos que vas a encontrar fueron ideados y diseñados originalmente pensando en las experiencias de <span className="font-semibold">mujeres cisgenero.</span></p>
+                        <p className="font-semibold text-black-800 dark:text-black-200 text-sm">¿Qué implica esto?</p>
+                        <p className="text-sm text-black-800 dark:text-black-300">Es probable que los contenidosno reflejen plenamente las experiencias de hombres trans, mujeres trans u hombres cisgénero.</p>
+                        <p className="text-sm text-black-800 dark:text-black-300">Si perteneces a alguno de estos grupos, es posible que sientas que hay aspectos de tu vivencia no contemplados. Y tendrás razón. </p>
+                        <p className="text-sm text-black-800 dark:text-black-300">Dicho esto, <span className="font-semibold">todas las personas son bienvenidas</span> Nos alegra que estés aquí por curiosidad, aprendizaje o apoyo.</p>
+                        <p className="text-sm text-black-800 dark:text-black-300">Estamos trabajando para que este proyecto crezca y ofrecerte información según tu realidad:</p>
+                        <p className="text-sm text-black-800 dark:text-black-300 font-semibold">Hombre trans</p>
+                        <p className="text-sm text-black-800 dark:text-black-300 font-semibold">Mujer trans</p>
+                        <p className="text-sm text-black-800 dark:text-black-300 font-semibold">Hombre cis</p>
+                        <p className="text-sm text-black-800 dark:text-black-300">Gracias por tu disposición a acompañarnos en este camino. Estamos aprendiendo contigo.</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Sexo al nacer */}

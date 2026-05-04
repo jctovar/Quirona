@@ -23,6 +23,7 @@ import GeneralHealthTest from "./pages/GeneralHealthTest";
 import Derivacion from "./pages/Derivacion";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";  
+import Apoyo from "./pages/Apoyo";
 import Module1Story from "./pages/Module1Story";
 import Module1Introduction from "./pages/Module1Introduction";
 import Module1Quiz from "./pages/Module1Quiz";
@@ -87,8 +88,9 @@ const App = () => (
               <Route path="/adverse-experiences" element={<AdverseExperiencesTest />} />
               <Route path="/general-health" element={<GeneralHealthTest />} />
               <Route path="/derivacion" element={<Derivacion />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />}/>
               <Route path="/profile" element={<Profile />} />
+              <Route path="/apoyo" element={<Apoyo />} />
               <Route path="/final-test-1" element={<FinalTest1 />} />
               <Route path="/final-test-2" element={<FinalTest2 />} />
               <Route path="/final-test-3" element={<FinalTest3 />} />
@@ -177,3 +179,7 @@ const App = () => (
           );
 
 export default App;
+function isAllTestsCompleted() {
+  throw new Error("Function not implemented.");
+}
+

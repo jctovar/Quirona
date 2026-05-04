@@ -232,13 +232,6 @@ const GeneralHealthTest = () => {
                     </svg>
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold">¡Has completado todos los cuestionarios!</h3>
-                <p className="text-muted-foreground">
-                  Has finalizado exitosamente la evaluación inicial. Ahora puedes acceder al panel principal de módulos.
-                </p>
-                <Button onClick={() => navigate("/dashboard")} className="w-full gradient-primary" size="lg">
-                  Continuar al panel principal
-                </Button>
                 <Button
                   variant="outline"
                   className="w-full"

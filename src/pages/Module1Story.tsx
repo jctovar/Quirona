@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
+import modulo1Inicio from "@/assets/modulo1-inicio1.jpeg";
 import { supabase } from "@/supabaseClient"; // Agregado
 import { toast } from "sonner"; // Para feedback visual
 import { updateProgress } from "@/lib/progressHelper";
@@ -212,7 +213,15 @@ const Module1Story = () => {
                     </select>
                   </div>
                 </div>
+                
               )}
+              <div className="rounded-3xl overflow-hidden border border-border shadow-sm mb-8 max-h-[460px]">
+                <img
+                  src={modulo1Inicio}
+                  alt="Ilustración de Ximena y Sofía"
+                  className="w-full h-[460px] object-cover"
+                />
+              </div>
               {!showQuestions ? (
                 <div className={`prose prose-lg max-w-none ${fontSizeClass}`}>
                   <div key={page} className="transition-transform duration-300">

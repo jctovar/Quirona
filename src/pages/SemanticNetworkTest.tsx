@@ -197,7 +197,7 @@ const SemanticNetworkTest = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />
       
-      <main className="container mx-auto pt-96 pb-8 px-4">
+      <main className="container mx-auto pt-48 pb-8 px-4">
         <Card className="max-w-3xl mx-auto border-2 shadow-quirona">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-primary font-bold">

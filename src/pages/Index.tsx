@@ -150,17 +150,6 @@ useEffect(() => {
               y entender que llorar no es malo. Al contrario, es humano y necesario.
             </p>
           </div>
-
-          {/* Espacio para video del proyecto */}
-          <div id="video-section" className="max-w-4xl mx-auto">
-            <div className="aspect-video bg-muted rounded-xl border-2 border-dashed border-primary/30 flex items-center justify-center">
-              <div className="text-center p-8">
-                <div className="text-6xl mb-4">🎬</div>
-                <p className="text-muted-foreground text-lg font-medium">Video del proyecto</p>
-                <p className="text-muted-foreground text-sm">(Espacio reservado para el video)</p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 

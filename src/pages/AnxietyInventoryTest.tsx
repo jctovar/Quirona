@@ -157,9 +157,9 @@ const AnxietyInventoryTest = () => {
     }
   };
 
-  // Redirigir a la pantalla de menú de tests como en los anteriores
-  const handleFinalNext = () => {
-    navigate("/initial-question");
+  // Redirigir al siguiente test: Escala de Asertividad
+  const handleNext = () => {
+    navigate("/assertiveness-scale");
   };
 
   if (showMenu) {
@@ -169,10 +169,6 @@ const AnxietyInventoryTest = () => {
         <TestMenu currentTest="anxiety" onStart={() => setShowMenu(false)} />
       </div>
     );
-  }
-
-  function handleNext(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    throw new Error("Function not implemented.");
   }
 
   return (

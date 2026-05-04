@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2, BookCheck} from "lucide-react";
+import modulo1Final from "@/assets/modulo1-final.jpeg";
 import { supabase } from "@/supabaseClient"; // Importamos supabase
 import { updateProgress } from "@/lib/progressHelper";
 import { toast } from "sonner";
@@ -240,6 +241,13 @@ const Module1Closure = () => {
                       <option value="text-xl">Muy grande</option>
                     </select>
                   </div>
+                </div>
+                <div className="rounded-3xl overflow-hidden border border-border shadow-sm mb-8 max-h-[360px]">
+                  <img
+                    src={modulo1Final}
+                    alt="Ilustración final de Ximena y Sofía"
+                    className="w-full h-[360px] object-cover"
+                  />
                 </div>
                 <div className={`prose prose-lg max-w-none ${fontSizeClass}`}>
                   <div key={page} className="transition-transform duration-300">

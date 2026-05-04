@@ -66,6 +66,7 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
     : role === "user"
     ? [
         { to: "/dashboard", label: "Página Principal" },
+        { to: "/apoyo", label: "Apoyo" },
       ]
     : [
         { to: "/researcher/perfilInvestigador", label: "Panel" },

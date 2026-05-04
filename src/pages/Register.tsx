@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-type RegistrationStep = 'selection' | 'video' | 'form';
+type RegistrationStep = 'selection' | 'video' | 'consent' | 'form';
 
 const programs = [
   {
@@ -57,6 +57,7 @@ const Register = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<RegistrationStep>('selection');
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [acceptedConsent, setAcceptedConsent] = useState(false);
   const [privacyDialogOpen, setPrivacyDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -79,6 +80,11 @@ const Register = () => {
   };
 
   const handleVideoWatched = () => {
+    setStep('consent');
+    toast.success("¡Perfecto! Por favor lee y acepta el asentimiento informado");
+  };
+
+  const handleConsentAccepted = () => {
     setStep('form');
     toast.success("¡Excelente! Ahora completa tu registro");
   };
@@ -259,7 +265,96 @@ const Register = () => {
     );
   }
 
-  // Paso 3: Formulario de registro
+  // Paso 3: Asentimiento Informado
+  if (step === 'consent') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
+        <Navbar />
+        
+        <div className="pt-96 pb-16 px-4">
+          <div className="container mx-auto max-w-3xl">
+            <Card className="shadow-quirona border-2">
+              <CardHeader className="text-center">
+                <CardTitle className="text-3xl font-bold">Asentimiento Informado</CardTitle>
+                <CardDescription className="text-base">
+                  Por favor lee con atención el siguiente asentimiento antes de continuar
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent className="space-y-6">
+                <div className="bg-muted/50 rounded-lg p-6 border border-border max-h-96 overflow-y-auto">
+                  <div className="space-y-4 text-sm text-muted-foreground">
+                    <p className="font-semibold text-foreground">Asentimiento Informado</p>
+                    
+                    <p>
+                      Es importante informarle que su anonimato está garantizado. Los datos personales solicitados serán tratados con fines de investigación, enseñanza y estadísticos por la Dra. Lorena Alejandra Flores Plata, investigadora de la Facultad de Estudios Superiores Iztacala (FESI) de la Universidad Nacional Autónoma de México, con domicilio en Av. de los Reyes 1, Tlalnepantla de Baz, México. C.P. 5700, Torre de tutorías, 2do. Piso, cubículo 22. Mismos que son supervisados por la Comisión de Ética de la FESI, a cargo del Presidente General: M. C. Esp. Federico Sandoval Olvera.
+                    </p>
+                    <p className="font-semibold text-foreground">Propósito del estudio</p>
+                    <p>Buscamos ayudar a que la atención en salud ginecológica sea más respetuosa, informada y sensible para todas las mujeres, si bien la responsabilidad de ofrecer un cuidado de calidad reside en los profesionales de la salud y en la regulación del gobierno, también es cierto que mujeres informadas en sus derechos como usuarias de servicios de salud y preparadas para actuar frente a las faltas a esto, son parte esencial y necesaria para un cambio en la atención en salud. Este programa tiene por objetivo brindar herramientas y conocimientos para responder ante situaciones de violencia ginecológica. Es importante informarte que tu confidencialidad está garantizado. Los datos personales solicitados serán tratados con fines de investigación, enseñanza y estadísticos por el Mtro. Javier Dario Rios Castillo, investigador de la Facultad de Estudios Superiores Iztacala (FESI) de la Universidad Nacional Autónoma de México, con domicilio en Av. de los Reyes 1, Tlalnepantla de Baz, México. C.P. 5700, Torre de tutorías, 2do. Piso, cubículo 22. Mismos que son supervisados por la Comisión de Ética de la FESI, a cargo del Presidente General: M. C. Esp. Federico Sandoval Olvera.</p>
+                    <p className="font-semibold text-foreground">¿Qué tendrás que hacer en este estudio?</p>
+                    <p>Si decides participar:
+                      <p>1. Contestarás una encuesta con información básica sobre ti (como tu edad, nivel de estudios, etc.).</p>
+                      <p>2. Responderás seis cuestionarios que nos permitirán tener datos sobre tu salud física y mental, así como conocer tus experiencias y pensamientos sobre la atención ginecológica. No es necesario que hayas asistido a una consulta ginecológica para participar.</p>
+                      <p>3. Completarás cuatro módulos que conforman el programa. En estos recibirás información sobre ginecología preventiva, que esperar en tu primera revisión ginecológica, las señales de la violencia ginecológica y como estrategias para responder ante la misma.</p>
+                      <p>4. Responderás cinco cuestionario finales que nos permitirán conocer que opinas del programa,  los efectos que tuvieron estos contenidos en tu salud y si responde a tus necesidades</p>
+                    </p>
+                    <p className="font-semibold text-foreground">Duración</p>
+                    <p>Los contenidos están diseñados para poder revisarlos a tu propio ritmo, esperamos que sean lo suficientemente útiles e interesantes de tal manera que puedas revisarlos de manera completa. Te enviaremos recordatorios de manera periódicamente para motivarte a revisar los contenidos de manera integra.</p>
+                    <p className="font-semibold text-foreground">Beneficios</p>
+                    <p>Tu participación ayudará a entender mejor este tema tan importante. Lo que compartas puede servir para mejorar la forma en que se te brinda atención médica y conocer tus derechos como paciente.También te brindaremos enlaces a recursos para informarte sobre salud sexual y reproductiva. </p>
+                    <p className="font-semibold text-foreground">Confidencialidad</p>
+                    <p>Tu información estará completamente protegida. Tu nombre ni ningun otro dato se usará en un ningun medio de comunicación.  Tus padres o tutores recibirán un correo de aviso de que participarás en este estudio con la posibilidad de que tu o ellas puedan retirar tus datos de nuestra base de datos a solicitud expresa.  Todo lo que digas será usado solo para este estudio y se presentará de forma general, junto con las respuestas de otras personas. </p>
+                    <p className="font-semibold text-foreground">Voluntariedad y derecho a retirarte</p>
+                    <p>Participar es completamente tu decisión. Puedes decir que no, o empezar y después decidir que ya no quieres seguir. Puedes retirarte en cualquier momento sin tener que dar explicaciones.</p>
+                    <p className="font-semibold text-foreground">Información de contacto</p>
+                    <p>Si requieres más información sobre este estudio, puedes comunicarte con:
+                    <p>Javier Darío Ríos Castillo</p>
+                    <p>Profesor de Asignatura, Facultad de Estudios Superiores Iztacala</p>
+                    <p>E-mail de contacto: javier.rios@iztacala.unam.mx</p>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-3 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                  <Checkbox
+                    id="consent"
+                    checked={acceptedConsent}
+                    onCheckedChange={(checked) => setAcceptedConsent(checked as boolean)}
+                    className="mt-1"
+                  />
+                  <label htmlFor="consent" className="text-sm text-foreground cursor-pointer">
+                    Declaro que he leído y entendido el asentimiento informado, y acepto participar en este programa con pleno conocimiento de los términos expuestos.
+                  </label>
+                </div>
+
+                <Button 
+                  onClick={handleConsentAccepted}
+                  disabled={!acceptedConsent}
+                  className="w-full gradient-primary transition-quirona hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  size="lg"
+                >
+                  {acceptedConsent ? 'Aceptar y continuar con el registro' : 'Debes aceptar el asentimiento para continuar'}
+                </Button>
+
+                <Button 
+                  variant="ghost"
+                  onClick={() => {
+                    setStep('video');
+                    setAcceptedConsent(false);
+                  }}
+                  className="w-full"
+                >
+                  ← Volver a ver el video
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Paso 4: Formulario de registro
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar />

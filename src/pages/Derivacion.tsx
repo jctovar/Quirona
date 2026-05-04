@@ -75,7 +75,7 @@ const Derivacion = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar />
-      <main className="container mx-auto pt-48 pb-8 px-4">
+      <main className="container mx-auto pt-96 pb-8 px-4">
         <Card className="max-w-3xl mx-auto">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
