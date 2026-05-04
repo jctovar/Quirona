@@ -1,3 +1,5 @@
+import UserLayout from "./layouts/UserLayout";
+import ResearcherLayout from "./layouts/ResearcherLayout";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,9 +7,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import QuienesSomos from "./pages/QuienesSomos";
-import FinalTest1 from "./pages/FinalTest1";
-import FinalTest2 from "./pages/FinalTest2";
-import FinalTest3 from "./pages/FinalTest3";
 import Preguntas from "./pages/Preguntas";
 import Contenidos from "./pages/Contenidos";
 import Trabajos from "./pages/Trabajos";
@@ -54,7 +53,12 @@ import Module4Visit from "./pages/Module4Visit";
 import Module4Game from "./pages/Module4Game";
 import Module4Feedback from "./pages/Module4Feedback";
 import Module4Closure from "./pages/Module4Closure";
+import FinalTest1 from "./pages/FinalTest1";
+import FinalTest2 from "./pages/FinalTest2";
+import FinalTest3 from "./pages/FinalTest3";
 import NotFound from "./pages/NotFound";
+import DashboardInvestigador from "./pages/DashboardInvestigador";
+import ProfileInvestigador from "./pages/ProfileInvestigador";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -64,65 +68,112 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/quienes-somos" element={<QuienesSomos />} />
-          <Route path="/preguntas" element={<Preguntas />} />
-          <Route path="/contenidos" element={<Contenidos />} />
-          <Route path="/trabajos" element={<Trabajos />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/initial-question" element={<InitialQuestion />} />
-          <Route path="/pre-education" element={<PreEducation />} />
-          <Route path="/initial-test" element={<InitialTest />} />
-          <Route path="/semantic-network-test" element={<SemanticNetworkTest />} />
-          <Route path="/anxiety-inventory" element={<AnxietyInventoryTest />} />
-          <Route path="/assertiveness-scale" element={<AssertivenessScaleTest />} />
-          <Route path="/adverse-experiences" element={<AdverseExperiencesTest />} />
-          <Route path="/general-health" element={<GeneralHealthTest />} />
-          <Route path="/derivacion" element={<Derivacion />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/module-1" element={<Module1Story />} />
-          <Route path="/module-1-intro" element={<Module1Introduction />} />
-          <Route path="/module-1-quiz" element={<Module1Quiz />} />
-          <Route path="/module-1-visit" element={<Module1Visit />} />
-          <Route path="/module-1-game" element={<Module1Game />} />
-          <Route path="/module-1-feedback" element={<Module1Feedback />} />
-          <Route path="/module-1-closure" element={<Module1Closure />} />
-          <Route path="/module-2" element={<Module2Story />} />
-          <Route path="/module-2-intro" element={<Module2Introduction />} />
-          <Route path="/module-2-quiz" element={<Module2Quiz />} />
-          <Route path="/module-2-visit" element={<Module2Visit />} />
-          <Route path="/module-2-game" element={<Module2Game />} />
-          <Route path="/module-2-feedback" element={<Module2Feedback />} />
-          <Route path="/module-2-game-2" element={<Module2Game2 />} />
-          <Route path="/module-2-closure" element={<Module2Closure />} />
-          <Route path="/module-3" element={<Module3Story />} />
-          <Route path="/module-3-intro" element={<Module3Introduction />} />
-          <Route path="/module-3-quiz" element={<Module3Quiz />} />
-          <Route path="/module-3-visit" element={<Module3Visit />} />
-          <Route path="/module-3-representation" element={<Module3Representation />} />
-          <Route path="/module-3-game" element={<Module3Game />} />
-          <Route path="/module-3-feedback" element={<Module3Feedback />} />
-          <Route path="/module-3-closure" element={<Module3Closure />} />
-          <Route path="/module-4" element={<Module4Story />} />
-          <Route path="/module-4-intro" element={<Module4Introduction />} />
-          <Route path="/module-4-quiz" element={<Module4Quiz />} />
-          <Route path="/module-4-visit" element={<Module4Visit />} />
-          <Route path="/module-4-game" element={<Module4Game />} />
-          <Route path="/module-4-feedback" element={<Module4Feedback />} />
-          <Route path="/module-4-closure" element={<Module4Closure />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/final-test-1" element={<FinalTest1 />} />
-          <Route path="/final-test-2" element={<FinalTest2 />} />
-          <Route path="/final-test-3" element={<FinalTest3 />} />
-          
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+            <Route path="/" element={<Index />} />
+            <Route path="/quienes-somos" element={<QuienesSomos />} />
+            <Route path="/preguntas" element={<Preguntas />} />
+            <Route path="/contenidos" element={<Contenidos />} />
+            <Route path="/trabajos" element={<Trabajos />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+            {/* RUTAS DE USUARIA */}
+            <Route element={<UserLayout />}>
+              <Route path="/initial-question" element={<InitialQuestion />} />
+              <Route path="/pre-education" element={<PreEducation />} />
+              <Route path="/initial-test" element={<InitialTest />} />
+              <Route path="/semantic-network-test" element={<SemanticNetworkTest />} />
+              <Route path="/anxiety-inventory" element={<AnxietyInventoryTest />} />
+              <Route path="/assertiveness-scale" element={<AssertivenessScaleTest />} />
+              <Route path="/adverse-experiences" element={<AdverseExperiencesTest />} />
+              <Route path="/general-health" element={<GeneralHealthTest />} />
+              <Route path="/derivacion" element={<Derivacion />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/final-test-1" element={<FinalTest1 />} />
+              <Route path="/final-test-2" element={<FinalTest2 />} />
+              <Route path="/final-test-3" element={<FinalTest3 />} />
+
+              {/* MÓDULOS */}
+              <Route path="/module-1" element={<Module1Story />} />
+              <Route path="/module-1-intro" element={<Module1Introduction />} />
+              <Route path="/module-1-quiz" element={<Module1Quiz />} />
+              <Route path="/module-1-visit" element={<Module1Visit />} />
+              <Route path="/module-1-game" element={<Module1Game />} />
+              <Route path="/module-1-feedback" element={<Module1Feedback />} />
+              <Route path="/module-1-closure" element={<Module1Closure />} />
+
+              <Route path="/module-2" element={<Module2Story />} />
+              <Route path="/module-2-intro" element={<Module2Introduction />} />
+              <Route path="/module-2-quiz" element={<Module2Quiz />} />
+              <Route path="/module-2-visit" element={<Module2Visit />} />
+              <Route path="/module-2-game" element={<Module2Game />} />
+              <Route path="/module-2-feedback" element={<Module2Feedback />} />
+              <Route path="/module-2-game-2" element={<Module2Game2 />} />
+              <Route path="/module-2-closure" element={<Module2Closure />} />
+
+              <Route path="/module-3" element={<Module3Story />} />
+              <Route path="/module-3-intro" element={<Module3Introduction />} />
+              <Route path="/module-3-quiz" element={<Module3Quiz />} />
+              <Route path="/module-3-visit" element={<Module3Visit />} />
+              <Route path="/module-3-representation" element={<Module3Representation />} />
+              <Route path="/module-3-game" element={<Module3Game />} />
+              <Route path="/module-3-feedback" element={<Module3Feedback />} />
+              <Route path="/module-3-closure" element={<Module3Closure />} />
+
+              <Route path="/module-4" element={<Module4Story />} />
+              <Route path="/module-4-intro" element={<Module4Introduction />} />
+              <Route path="/module-4-quiz" element={<Module4Quiz />} />
+              <Route path="/module-4-visit" element={<Module4Visit />} />
+              <Route path="/module-4-game" element={<Module4Game />} />
+              <Route path="/module-4-feedback" element={<Module4Feedback />} />
+              <Route path="/module-4-closure" element={<Module4Closure />} />
+            </Route>
+
+            {/* RUTAS DE INVESTIGADOR */}
+            <Route path="/researcher" element={<ResearcherLayout />}>
+              <Route path="perfilInvestigador" element={<DashboardInvestigador />} />
+              <Route path="profileInvestigador" element={<ProfileInvestigador />} />
+              <Route path="module-1" element={<Module1Story />} />
+              <Route path="module-1-intro" element={<Module1Introduction />} />
+              <Route path="module-1-quiz" element={<Module1Quiz />} />
+              <Route path="module-1-visit" element={<Module1Visit />} />
+              <Route path="module-1-game" element={<Module1Game />} />
+              <Route path="module-1-feedback" element={<Module1Feedback />} />
+              <Route path="module-1-closure" element={<Module1Closure />} />
+
+              <Route path="module-2" element={<Module2Story />} />
+              <Route path="module-2-intro" element={<Module2Introduction />} />
+              <Route path="module-2-quiz" element={<Module2Quiz />} />
+              <Route path="module-2-visit" element={<Module2Visit />} />
+              <Route path="module-2-game" element={<Module2Game />} />
+              <Route path="module-2-feedback" element={<Module2Feedback />} />
+              <Route path="module-2-game-2" element={<Module2Game2 />} />
+              <Route path="module-2-closure" element={<Module2Closure />} />
+
+              <Route path="module-3" element={<Module3Story />} />
+              <Route path="module-3-intro" element={<Module3Introduction />} />
+              <Route path="module-3-quiz" element={<Module3Quiz />} />
+              <Route path="module-3-visit" element={<Module3Visit />} />
+              <Route path="module-3-representation" element={<Module3Representation />} />
+              <Route path="module-3-game" element={<Module3Game />} />
+              <Route path="module-3-feedback" element={<Module3Feedback />} />
+              <Route path="module-3-closure" element={<Module3Closure />} />
+
+              <Route path="module-4" element={<Module4Story />} />
+              <Route path="module-4-intro" element={<Module4Introduction />} />
+              <Route path="module-4-quiz" element={<Module4Quiz />} />
+              <Route path="module-4-visit" element={<Module4Visit />} />
+              <Route path="module-4-game" element={<Module4Game />} />
+              <Route path="module-4-feedback" element={<Module4Feedback />} />
+              <Route path="module-4-closure" element={<Module4Closure />} />              
+            </Route>
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+
+          </Routes>
+                </BrowserRouter>
+              </TooltipProvider>
+            </QueryClientProvider>
+          );
 
 export default App;

@@ -2,13 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/supabaseClient"; // Importamos supabase
 import { updateProgress } from "@/lib/progressHelper"; // Importamos el helper
 import { toast } from "sonner";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+
 
 interface ScrollRevealProps {
   children: React.ReactNode;
@@ -68,7 +70,7 @@ const myths = [
   },
 ];
 const Module1Introduction = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [heardMyths, setHeardMyths] = useState<Record<number, boolean>>({});
   const [isSaving, setIsSaving] = useState(false);
   const toggleMyth = (index: number) => {
@@ -103,20 +105,20 @@ const handleContinue = async () => {
       await updateProgress("m1_intro");
 
       // 3. Navegamos al siguiente paso
-      navigate("/module-1-quiz");
+      goTo("/module-1-quiz");
 
     } catch (error: any) {
       console.error("Error:", error);
       toast.error("Hubo un problema al guardar tu progreso.");
       // Opcional: navigate igualmente para no trabar el flujo
-      navigate("/module-1-quiz");
+      goTo("/module-1-quiz");
     } finally {
       setIsSaving(false);
     }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           {/* Intro card */}

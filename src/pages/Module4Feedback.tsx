@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Star, RotateCcw } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
-
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const feedbackData: Record<number, string> = {
   1: "No asertiva: Te minimiza y te calla. Preguntar no es ser intensa: es participar y cuidarte.",
   2: "Asertiva: Protege tu privacidad y establece una regla clara: nadie entra al consultorio sin tu autorización.",
@@ -54,7 +55,7 @@ const phraseTexts: Record<number, string> = {
 const correctInside = [1, 3, 5, 7, 9, 11, 13, 15, 18, 19];
 const correctOutside = [2, 4, 6, 8, 10, 12, 14, 16, 17];
 const Module4Feedback = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const location = useLocation();
   const state = location.state as { score?: number; accepted?: number[]; rejected?: number[]; attempts?: number } | null;
@@ -69,10 +70,10 @@ const Module4Feedback = () => {
     setIsSaving(true);
     try {
       await updateProgress("m4_feedback");
-      navigate("/module-4-closure");
+      goTo("/module-4-closure");
     } catch (error) {
       console.error("Error al guardar progreso:", error);
-      navigate("/module-4-closure");
+      goTo("/module-4-closure");
     } finally {
       setIsSaving(false);
     }
@@ -80,7 +81,7 @@ const Module4Feedback = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2 space-y-8">
           {/* Score card */}
@@ -105,7 +106,7 @@ const Module4Feedback = () => {
                   <Button
                     variant="outline"
                     onClick={() =>
-                      navigate("/module-4-game", { state: { attempts } })
+                      goTo("/module-4-game", { state: { attempts } })
                     }
                     className="px-6 py-5"
                   >

@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
-
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const statements = [
   "Ser asertiva significa decir lo que necesito con claridad y respeto, sin agredir.",
   "Ser asertiva es lo mismo que ser grosera o conflictiva.",
@@ -25,7 +25,7 @@ const statements = [
   "Es mi obligación denunciar si tengo una experiencia de violencia ginecológica.",
 ];
 const Module4Quiz = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -66,7 +66,7 @@ const Module4Quiz = () => {
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           <Card className="border-2 shadow-quirona">
@@ -138,7 +138,7 @@ const Module4Quiz = () => {
                     Tus respuestas han sido registradas. Continuaremos explorando estos temas a lo largo del módulo.
                   </p>
                   <Button
-                    onClick={() => navigate("/module-4-visit")}
+                    onClick={() => goTo("/module-4-visit")}
                     className="gradient-primary text-white px-8 py-6 text-lg mt-4"
                   >
                     Continuar a la siguiente sección

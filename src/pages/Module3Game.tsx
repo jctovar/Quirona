@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Star } from "lucide-react";
 import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
-
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const questions = [
   {
     id: 1,
@@ -97,7 +97,7 @@ const violenceGroups = [
 ];
 
 const Module3Game = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const [phase, setPhase] = useState<"intro" | "playing" | "feedback" | "done">("intro");
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -222,7 +222,7 @@ const Module3Game = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3xl">
           {phase === "intro" && playCount < 3 && (
@@ -250,7 +250,7 @@ const Module3Game = () => {
                 <p className="text-muted-foreground text-lg">
                   Has alcanzado el máximo de 3 intentos para este ejercicio.
                 </p>
-                <Button onClick={() => navigate("/module-3-feedback")} className="gradient-primary text-white px-8 py-6 text-lg">
+                <Button onClick={() => goTo("/module-3-feedback")} className="gradient-primary text-white px-8 py-6 text-lg">
                   Ir a retroalimentación
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
@@ -355,7 +355,7 @@ const Module3Game = () => {
                       Jugar otra vez
                     </Button>
                   )}
-                  <Button onClick={() => navigate("/module-3-feedback")} className="bg-gray-500 text-white hover:bg-gray-600 px-8">
+                  <Button onClick={() => goTo("/module-3-feedback")} className="bg-gray-500 text-white hover:bg-gray-600 px-8">
                     Ir a retroalimentación
                   </Button>
                 </div>
@@ -373,7 +373,7 @@ const Module3Game = () => {
                     Jugar otra vez
                   </Button>
                   <Button 
-                    onClick={() => navigate("/module-3-feedback")} 
+                    onClick={() => goTo("/module-3-feedback")} 
                     disabled={isSaving}
                     className="bg-gray-500 text-white hover:bg-gray-600 px-8"
                   >

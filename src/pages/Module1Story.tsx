@@ -2,14 +2,14 @@ import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/supabaseClient"; // Agregado
 import { toast } from "sonner"; // Para feedback visual
 import { updateProgress } from "@/lib/progressHelper";
-
+import useRoleNavigation from "@/hooks/useRoleNavigation";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const Module1Story = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -167,7 +167,7 @@ const Module1Story = () => {
     await updateProgress("m1_story"); 
 
     // Pase lo que pase, avanzamos
-    navigate("/module-1-intro");
+    goTo("/module-1-intro");
     setIsProcessing(false);
   };
   const handleContinue = () => {
@@ -187,7 +187,7 @@ const Module1Story = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
 
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">

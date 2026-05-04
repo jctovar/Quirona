@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";   
+
 const Module3Closure = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const [phase, setPhase] = useState<"questions" | "story">("questions");
   const [page, setPage] = useState(0);
@@ -52,9 +54,9 @@ const Module3Closure = () => {
     try {
       await updateProgress("m3_closure");
       toast.success("¡Módulo 3 completado con éxito!");
-      navigate("/dashboard");
+      goTo("/dashboard");
     } catch (error) {
-      navigate("/dashboard");
+      goTo("/dashboard");
     } finally {
       setIsSaving(false);
     }
@@ -166,7 +168,7 @@ const Module3Closure = () => {
     ];
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           {phase === "questions" ? (

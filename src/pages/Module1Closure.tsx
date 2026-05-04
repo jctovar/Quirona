@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2, BookCheck} from "lucide-react";
 import { supabase } from "@/supabaseClient"; // Importamos supabase
 import { updateProgress } from "@/lib/progressHelper";
 import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 
 const Module1Closure = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [phase, setPhase] = useState<"questions" | "story">("questions");
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState({ fear: "", phrase: "", advice: "" });
@@ -147,10 +149,10 @@ const Module1Closure = () => {
       await updateProgress("m1_closure");
       
       toast.success("¡Felicidades! Has completado el Módulo 1.");
-      navigate("/dashboard");
+      goTo("/dashboard");
     } catch (error) {
       console.error("Error al finalizar módulo:", error);
-      navigate("/dashboard");
+      goTo("/dashboard");
     } finally {
       setIsSaving(false);
     }
@@ -158,7 +160,7 @@ const Module1Closure = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           {phase === "questions" ? (

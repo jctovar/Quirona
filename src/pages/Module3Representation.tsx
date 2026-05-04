@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
@@ -37,7 +38,7 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   );
 };
 const Module3Representation = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const [known, setKnown] = useState<Record<number, boolean>>({});
   const handleContinue = async () => {
@@ -45,10 +46,10 @@ const Module3Representation = () => {
   try {
     // Marcamos m3_feedback en el progreso
     await updateProgress("m3_representation");
-    navigate("/module-3-game");
+    goTo("/module-3-game");
   } catch (error) {
     console.error("Error al guardar progreso:", error);
-    navigate("/module-3-game");
+    goTo("/module-3-game");
   } finally {
     setIsSaving(false);
   }
@@ -56,7 +57,7 @@ const Module3Representation = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           {/* Intro */}

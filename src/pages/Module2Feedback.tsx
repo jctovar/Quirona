@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ArrowRight, Star, RotateCcw, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { updateProgress } from "@/lib/progressHelper";
 import { toast } from "sonner";
-
+import useRoleNavigation from "@/hooks/useRoleNavigation";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const feedbackData: Record<number, string> = {
   1: "Sí. Recuerda que es necesario que el consultorio esté equipado con un área destinada para cambiarte, o en su defecto que te den un espacio a solas para hacerlo.",
   2: "No. El personal de salud debe brindarte todos los elementos necesarios para una revisión segura, lo cual incluye material limpio.",
@@ -49,7 +50,7 @@ const phraseTexts: Record<number, string> = {
 const correctInside = [1, 3, 4, 5, 7, 8, 9, 10, 12, 13, 14, 16];
 
 const Module2Feedback = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const location = useLocation();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -67,10 +68,10 @@ const Module2Feedback = () => {
     try {
       await updateProgress("m2_feedback");
       // USAMOS TU RUTA ORIGINAL PARA EVITAR EL 404
-      navigate("/module-2-game-2"); 
+      goTo("/module-2-game-2");
     } catch (error) {
       console.error("Error al guardar progreso:", error);
-      navigate("/module-2-game-2");
+      goTo("/module-2-game-2");
     } finally {
       setIsSaving(false);
     }
@@ -78,7 +79,7 @@ const Module2Feedback = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3xl space-y-8">
           
@@ -103,7 +104,7 @@ const Module2Feedback = () => {
                 {canRetry && (
                   <Button
                     variant="outline"
-                    onClick={() => navigate("/module-2-game", { state: { attempts } })}
+                    onClick={() => goTo("/module-2-game", { state: { attempts } })}
                     className="px-6 py-6 border-primary text-primary hover:bg-primary/5"
                   >
                     <RotateCcw className="w-4 h-4 mr-2" />

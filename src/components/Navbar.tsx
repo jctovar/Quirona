@@ -3,6 +3,7 @@ import logo from "../assets/logo.png";
 import { Button } from "./ui/button";
 import { User, Menu, Mail, Facebook, Instagram } from "lucide-react";
 import { useState, useEffect } from "react";
+import { supabase } from "@/supabaseClient";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,21 +25,31 @@ interface NavbarProps {
 export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarProps) => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [auth, setAuth] = useState(isAuthenticated);
+  const [auth, setAuth] = useState(false);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      const saved = localStorage.getItem("isAuthenticated");
-      setAuth(saved === "true");
-    }
-  }, [isAuthenticated]);
+useEffect(() => {
+  const checkSession = async () => {
+    const { data } = await supabase.auth.getSession();
+    setAuth(!!data.session);
+  };
 
+  checkSession();
+
+  const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    setAuth(!!session);
+  });
+
+  return () => {
+    listener.subscription.unsubscribe();
+  };
+}, []);
   const isActive = (path: string) => location.pathname === path;
 
   const menuItems = !auth ? [
     { to: "/quienes-somos", label: "¿Quiénes somos?" },
     { to: "/contenidos", label: "Contenidos" },
     { to: "/preguntas", label: "Preguntas frecuentes" },
+    { to: "/blog", label: "Blog" },
     { to: "/trabajos", label: "Trabajos de investigación" },
   ] : [
     { to: "/dashboard", label: "Página Principal" },
@@ -52,7 +63,7 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
       {/* Contenedor principal del header */}
       <div className="bg-background border-b border-border">
         {/* Fila superior: email y redes sociales (oculta cuando hay sesión) */}
-        {!isAuthenticated && (
+        {!auth && (
           <div className="container mx-auto px-4 py-2 flex items-center justify-between border-b border-border/50">
             <div className="flex items-center gap-2 text-primary">
               <Mail className="w-4 h-4" />
@@ -76,13 +87,13 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
         <div className="h-0.5 bg-primary"></div>
 
         {/* Fila principal: logo y navegación */}
-        <div className={`container mx-auto px-4 ${isAuthenticated ? "py-2" : "py-4"} flex items-center justify-between`}>
+        <div className={`container mx-auto px-4 ${auth ? "py-2" : "py-4"} flex items-center justify-between`}>
           {/* Logo grande */}
           <Link to="/" className="flex-shrink-0">
             <img
               src={logo}
               alt="Quirona Logo"
-              className={isAuthenticated ? "h-24 md:h-40 w-40" : "h-56 md:h-90 w-90"}
+              className={auth ? "h-24 md:h-40 w-40" : "h-56 md:h-90 w-90"}
             />
           </Link>
 
@@ -100,7 +111,7 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
               </Link>
             ))}
             
-            {!isAuthenticated ? (
+            {!auth ? (
               <>
                 <Link to="/login">
                   <Button variant="ghost" className="text-sm font-semibold uppercase tracking-wide">
@@ -162,7 +173,7 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
                   </Link>
                 ))}
                 
-                {!isAuthenticated ? (
+                {!auth ? (
                   <>
                     <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="outline" className="w-full transition-quirona">

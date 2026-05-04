@@ -2,14 +2,15 @@ import { useState, useEffect, useCallback } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Clock, CheckCircle, XCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import sillaImg from "@/assets/silla.jpg";
 import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
-
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const phrases = [
   { id: 1, text: '“Perdón por molestar, mejor no pregunto para no verme intensa.”', correct: true },
   { id: 2, text: '“Necesito que cierren la puerta y que nadie entre sin mi consentimiento.”', correct: false },
@@ -42,7 +43,7 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 const Module4Game = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const location = useLocation();
   const prevAttempts = (location.state as { attempts?: number } | null)?.attempts ?? 0;
   const [phase, setPhase] = useState<"intro" | "playing" | "done">("intro");
@@ -147,7 +148,7 @@ const Module4Game = () => {
       await updateProgress("m4_game");
 
       // 3. Navegamos al feedback pasando los datos
-      navigate("/module-4-feedback", { 
+      goTo("/module-4-feedback", { 
         state: { 
           score, 
           accepted, 
@@ -158,7 +159,7 @@ const Module4Game = () => {
     } catch (error) {
       console.error("Error al guardar juego:", error);
       // Navegamos de todos modos para no bloquear a la usuaria
-      navigate("/module-4-feedback");
+      goTo("/module-4-feedback");
     } finally {
       setIsSaving(false);
     }
@@ -181,7 +182,7 @@ const Module4Game = () => {
   }, [visible, queue, phase]);
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-7xl">
           {phase === "intro" && (

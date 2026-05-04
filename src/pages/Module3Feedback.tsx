@@ -1,11 +1,12 @@
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react"; 
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const correctAnswers: Record<number, { text: string; violenceType: string }> = {
   1: { text: 'El médico revisa tus resultados y comenta en tono de desaprobación: "Con tantas parejas, no me sorprende que tengas esta infección; deberías tener más respeto por ti misma".', violenceType: "Violencias psicológicas y de subordinación" },
   2: { text: 'Al solicitar una ligadura de trompas, la doctora te responde "Es un desperdicio; eres joven y vas a cambiar de opinión porque tu destino natural es ser madre".', violenceType: "Violencias psicológicas y de subordinación" },
@@ -24,24 +25,24 @@ const correctAnswers: Record<number, { text: string; violenceType: string }> = {
 };
 
 const Module3Feedback = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const handleContinue = async () => {
   setIsSaving(true);
   try {
     // Marcamos m3_feedback en el progreso
     await updateProgress("m3_feedback");
-    navigate("/module-3-closure");
+    goTo("/module-3-closure");
   } catch (error) {
     console.error("Error al guardar progreso:", error);
-    navigate("/module-3-closure");
+    goTo("/module-3-closure");
   } finally {
     setIsSaving(false);
   }
 };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-6xl">
           {/* Header */}

@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
@@ -36,7 +37,7 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   );
 };
 const Module2Visit = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
 
   // --- FUNCIÓN DE PROGRESO ---
@@ -45,17 +46,17 @@ const Module2Visit = () => {
     try {
       // Marcamos la cuarta parte del Módulo 2 (m2_visit)
       await updateProgress("m2_visit");
-      navigate("/module-2-game");
+      goTo("/module-2-game");
     } catch (error) {
       console.error("Error al guardar progreso:", error);
-      navigate("/module-2-game");
+      goTo("/module-2-game");
     } finally {
       setIsSaving(false);
     }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           {/* Intro */}

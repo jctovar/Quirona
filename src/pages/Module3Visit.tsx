@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2 } from "lucide-react"; // Importamos Loader2
 import { updateProgress } from "@/lib/progressHelper";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
@@ -36,7 +37,7 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   );
 };
 const Module3Visit = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const [known, setKnown] = useState<Record<number, boolean>>({});
   const handleContinue = async () => {
@@ -44,17 +45,17 @@ const Module3Visit = () => {
     try {
       // Guardamos el paso 4 del Módulo 3
       await updateProgress("m3_visit");
-      navigate("/module-3-representation"); // Siguiente sección
+      goTo("/module-3-representation"); // Siguiente sección
     } catch (error) {
       console.error("Error al guardar progreso:", error);
-      navigate("/module-3-representation");
+      goTo("/module-3-representation");
     } finally {
       setIsSaving(false);
     }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           {/* Intro */}

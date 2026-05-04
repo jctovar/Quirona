@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, CheckCircle, Loader2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
-
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const statements = [
   "Que no tengas la intimidad suficiente para cambiarte.",
   "Que el personal de la salud no te trate con respeto.",
@@ -35,7 +35,7 @@ const correctAnswers = [
 ];
 
 const Module2Game2 = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [attempts, setAttempts] = useState(1);
@@ -97,7 +97,7 @@ const Module2Game2 = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3xl">
           <Card className="border-2 shadow-quirona">
@@ -171,7 +171,7 @@ const Module2Game2 = () => {
                       </Button>
                     )}
                     <Button
-                      onClick={() => navigate("/module-2-closure")}
+                      onClick={() => goTo("/module-2-closure")}
                       className="gradient-primary text-white px-10 py-6 text-lg shadow-md"
                     >
                       Continuar al cierre

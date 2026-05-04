@@ -2,12 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ArrowRight, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/supabaseClient"; // Importación de Supabase
 import { updateProgress } from "@/lib/progressHelper";
 import consultorioImg from "@/assets/consultorio.png";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const phrases = [
   { id: 1, text: 'Área para cambiarte', correct: true },
   { id: 2, text: 'Sábanas sucias', correct: false },
@@ -37,7 +39,7 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 const Module2Game = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const location = useLocation();
   const prevAttempts = (location.state as { attempts?: number } | null)?.attempts ?? 0;
   const [phase, setPhase] = useState<"intro" | "playing" | "done">("intro");
@@ -145,7 +147,7 @@ const Module2Game = () => {
       await updateProgress("m2_game");
 
       // 3. Navegamos a la retroalimentación
-      navigate("/module-2-feedback", { 
+      goTo("/module-2-feedback", { 
         state: { 
           score, 
           accepted, 
@@ -157,7 +159,7 @@ const Module2Game = () => {
     } catch (error: any) {
       console.error("Error al guardar resultados del juego:", error);
       // Navegamos de todos modos para no interrumpir el flujo
-      navigate("/module-2-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });
+      goTo("/module-2-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });
     } finally {
       setIsSaving(false);
     }
@@ -180,7 +182,7 @@ const Module2Game = () => {
   }, [visible, queue, phase]);
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-7xl">
           {phase === "intro" && (

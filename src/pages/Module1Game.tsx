@@ -2,12 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ArrowRight, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import cerebroImg from "@/assets/cerebro.jpg";
 import { supabase } from "@/supabaseClient"; // Importación de Supabase
 import { updateProgress } from "@/lib/progressHelper";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 const phrases = [
   { id: 1, text: '"Vas al ginecólogo si hiciste algo indebido"', correct: false },
   { id: 2, text: '"Puedes ir a consulta ginecológica para informarte"', correct: true },
@@ -38,7 +40,7 @@ function shuffleArray<T>(arr: T[]): T[] {
   return a;
 }
 const Module1Game = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const location = useLocation();
   const prevAttempts = (location.state as { attempts?: number } | null)?.attempts ?? 0;
   const [phase, setPhase] = useState<"intro" | "playing" | "done">("intro");
@@ -146,7 +148,7 @@ const Module1Game = () => {
       await updateProgress("m1_game");
 
       // 3. Navegamos a la retroalimentación
-      navigate("/module-1-feedback", { 
+      goTo("/module-1-feedback", { 
         state: { 
           score, 
           accepted, 
@@ -158,14 +160,14 @@ const Module1Game = () => {
     } catch (error: any) {
       console.error("Error al guardar juego:", error);
       // Navegamos aunque falle la red para no arruinar la experiencia
-      navigate("/module-1-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });
+      goTo("/module-1-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });
     } finally {
       setIsSaving(false);
     }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-7xl">
           {phase === "intro" && (

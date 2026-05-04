@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react"; // Para el estado de carga
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const statements = [
   "Las buenas pacientes ponen atención y por eso no hacen preguntas.",
   "Está comprobado que las mujeres toleran más el dolor que los hombres.",
@@ -18,7 +19,7 @@ const statements = [
   "Las mujeres lesbianas necesitan ir al ginecólogo igual que una mujer heterosexual.",
 ];
 const Module3Quiz = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const allAnswered = Object.keys(answers).length === statements.length;
@@ -60,7 +61,7 @@ const Module3Quiz = () => {
 };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           <Card className="border-2 shadow-quirona">
@@ -132,7 +133,7 @@ const Module3Quiz = () => {
                     Tus respuestas han sido registradas. Continuaremos explorando estos temas a lo largo del módulo.
                   </p>
                   <Button
-                    onClick={() => navigate("/module-3-visit")}
+                    onClick={() => goTo("/module-3-visit")}
                     className="gradient-primary text-white px-8 py-6 text-lg mt-4"
                   >
                     Continuar a la siguiente sección

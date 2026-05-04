@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/supabaseClient"; // Importación necesaria
 import { updateProgress } from "@/lib/progressHelper"; // Importación necesaria
 import { toast } from "sonner";
-
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const Module2Closure = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [phase, setPhase] = useState<"questions" | "story">("questions");
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState({ fear: "", phrase: "", advice: "" });
@@ -59,10 +59,10 @@ const Module2Closure = () => {
       await updateProgress("m2_closure");
       
       toast.success("¡Módulo 2 completado con éxito!");
-      navigate("/dashboard");
+      goTo("/dashboard");
     } catch (error) {
       console.error("Error al finalizar:", error);
-      navigate("/dashboard");
+      goTo("/dashboard");
     } finally {
       setIsSaving(false);
     }
@@ -109,7 +109,7 @@ const Module2Closure = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3xl"> {/* Ajustado a 3xl */}
           {phase === "questions" ? (

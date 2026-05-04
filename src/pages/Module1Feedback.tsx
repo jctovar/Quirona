@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ArrowRight, Star, RotateCcw, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { updateProgress } from "@/lib/progressHelper";
 import { toast } from "sonner";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 
 const feedbackData: Record<number, string> = {
   1: "Ir a consulta médica no es un castigo ni tiene que ver con juicios morales, ya que el personal de salud debe escucharte siempre sin juzgarte.",
@@ -51,7 +53,7 @@ const phraseTexts: Record<number, string> = {
 const correctInside = [2, 4, 5, 6, 9, 10, 12, 14, 15, 17];
 
 const Module1Feedback = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const location = useLocation();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -68,10 +70,10 @@ const Module1Feedback = () => {
     setIsSaving(true);
     try {
       await updateProgress("m1_feedback");
-      navigate("/module-1-closure");
+      goTo("/module-1-closure");
     } catch (error) {
       console.error("Error al guardar progreso:", error);
-      navigate("/module-1-closure");
+      goTo("/module-1-closure");
     } finally {
       setIsSaving(false);
     }
@@ -79,7 +81,7 @@ const Module1Feedback = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3xl space-y-8">
           
@@ -104,7 +106,7 @@ const Module1Feedback = () => {
                 {canRetry && (
                   <Button
                     variant="outline"
-                    onClick={() => navigate("/module-1-game", { state: { attempts } })}
+                    onClick={() => goTo("/module-1-game", { state: { attempts } })}
                     className="px-6 py-6 border-primary text-primary hover:bg-primary/5"
                   >
                     <RotateCcw className="w-4 h-4 mr-2" />

@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader, Loader2} from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
-
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const Module2Story = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -78,11 +78,11 @@ const Module2Story = () => {
       // Llamamos al helper para marcar m2_story
       // El helper recalculará automáticamente el % basado en los 30 pasos totales
       await updateProgress("m2_story");
-      navigate("/module-2-intro");
+      goTo("/module-2-intro");
     } catch (error) {
       console.error("Error al guardar progreso:", error);
       // Navegamos de todos modos para no bloquear a la usuaria
-      navigate("/module-2-intro");
+      goTo("/module-2-intro");
     } finally {
       setIsProcessing(false);
     }
@@ -104,7 +104,7 @@ const Module2Story = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
 
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">

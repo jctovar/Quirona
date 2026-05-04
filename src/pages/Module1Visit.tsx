@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/supabaseClient"; // Importación de Supabase
 import { updateProgress } from "@/lib/progressHelper"; // Importación del Helper
 import { toast } from "sonner";
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
@@ -50,7 +51,7 @@ const visitPoints = [
   "¡Puedes hablar de otras dudas o inquietudes sobre tu salud integral! No dudes en hablar sobre el acné, los cólicos fuertes, el uso de anticonceptivos, prevenir infecciones (ITS) o incluso, si te has sentido triste o con mucha ansiedad.",
 ];
 const Module1Visit = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [known, setKnown] = useState<Record<number, boolean>>({});
   const [isSaving, setIsSaving] = useState(false);
 
@@ -81,13 +82,13 @@ const handleContinue = async () => {
       await updateProgress("m1_visit");
 
       // 3. Navegamos al juego
-      navigate("/module-1-game");
+      goTo("/module-1-game");
 
     } catch (error: any) {
       console.error("Error:", error);
       toast.error("Hubo un error al guardar tu avance.");
       // Opcional: navegar de todos modos
-      navigate("/module-1-game");
+      goTo("/module-1-game");
     } finally {
       setIsSaving(false);
     }
@@ -95,7 +96,7 @@ const handleContinue = async () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           {/* Intro */}

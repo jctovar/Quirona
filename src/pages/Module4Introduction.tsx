@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2, BookOpen, Heart, Shield, MessageCircle, Smartphone} from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { updateProgress } from "@/lib/progressHelper";
-
+import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
@@ -56,7 +56,7 @@ const myths = [
   },
 ];
 const Module4Introduction = () => {
-  const navigate = useNavigate();
+  const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const [heardMyths, setHeardMyths] = useState<Record<number, boolean>>({});
   const toggleMyth = (index: number) => {
@@ -68,17 +68,17 @@ const Module4Introduction = () => {
     setIsSaving(true);
     try {
       await updateProgress("m4_intro");
-      navigate("/module-4-quiz"); // Ruta al quiz del módulo 4
+      goTo("/module-4-quiz"); // Ruta al quiz del módulo 4
     } catch (error) {
       console.error("Error al guardar progreso:", error);
-      navigate("/module-4-quiz");
+      goTo("/module-4-quiz");
     } finally {
       setIsSaving(false);
     }
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      <Navbar isAuthenticated />
+      <UserNavbarWrapper />
       <div className="pt-48 pb-16 px-4">
         <div className="container mx-auto max-w-3x2">
           {/* Intro card */}

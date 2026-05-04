@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { Card, CardContent } from "@/components/ui/card";
-
+import { useEffect, useState } from "react";
 const carouselItems = [
   {
     title: "Nueva actualización",
@@ -61,9 +61,15 @@ const scrollToVideo = () => {
 };
 
 const Index = () => {
+  const [auth, setAuth] = useState(false);
+
+useEffect(() => {
+  const saved = localStorage.getItem("isAuthenticated");
+  setAuth(saved === "true");
+}, []);
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <Navbar isAuthenticated={auth} />
       
       {/* Carrusel de actualizaciones - debajo del header */}
       <section className="pt-48 md:pt-[26rem] pb-8 px-4 bg-muted/30">
