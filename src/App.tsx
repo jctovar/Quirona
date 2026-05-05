@@ -60,6 +60,11 @@ import FinalTest3 from "./pages/FinalTest3";
 import NotFound from "./pages/NotFound";
 import DashboardInvestigador from "./pages/DashboardInvestigador";
 import ProfileInvestigador from "./pages/ProfileInvestigador";
+import ResearcherDashboard from "./pages/ResearcherDashboard";
+//import ResearcherUserDetail from "./pages/ResearcherUserDetail";
+//import ResearcherMessages from "./pages/ResearcherMessages";
+//import ResearcherProfile from "./pages/ResearcherProfile";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -129,8 +134,22 @@ const App = () => (
               <Route path="/module-4-game" element={<Module4Game />} />
               <Route path="/module-4-feedback" element={<Module4Feedback />} />
               <Route path="/module-4-closure" element={<Module4Closure />} />
+              {/* Dashboard principal del investigador */}
+              <Route path="/researcher-dashboard" element={<ResearcherDashboard />} />
+
+              {/* Detalle individual de cada usuaria (el :id permite ver perfiles diferentes) */}
+              {/* </Route><Route path="/researcher/user/:id" element={<ResearcherUserDetail />} />*/}
+
+              {/* Buzón de sugerencias recibido por las usuarias */}
+              {/* <Route path="/researcher-messages" element={<ResearcherMessages />} />*/}
+
+              {/* Perfil del investigador para editar sus datos */}
+              {/* <Route path="/researcher-profile" element={<ResearcherProfile />} />*/}
             </Route>
 
+  
+  
+          
             {/* RUTAS DE INVESTIGADOR */}
             <Route path="/researcher" element={<ResearcherLayout />}>
               <Route path="perfilInvestigador" element={<DashboardInvestigador />} />

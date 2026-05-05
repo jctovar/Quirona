@@ -22,42 +22,68 @@ const Login = () => {
 
   // 2. Función convertida a ASYNC para esperar la respuesta de Supabase
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validación de Frontend
-    if (!formData.username || !formData.password) {
-      toast.error("Por favor ingresa tu correo y contraseña.");
-      return;
+  e.preventDefault();
+  
+  // 1. Validación de Frontend (Mantenemos la tuya)
+  if (!formData.username || !formData.password) {
+    toast.error("Por favor ingresa tu correo y contraseña.");
+    return;
+  }
+
+  setLoading(true);
+
+  // 2. LLAMADA REAL A SUPABASE
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: formData.username, // Tu estado usa 'username' para el campo de email
+    password: formData.password,
+  });
+
+  if (error) {
+    // Tu manejo de errores (Mantenemos la lógica de confirmación y credenciales)
+    if (error.message === "Email not confirmed") {
+      toast.error("Por favor, confirma tu correo electrónico para poder entrar.");
+    } else if (error.message === "Invalid login credentials") {
+      toast.error("El correo o la contraseña son incorrectos.");
+    } else {
+      toast.error(error.message);
     }
+    setLoading(false);
+    return;
+  }
 
-    setLoading(true);
+  // 3. VALIDACIÓN DE ROL (La parte nueva)
+  if (data.user) {
+    try {
+      // Consultamos la tabla profiles para ver quién acaba de entrar
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
 
-    // 3. LLAMADA REAL A SUPABASE
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: formData.username, // Pasamos el 'username' del estado como email
-      password: formData.password,
-    });
+      if (profileError) throw profileError;
 
-    if (error) {
-      // Manejo de errores comunes
-      if (error.message === "Email not confirmed") {
-        toast.error("Por favor, confirma tu correo electrónico para poder entrar.");
-      } else if (error.message === "Invalid login credentials") {
-        toast.error("El correo o la contraseña son incorrectos.");
+      // 4. DIRECCIONAMIENTO INTELIGENTE
+      if (profile?.role === 'researcher') {
+        toast.success(`¡Bienvenido al panel de investigación!`);
+        // El investigador va directo a sus estadísticas
+        setTimeout(() => navigate("/researcher-dashboard"), 1000);
       } else {
-        toast.error(error.message);
+        toast.success("¡Bienvenida de nuevo a QUIRONA!");
+        // La usuaria sigue tu flujo normal
+        setTimeout(() => navigate("/initial-question"), 1000);
       }
-      setLoading(false);
-      return;
-    }
 
-    // 4. Si llegamos aquí, el inicio de sesión fue exitoso
-    if (data.user) {
-      toast.success("¡Bienvenida de nuevo a QUIRONA!");
-      // Quitamos el localStorage manual, Supabase gestiona la sesión por nosotros
-      setTimeout(() => navigate("/initial-question"), 1000);
+    } catch (err) {
+      console.error("Error al obtener el perfil:", err);
+      // Si algo falla con el perfil, por seguridad la mandamos al flujo de usuaria
+      navigate("/initial-question");
+    } finally {
+      // El loading se apaga dentro de los timeouts o aquí si hubo error
+      setLoading(false);
     }
-  };
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">

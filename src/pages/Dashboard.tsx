@@ -1,21 +1,40 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { ModuleCard } from "@/components/ModuleCard";
-import { BookOpen, Shield, Heart, Users, Loader2, ArrowRight, CheckCircle } from "lucide-react";
+import { BookOpen, Shield, Heart, Users, Loader2, ArrowRight, CheckCircle, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/supabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button"; // Corregido el import de Button
+import { Textarea } from "@/components/ui/textarea";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("Usuario");
   const [overallProgress, setOverallProgress] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [suggestion, setSuggestion] = useState("");
   const [progressRecord, setProgressRecord] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const checkUserAccess = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { navigate("/"); return; }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      // Si es investigador, lo mandamos a su panel
+      if (profile?.role === 'researcher') {
+        navigate("/researcher-dashboard");
+      }
+    };
+    checkUserAccess();
     const fetchUserData = async () => {
       try {
         setLoading(true);
@@ -120,6 +139,18 @@ const Dashboard = () => {
       toast.error("Error al cerrar sesión");
     }
   };
+  const sendSuggestion = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from('suggestions')
+      .insert([{ user_id: user?.id, message: suggestion }]);
+
+    if (!error) {
+      toast.success("¡Gracias! Tu mensaje ha sido enviado a los investigadores.");
+      setSuggestion("");
+      setIsModalOpen(false);
+    }
+  };
 
   const handleModuleClick = (index: number) => {
     // Verificar si el módulo está desbloqueado
@@ -196,13 +227,17 @@ const Dashboard = () => {
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Bienvenida a tu espacio de aprendizaje. Explora los módulos educativos y 
-              avanza a tu propio ritmo.
+              avanza a tu propio ritmo.  
             </p>
+            <br></br>
+            <Button onClick={() => setIsModalOpen(true)} variant="outline" className="mb-4">
+              <MessageSquare className="mr-2 w-4 h-4" /> Buzón de sugerencias
+            </Button>
           </div>
 
           {/* Grid de Módulos */}
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Módulos educativos</h2>
+            <h2 className="text-2xl font-bold text-center mb-6">Módulos educativos</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {modules.map((module, index) => (
                 <div key={index} className={!module.isUnlocked ? "opacity-60 grayscale-[0.5]" : ""}>
@@ -250,6 +285,29 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
+
+
+          {/* BUZÓN */}
+          {isModalOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md">
+              <CardContent className="p-6 space-y-4">
+                <h3 className="text-xl font-bold">Buzón de sugerencias</h3>
+                <Textarea 
+                  placeholder="Escribe aquí tus dudas o comentarios para los investigadores..."
+                  value={suggestion}
+                  onChange={(e) => setSuggestion(e.target.value)}
+                  className="min-h-[150px]"
+                />
+                <div className="flex gap-2">
+                  <Button onClick={() => setIsModalOpen(false)} variant="ghost" className="flex-1">Cancelar</Button>
+                  <Button onClick={sendSuggestion} className="flex-1 gradient-primary text-white">Enviar</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
 
           {/* TEST FINAL */}
           {allModulesCompleted && (

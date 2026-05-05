@@ -13,6 +13,7 @@ const FinalTest1 = () => {
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const [isSaving, setIsSaving] = useState(false);
+    const [initialOrder1, setInitialOrder1] = useState<string[]>([]);
 
   // Estados para Ejercicio 1
   const [words1, setWords1] = useState<string[]>(Array(10).fill(""));
@@ -54,8 +55,12 @@ const FinalTest1 = () => {
   };
 
   const nextStep = () => {
-    if (page === 2) setOrdered1(words1.filter(w => w.trim() !== ""));
-    if (page === 5) setOrdered2(words2.filter(w => w.trim() !== ""));
+    if (page === 2) {
+      const initialList = words1.filter(w => w.trim() !== "");
+      setOrdered1(initialList);
+      // Guardamos una copia que NUNCA se mueva para saber el orden original
+      setInitialOrder1(initialList); 
+    }
     setPage(page + 1);
     window.scrollTo(0, 0);
   };
@@ -132,7 +137,7 @@ const FinalTest1 = () => {
               {/* PAGINA 3: JERARQUIZACIÓN EJERCICIO 1 */}
               {page === 3 && (
                 <div className="space-y-6 text-center">
-                   <div className="bg-gray-50 p-6 rounded-2xl text-left mb-6 border border-gray-100">
+                  <div className="bg-gray-50 p-6 rounded-2xl text-left mb-6 border border-gray-100">
                     <p className="text-sm text-gray-600">
                       Debes asignar la parte más alta de la lista a la palabra más importante... la segunda posición a la que le sigue en importancia... y así sucesivamente.
                     </p>
