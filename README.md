@@ -9,6 +9,7 @@
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](https://vitejs.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE)
 
 Proyecto académico de la **FES Iztacala, UNAM**, con la colaboración de **SUAyED**, **IPN** y **ESCOM**.
 
@@ -29,7 +30,7 @@ El sistema contempla dos tipos de acceso:
 - **Usuarias**: recorren módulos, responden tests y consultan su progreso.
 - **Investigadoras/es**: dan seguimiento al avance y a los resultados del estudio.
 
-> ⚠️ Este repositorio contiene código de una plataforma que trata **datos personales sensibles de salud**. Su uso, despliegue o reutilización requiere autorización del equipo responsable.
+> ⚠️ Este repositorio contiene código de una plataforma que trata **datos personales sensibles de salud**. El código se distribuye bajo GPL-3.0; el despliegue con datos reales y el uso de los instrumentos requiere autorización del equipo responsable.
 
 ---
 
@@ -52,6 +53,7 @@ El sistema contempla dos tipos de acceso:
 - [Solución de problemas](#-solución-de-problemas)
 - [Estado del proyecto](#-estado-del-proyecto)
 - [Contribución](#-contribución)
+- [Licencia](#-licencia)
 - [Créditos](#-créditos)
 - [Contacto](#-contacto)
 
@@ -368,6 +370,25 @@ El plan detallado de pendientes está en [`ROADMAP.md`](./ROADMAP.md).
 
 **Convención de ramas:** `feat/…`, `fix/…`, `docs/…`, `chore/…`, `refactor/…`.
 
+Consulta [`CONTRIBUTING.md`](./CONTRIBUTING.md) para el flujo completo, los estándares de código y las reglas de seguridad y privacidad.
+
+---
+
+## 📄 Licencia
+
+Este proyecto se distribuye bajo la **GNU General Public License v3.0**. El texto completo está en [`LICENSE`](./LICENSE).
+
+```text
+Copyright (C) 2025 Proyecto Quirona — FES Iztacala, UNAM
+```
+
+Implicaciones principales:
+
+- Puedes usar, estudiar, modificar y redistribuir el código.
+- Cualquier trabajo derivado debe distribuirse bajo **GPL-3.0** y conservar los avisos de copyright.
+- El software se entrega **sin garantía**, según los términos de la licencia.
+- La licencia cubre el **código**. Los contenidos educativos, instrumentos psicométricos, imágenes y datos del estudio **no** se licencian automáticamente y su uso requiere autorización del equipo responsable.
+
 ---
 
 ## 🏅 Créditos
@@ -398,7 +419,7 @@ El plan detallado de pendientes está en [`ROADMAP.md`](./ROADMAP.md).
 <div align="center">
 
 **Proyecto académico e institucional de la UNAM.**
-El uso del código, de los instrumentos y de los datos requiere autorización del equipo responsable.
+Código bajo GPL-3.0 · Contenidos, instrumentos y datos requieren autorización del equipo responsable.
 
 © 2025 QUIRONA UNAM · Educación en salud ginecológica
 
