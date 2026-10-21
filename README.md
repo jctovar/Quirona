@@ -55,12 +55,24 @@ Antes de ejecutar el proyecto, instala todas las dependencias necesarias con:
 npm install
 Este comando descargará los paquetes definidos en el archivo package.json.
 
+Configurar variables de entorno
+El proyecto necesita conectarse a Supabase. Copia el archivo de ejemplo y completa los valores:
+
+cp .env.example .env
+
+Abre el archivo .env y coloca los datos de tu proyecto (Supabase Dashboard → Project Settings → API):
+
+VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
+VITE_SUPABASE_ANON_KEY=tu-clave-publica-anon
+
+Importante: usa únicamente la clave pública (anon / publishable). Las claves privadas (service_role o sb_secret_...) nunca deben ir en este archivo, porque se incluyen en el código que descarga el navegador. El archivo .env está en .gitignore, no lo subas al repositorio.
+
 Ejecutar el proyecto
-Una vez instaladas las dependencias, inicia el proyecto con:
+Una vez instaladas las dependencias y configurado el .env, inicia el proyecto con:
 npm run dev
 El servidor se iniciará automáticamente.
-Podrás abrir el proyecto en tu navegador en una dirección similar a:
-http://localhost:5173
+Podrás abrir el proyecto en tu navegador en:
+http://localhost:8080
 
 Solución de posibles errores
 Si encuentras errores, revisa lo siguiente:
