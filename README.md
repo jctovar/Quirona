@@ -114,6 +114,7 @@ flowchart LR
 quirona/
 ├── docs/                    # Capturas y documentación del proyecto
 ├── public/                  # Archivos estáticos y _redirects (SPA)
+├── supabase/                # Migraciones SQL y verificaciones de seguridad
 ├── src/
 │   ├── assets/              # Imágenes, logos y video de bienvenida
 │   ├── components/          # Componentes de aplicación
@@ -297,6 +298,7 @@ Este proyecto maneja datos de salud mental y experiencias de violencia, consider
 - El repositorio **no** contiene credenciales: `.env` está ignorado y solo se versiona `.env.example`.
 - El cliente usa exclusivamente la clave pública; las claves privadas se gestionan fuera del frontend.
 - El acceso a datos se restringe con **Row Level Security** en PostgreSQL.
+- Los parches de RLS, permisos y RPC viven en [`supabase/migrations/`](./supabase/migrations/) con instrucciones en [`supabase/README.md`](./supabase/README.md).
 - El registro incluye asentimiento informado y aviso de privacidad.
 - Recomendaciones para contribuir:
   - No registrar datos personales en `console.log`.
