@@ -30,7 +30,15 @@ revoke all on table public.profiles from anon;
 --    (la app no inserta ni borra perfiles desde el cliente; los crea el
 --     trigger de auth.users)
 revoke insert, update, delete on table public.profiles from authenticated;
+revoke truncate, references, trigger on table public.profiles from authenticated;
+revoke update (role) on table public.profiles from authenticated;  -- defensa por si hubiera grants de columna
 grant update (has_experience) on table public.profiles to authenticated;
+
+-- 3b) Eliminar las políticas permisivas que causaban la exposición ----------
+--     "Lectura global..." permitía SELECT a cualquier autenticado.
+--     "Permitir inserción total" permitía INSERT a cualquiera.
+drop policy if exists "Lectura global para usuarios autenticados" on public.profiles;
+drop policy if exists "Permitir inserción total" on public.profiles;
 
 -- 4) Helper para políticas --------------------------------------------------
 create or replace function public.is_researcher_secure()

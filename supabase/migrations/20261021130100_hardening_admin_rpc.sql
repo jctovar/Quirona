@@ -34,6 +34,7 @@ begin
   end loop;
 
   -- Helpers de rol: no deben ser invocables sin sesión
+  -- (hay que revocar de PUBLIC, no solo de anon: anon hereda de PUBLIC)
   for r in
     select p.oid::regprocedure as signature
     from pg_proc p
@@ -41,7 +42,10 @@ begin
     where n.nspname = 'public'
       and p.proname in ('is_researcher', 'check_is_researcher', 'check_is_admin')
   loop
+    execute format('revoke execute on function %s from public', r.signature);
     execute format('revoke execute on function %s from anon', r.signature);
+    execute format('grant execute on function %s to authenticated', r.signature);
+    execute format('grant execute on function %s to service_role', r.signature);
   end loop;
 end $$;
 

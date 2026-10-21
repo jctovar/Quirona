@@ -10,6 +10,7 @@ Este directorio contiene los cambios de base de datos del proyecto, incluidos lo
 |---|---|
 | `20261021130000_hardening_profiles_rls.sql` | Cierra la escalada de privilegios y la lectura masiva de `profiles`: revoca escrituras de `anon`, limita `authenticated` a `has_experience`, añade políticas restrictivas de SELECT/UPDATE y un trigger que impide cambiar `role` |
 | `20261021130100_hardening_admin_rpc.sql` | Retira `admin_create_researcher` de `anon`/`authenticated` (solo `service_role`) y oculta los helpers de rol a `anon` |
+| `20261021130200_allow_sql_role_updates.sql` | Permite al equipo cambiar roles desde el SQL Editor (sin JWT), manteniendo el bloqueo para sesiones de PostgREST |
 
 ## Antes de aplicar
 
@@ -72,6 +73,21 @@ drop function if exists public.is_researcher_secure();
 grant insert, update, delete on public.profiles to authenticated;
 grant all on public.profiles to anon;
 ```
+
+## Estado de aplicación
+
+Aplicadas en el proyecto `zeogqrwfqnrejexgwqjp` el **2026-10-21**, con verificación funcional vía REST:
+
+| Prueba | Resultado |
+|---|---|
+| Usuaria normal intenta `PATCH role = researcher` | `403` · `42501 permission denied` ✅ |
+| Usuaria normal lee `profiles` | 1 fila (la propia) ✅ |
+| Investigadora lee `profiles` | todas las filas ✅ |
+| Investigadora intenta cambiar su rol | `403` ✅ |
+| Actualización legítima (`has_experience`) | `204` ✅ |
+| `anon` lee / inserta en `profiles` | `401` ✅ |
+| `anon` ejecuta `admin_create_researcher` | `401 permission denied` ✅ |
+| Lectura clínica por investigadora | `200` (sin regresiones) ✅ |
 
 ## Notas de diseño
 
