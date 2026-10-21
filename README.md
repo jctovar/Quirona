@@ -1,86 +1,405 @@
-🌸 Proyecto Quirona
+<div align="center">
 
-Bienvenida al repositorio del proyecto Quirona Empower Her.
-Este documento te guiará paso a paso para instalar las herramientas necesarias, clonar el repositorio y ejecutar el proyecto correctamente en tu computadora.
+# 🌸 Quirona Empower Her
 
-Instalar Node.js
-Node.js es necesario para ejecutar el proyecto y manejar las dependencias.
+**Plataforma educativa digital sobre salud ginecológica, prevención de violencia ginecológica y derechos en salud para mujeres adolescentes.**
 
-Ingresa a la página oficial: https://nodejs.org/
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](https://vitejs.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
 
-Descarga la versión LTS (recomendada).
+Proyecto académico de la **FES Iztacala, UNAM**, con la colaboración de **SUAyED**, **IPN** y **ESCOM**.
 
-Ejecuta el instalador y deja las opciones por defecto.
+</div>
 
-Verifica que la instalación se haya realizado correctamente con los comandos:
-node -v
-npm -v
-Si ambos comandos muestran una versión, todo está correcto.
+<div align="center">
+  <img src="docs/screenshot-home.png" alt="Pantalla de inicio de Quirona" width="880" />
+</div>
 
-Instalar Git
-Git permite gestionar el control de versiones y clonar el repositorio del proyecto.
+---
 
-Descarga Git desde: https://git-scm.com/downloads
+## 📖 Descripción
 
-Instálalo dejando las opciones por defecto y asegúrate de marcar “Add Git to PATH”.
+Quirona es una aplicación web que acompaña a mujeres adolescentes en un recorrido formativo de cuatro módulos sobre salud ginecológica y prevención de la violencia ginecológica y obstétrica. Combina contenidos narrativos, cuestionarios, actividades interactivas y una batería de instrumentos psicométricos de evaluación inicial y final, con un panel de seguimiento para el equipo de investigación.
 
-Verifica la instalación con:
-git --version
+El sistema contempla dos tipos de acceso:
 
-Vincular GitHub con Visual Studio Code
+- **Usuarias**: recorren módulos, responden tests y consultan su progreso.
+- **Investigadoras/es**: dan seguimiento al avance y a los resultados del estudio.
 
-Abre Visual Studio Code.
+> ⚠️ Este repositorio contiene código de una plataforma que trata **datos personales sensibles de salud**. Su uso, despliegue o reutilización requiere autorización del equipo responsable.
 
-Dirígete a la pestaña Control de código fuente (ícono de ramita o con Ctrl + Shift + G).
+---
 
-Inicia sesión con tu cuenta de GitHub (clic en “Iniciar sesión con GitHub” o “Publicar en GitHub”).
+## 📑 Tabla de contenidos
 
-Autoriza a Visual Studio Code para acceder a tu cuenta.
+- [Características](#-características)
+- [Stack tecnológico](#-stack-tecnológico)
+- [Arquitectura](#-arquitectura)
+- [Estructura del proyecto](#-estructura-del-proyecto)
+- [Requisitos](#-requisitos)
+- [Puesta en marcha](#-puesta-en-marcha)
+- [Variables de entorno](#-variables-de-entorno)
+- [Scripts disponibles](#-scripts-disponibles)
+- [Rutas de la aplicación](#-rutas-de-la-aplicación)
+- [Modelo de datos](#-modelo-de-datos)
+- [Roles y control de acceso](#-roles-y-control-de-acceso)
+- [Flujo de la usuaria](#-flujo-de-la-usuaria)
+- [Seguridad y privacidad](#-seguridad-y-privacidad)
+- [Despliegue](#-despliegue)
+- [Solución de problemas](#-solución-de-problemas)
+- [Estado del proyecto](#-estado-del-proyecto)
+- [Contribución](#-contribución)
+- [Créditos](#-créditos)
+- [Contacto](#-contacto)
 
-Comprueba que tu usuario de GitHub aparezca correctamente en la esquina inferior izquierda.
+---
 
-Clonar el repositorio
-Con Git instalado y GitHub vinculado, ahora puedes clonar el proyecto.
+## ✨ Características
 
-Abre una terminal en Visual Studio Code o PowerShell.
+| Área | Detalle |
+|---|---|
+| **Contenido educativo** | 4 módulos con relato, introducción, quiz, visita guiada, actividad interactiva, retroalimentación y cierre |
+| **Evaluación** | Test inicial, red semántica, inventario de ansiedad, escala de asertividad, experiencias adversas, salud general y 3 evaluaciones finales |
+| **Progreso** | Seguimiento por módulo y porcentaje global, con desbloqueo secuencial |
+| **Buzón** | Envío de sugerencias de las usuarias al equipo de investigación |
+| **Panel de investigación** | Métricas de participación, avance por módulo y resultados agregados |
+| **Derivación y apoyo** | Directorio de líneas de ayuda y servicios de atención con marcado directo |
+| **Accesibilidad y UX** | Diseño responsivo, componentes accesibles (Radix UI), navegación por sesiones |
+| **Consentimiento informado** | Asentimiento, aviso de privacidad y selección de programa durante el registro |
 
-Ejecuta el comando:
-git clone https://github.com/leyvaortiznazli/quirona-empower-her.git
+---
 
-Entra en la carpeta del proyecto:
-cd quirona-empower-her
+## 🧰 Stack tecnológico
 
-Instalar dependencias
-Antes de ejecutar el proyecto, instala todas las dependencias necesarias con:
+| Capa | Tecnología |
+|---|---|
+| **UI** | React 18, TypeScript 5, Tailwind CSS 3, shadcn/ui + Radix UI, lucide-react |
+| **Build** | Vite 5 (`@vitejs/plugin-react-swc`) |
+| **Ruteo** | React Router DOM 6 |
+| **Estado y datos** | TanStack Query 5, React Hooks |
+| **Formularios** | React Hook Form + Zod |
+| **Backend** | Supabase (PostgreSQL, Auth, Row Level Security) |
+| **Gráficas** | Recharts |
+| **Hosting sugerido** | Netlify (incluye `dist/_redirects` para SPA) |
+
+---
+
+## 🏗️ Arquitectura
+
+```mermaid
+flowchart LR
+    U[Usuaria / Investigador] -->|HTTPS| SPA[SPA React + Vite]
+    SPA -->|supabase-js<br/>clave pública anon| API[Supabase API]
+    API --> AUTH[Auth<br/>email + contraseña]
+    API --> REST[PostgREST]
+    API --> RLS[Políticas RLS]
+    RLS --> DB[(PostgreSQL)]
+```
+
+- El cliente es una **SPA** que se sirve como archivos estáticos.
+- Toda la persistencia y autenticación pasa por **Supabase** mediante `@supabase/supabase-js`.
+- El control de acceso a los datos se define en **políticas RLS** del lado de la base de datos; el cliente **solo** utiliza la clave pública (`anon` / `publishable`).
+- No existe backend propio: cualquier lógica privilegiada debe implementarse en Supabase (funciones `SECURITY DEFINER` o Edge Functions), nunca en el navegador.
+
+---
+
+## 📂 Estructura del proyecto
+
+```text
+quirona/
+├── docs/                    # Capturas y documentación del proyecto
+├── public/                  # Archivos estáticos y _redirects (SPA)
+├── src/
+│   ├── assets/              # Imágenes, logos y video de bienvenida
+│   ├── components/          # Componentes de aplicación
+│   │   └── ui/              # Biblioteca shadcn/ui (49 componentes)
+│   ├── hooks/               # Hooks personalizados (rol, mobile, toast)
+│   ├── layouts/             # UserLayout, ResearcherLayout
+│   ├── lib/                 # Utilidades, progreso y helpers
+│   ├── pages/               # 56 vistas (módulos, tests, paneles)
+│   ├── App.tsx              # Definición de rutas
+│   ├── main.tsx             # Punto de entrada
+│   └── supabaseClient.js    # Cliente de Supabase
+├── .env.example             # Plantilla de variables de entorno
+├── ROADMAP.md               # Plan de trabajo y pendientes
+├── tailwind.config.ts
+└── vite.config.ts
+```
+
+---
+
+## ✅ Requisitos
+
+| Herramienta | Versión recomendada |
+|---|---|
+| Node.js | 20 LTS o superior (mínimo 18) |
+| npm | 9 o superior |
+| Cuenta/proyecto de Supabase | Con las tablas y políticas del proyecto |
+| Git | 2.30 o superior |
+
+---
+
+## 🚀 Puesta en marcha
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/jctovar/Quirona.git
+cd Quirona
+
+# 2. Instalar dependencias
 npm install
-Este comando descargará los paquetes definidos en el archivo package.json.
 
-Configurar variables de entorno
-El proyecto necesita conectarse a Supabase. Copia el archivo de ejemplo y completa los valores:
-
+# 3. Configurar variables de entorno
 cp .env.example .env
+# edita .env con los datos de tu proyecto de Supabase
 
-Abre el archivo .env y coloca los datos de tu proyecto (Supabase Dashboard → Project Settings → API):
-
-VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
-VITE_SUPABASE_ANON_KEY=tu-clave-publica-anon
-
-Importante: usa únicamente la clave pública (anon / publishable). Las claves privadas (service_role o sb_secret_...) nunca deben ir en este archivo, porque se incluyen en el código que descarga el navegador. El archivo .env está en .gitignore, no lo subas al repositorio.
-
-Ejecutar el proyecto
-Una vez instaladas las dependencias y configurado el .env, inicia el proyecto con:
+# 4. Levantar el entorno de desarrollo
 npm run dev
-El servidor se iniciará automáticamente.
-Podrás abrir el proyecto en tu navegador en:
-http://localhost:8080
+```
 
-Solución de posibles errores
-Si encuentras errores, revisa lo siguiente:
+La aplicación queda disponible en **http://localhost:8080**.
 
-Asegúrate de tener Node.js y Git correctamente instalados.
+> Si el puerto está ocupado, Vite elegirá el siguiente libre e imprimirá la URL en la terminal.
 
-Verifica que estás dentro de la carpeta del proyecto antes de ejecutar los comandos (cd quirona-empower-her).
+---
 
-Si el error está relacionado con permisos o versiones, intenta ejecutar:
-npm cache clean --force
-npm install
+## 🔐 Variables de entorno
+
+Crea un archivo `.env` en la raíz (está incluido en `.gitignore`):
+
+| Variable | Descripción | Ejemplo |
+|---|---|---|
+| `VITE_SUPABASE_URL` | URL del proyecto de Supabase | `https://<project-ref>.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | Clave pública `anon` o `publishable` | `eyJhbGciOi...` o `sb_publishable_...` |
+
+**Reglas de seguridad:**
+
+- ✅ Usa únicamente la clave **pública** (`anon` / `publishable`).
+- ❌ Nunca coloques `service_role` ni `sb_secret_...`: **todo lo que empieza con `VITE_` se incluye en el bundle del navegador**.
+- ❌ No subas `.env` al repositorio.
+
+En el hosting, configura las mismas variables en el panel del proveedor (Netlify/Vercel) antes de compilar.
+
+---
+
+## 📜 Scripts disponibles
+
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Servidor de desarrollo con HMR en el puerto 8080 |
+| `npm run build` | Build de producción en `dist/` |
+| `npm run build:dev` | Build en modo desarrollo |
+| `npm run preview` | Sirve localmente el build de producción |
+| `npm run lint` | Ejecuta ESLint sobre todo el proyecto |
+
+---
+
+## 🗺️ Rutas de la aplicación
+
+### Públicas
+
+| Ruta | Vista |
+|---|---|
+| `/` | Inicio |
+| `/quienes-somos` | Quiénes somos |
+| `/contenidos` | Contenidos |
+| `/preguntas` | Preguntas frecuentes |
+| `/trabajos` | Trabajos de investigación |
+| `/login` · `/register` | Acceso y registro |
+
+### Área de la usuaria
+
+| Ruta | Vista |
+|---|---|
+| `/initial-question` · `/pre-education` | Pregunta inicial y preparación |
+| `/dashboard` · `/profile` | Panel y perfil |
+| `/initial-test` · `/semantic-network-test` · `/anxiety-inventory` | Evaluaciones iniciales |
+| `/assertiveness-scale` · `/adverse-experiences` · `/general-health` | Instrumentos psicométricos |
+| `/derivacion` · `/apoyo` | Directorio de ayuda |
+| `/module-1` … `/module-4-*` | Contenido de los 4 módulos |
+| `/final-test-1` · `/final-test-2` · `/final-test-3` | Evaluaciones finales |
+
+### Área de investigación
+
+| Ruta | Vista |
+|---|---|
+| `/researcher-dashboard` | Panel de seguimiento del estudio |
+| `/researcher/perfilInvestigador` | Perfil del investigador |
+| `/researcher/profileInvestigador` | Configuración del perfil |
+
+---
+
+## 🗃️ Modelo de datos
+
+Tablas principales en Supabase (esquema `public`):
+
+| Tabla | Contenido |
+|---|---|
+| `profiles` | Datos de la participante y rol (`user` / `researcher`) |
+| `user_progress` | Avance por módulo y porcentaje global |
+| `module_1_responses` … `module_4_responses` | Respuestas y puntajes de cada módulo |
+| `initial_test_responses` | Test inicial |
+| `semantic_network_responses` | Red semántica |
+| `anxiety_inventory_responses` | Inventario de ansiedad (estado/rasgo, inicial y final) |
+| `assertiveness_scale_responses` | Escala de asertividad |
+| `adverse_experiences_responses` | Experiencias adversas |
+| `general_health_responses` | Salud general |
+| `final_evaluations` | Evaluaciones finales 1, 2 y 3 |
+| `suggestions` | Buzón de sugerencias |
+| `admin_feedback` | Retroalimentación del equipo |
+| `test_attempts`, `test_sus_responses`, `test_usability_responses`, `apoi_test` | Instrumentos complementarios de usabilidad y aceptación |
+
+Funciones RPC de apoyo para validación de rol y tareas administrativas del equipo de investigación.
+
+---
+
+## 👥 Roles y control de acceso
+
+| Rol | Acceso |
+|---|---|
+| `user` | Módulos, evaluaciones, progreso propio, sugerencias y perfil propio |
+| `researcher` | Panel de investigación, seguimiento de participantes y resultados agregados |
+
+- El rol se almacena en `profiles.role`.
+- La interfaz redirige según el rol al iniciar sesión.
+- **La autorización real debe vivir en RLS y en funciones del servidor**; las comprobaciones del cliente son solo de experiencia de usuario.
+
+---
+
+## 🩺 Flujo de la usuaria
+
+```text
+Registro + asentimiento informado
+        ↓
+Pregunta inicial → Preparación
+        ↓
+Evaluaciones iniciales (6 instrumentos)
+        ↓
+Módulo 1 → Módulo 2 → Módulo 3 → Módulo 4
+  (relato · intro · quiz · visita · actividad · feedback · cierre)
+        ↓
+Evaluaciones finales (3)
+        ↓
+Panel de progreso · Derivación y apoyo · Buzón de sugerencias
+```
+
+---
+
+## 🔒 Seguridad y privacidad
+
+Este proyecto maneja datos de salud mental y experiencias de violencia, considerados **datos personales sensibles**.
+
+- El repositorio **no** contiene credenciales: `.env` está ignorado y solo se versiona `.env.example`.
+- El cliente usa exclusivamente la clave pública; las claves privadas se gestionan fuera del frontend.
+- El acceso a datos se restringe con **Row Level Security** en PostgreSQL.
+- El registro incluye asentimiento informado y aviso de privacidad.
+- Recomendaciones para contribuir:
+  - No registrar datos personales en `console.log`.
+  - No incluir datos reales en issues, capturas o pruebas.
+  - No desactivar RLS para “probar rápido”.
+
+Si encuentras una vulnerabilidad, **no abras un issue público**: repórtala al correo de contacto.
+
+---
+
+## 🌐 Despliegue
+
+El proyecto se despliega como sitio estático:
+
+```bash
+npm run build     # genera dist/
+```
+
+| Proveedor | Configuración |
+|---|---|
+| **Netlify** | Build: `npm run build` · Publish: `dist` · Variables `VITE_SUPABASE_*` en el panel. `dist/_redirects` ya resuelve el fallback SPA |
+| **Vercel** | Build: `npm run build` · Output: `dist` · Añadir rewrite a `index.html` |
+| **Nginx/Apache** | Servir `dist/` con fallback a `index.html` para rutas del cliente |
+
+---
+
+## 🧯 Solución de problemas
+
+| Síntoma | Causa probable | Solución |
+|---|---|---|
+| Pantalla en blanco al arrancar | Falta `.env` o variables vacías | Crear `.env` desde `.env.example` y reiniciar Vite |
+| `supabaseUrl is required` | `VITE_SUPABASE_URL` no definida | Verificar el `.env` y reiniciar el servidor |
+| El puerto 8080 está ocupado | Otra instancia de Vite | Cerrar la anterior o usar la URL que imprime Vite |
+| Error 404 al recargar una ruta | Falta fallback SPA en el hosting | Configurar `_redirects` o rewrite a `index.html` |
+| Fallo de instalación | Caché o versiones incompatibles | `rm -rf node_modules package-lock.json && npm install` |
+
+---
+
+## 📌 Estado del proyecto
+
+| Comprobación | Estado |
+|---|---|
+| Build de producción (`npm run build`) | ✅ |
+| Verificación de tipos (`tsc --noEmit`) | ✅ |
+| Lint (`npm run lint`) | ⚠️ 24 errores y 7 advertencias conocidas |
+| Pruebas automatizadas y CI | ⏳ Pendiente |
+| Revisión de seguridad de RLS y políticas de acceso | 🔄 En curso |
+
+El plan detallado de pendientes está en [`ROADMAP.md`](./ROADMAP.md).
+
+---
+
+## 🤝 Contribución
+
+1. Crea una rama descriptiva:
+   ```bash
+   git checkout -b fix/rls-perfiles
+   ```
+2. Sigue **Conventional Commits** con emoji:
+   ```text
+   ✨ feat: agregar validación de CURP
+   🐛 fix: corregir cálculo de progreso del módulo 3
+   📝 docs: actualizar guía de despliegue
+   ```
+3. Antes de abrir un PR:
+   ```bash
+   npm run lint
+   npm run build
+   ```
+4. Abre el PR contra `main` de tu fork y describe el cambio y su impacto.
+
+**Convención de ramas:** `feat/…`, `fix/…`, `docs/…`, `chore/…`, `refactor/…`.
+
+---
+
+## 🏅 Créditos
+
+**Contenido de módulos**
+
+| Módulo | Autor/a |
+|---|---|
+| 1. Ginecología preventiva | Javier Darío Ríos Castillo |
+| 2. Estándares de atención en consulta ginecológica | Aline González Castro |
+| 3. ¿Qué es la violencia ginecológica? | Javier Darío Ríos Castillo |
+| 4. Responder a la violencia ginecológica | Alfonso Mendoza |
+
+**Instituciones colaboradoras:** UNAM · FES Iztacala · SUAyED · IPN · ESCOM
+
+**Líneas de apoyo incluidas:** Línea UNAM, Línea de la Vida, Línea de las Mujeres, Locatel, Línea sin Violencia del Estado de México, Centros de Integración Juvenil, SALME y Línea de Consejo Ciudadano.
+
+---
+
+## 📬 Contacto
+
+- **Correo:** quirona@iztacala.unam.mx
+- **Dirección:** Av. de los Barrios No. 1, Los Reyes Iztacala, Tlalnepantla de Baz, Estado de México, C.P. 54090
+- **Repositorio original:** [leyvaortiznazli/Quirona](https://github.com/leyvaortiznazli/Quirona)
+
+---
+
+<div align="center">
+
+**Proyecto académico e institucional de la UNAM.**
+El uso del código, de los instrumentos y de los datos requiere autorización del equipo responsable.
+
+© 2025 QUIRONA UNAM · Educación en salud ginecológica
+
+</div>
