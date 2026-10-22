@@ -49,6 +49,7 @@ El sistema contempla dos tipos de acceso:
 - [Roles y control de acceso](#-roles-y-control-de-acceso)
 - [Flujo de la usuaria](#-flujo-de-la-usuaria)
 - [Seguridad y privacidad](#-seguridad-y-privacidad)
+- [Pruebas](#-pruebas)
 - [Despliegue](#-despliegue)
 - [Solución de problemas](#-solución-de-problemas)
 - [Estado del proyecto](#-estado-del-proyecto)
@@ -123,12 +124,15 @@ quirona/
 │   ├── layouts/             # UserLayout, ResearcherLayout
 │   ├── lib/                 # Utilidades, progreso y helpers
 │   ├── pages/               # 56 vistas (módulos, tests, paneles)
+│   ├── test/                # Setup de Vitest / Testing Library
 │   ├── App.tsx              # Definición de rutas
 │   ├── main.tsx             # Punto de entrada
 │   └── supabaseClient.js    # Cliente de Supabase
 ├── .env.example             # Plantilla de variables de entorno
 ├── ROADMAP.md               # Plan de trabajo y pendientes
 ├── tailwind.config.ts
+├── vitest.config.ts         # Configuración de pruebas
+└── vite.config.ts
 └── vite.config.ts
 ```
 
@@ -197,6 +201,9 @@ En el hosting, configura las mismas variables en el panel del proveedor (Netlify
 | `npm run build:dev` | Build en modo desarrollo |
 | `npm run preview` | Sirve localmente el build de producción |
 | `npm run lint` | Ejecuta ESLint sobre todo el proyecto |
+| `npm test` | Ejecuta la suite de pruebas unitarias (Vitest) |
+| `npm run test:watch` | Pruebas en modo interactivo |
+| `npm run test:coverage` | Pruebas con reporte de cobertura |
 
 ---
 
@@ -310,6 +317,32 @@ Si encuentras una vulnerabilidad, **no abras un issue público**: repórtala al 
 
 ---
 
+## 🧪 Pruebas
+
+La suite usa **Vitest** + **Testing Library** sobre `jsdom`:
+
+| Comando | Descripción |
+|---|---|
+| `npm test` | Ejecuta todas las pruebas una vez |
+| `npm run test:watch` | Reejecuta al guardar cambios |
+| `npm run test:coverage` | Genera el reporte en `coverage/` |
+
+**36 pruebas en 7 archivos:**
+
+| Área | Archivo | Qué cubre |
+|---|---|---|
+| Progreso local | `src/lib/testProgress.ts` | Persistencia en `localStorage`, JSON corrupto y acumulación de tests |
+| Progreso en BD | `src/lib/progressHelper.ts` | Guardado según rol (mock de Supabase), errores y sesión ausente |
+| Utilidades | `src/lib/utils.ts` | Merge de clases y conflictos de Tailwind |
+| Ruteo por rol | `src/hooks/useRoleNavigation.ts` | Rutas de usuaria vs. investigador |
+| Responsive | `src/hooks/use-mobile.tsx` | Breakpoint, cambio de tamaño y limpieza del listener |
+| Componente | `src/components/ModuleCard.tsx` | Contenido, autoría y callback |
+| Componente | `src/components/TestMenu.tsx` | Estados de progreso, bloqueo de módulos y navegación |
+
+Configuración: `vitest.config.ts` y `src/test/setup.ts`. El setup incluye un `localStorage` en memoria por una incompatibilidad entre Node 26 y jsdom.
+
+---
+
 ## 🌐 Despliegue
 
 El proyecto se despliega como sitio estático:
@@ -345,7 +378,8 @@ npm run build     # genera dist/
 | Build de producción (`npm run build`) | ✅ |
 | Verificación de tipos (`tsc --noEmit`) | ✅ |
 | Lint (`npm run lint`) | ⚠️ 24 errores y 7 advertencias conocidas |
-| Pruebas automatizadas y CI | ⏳ Pendiente |
+| Pruebas unitarias (`npm test`) | ✅ 36 pruebas |
+| Pruebas de integración/E2E y CI | ⏳ Pendiente |
 | Revisión de seguridad de RLS y políticas de acceso | 🔄 En curso |
 
 El plan detallado de pendientes está en [`ROADMAP.md`](./ROADMAP.md).

@@ -165,15 +165,17 @@ Ejecuta y corrige lo que aplique:
 
 ```bash
 npm run lint      # ESLint
+npm test          # pruebas unitarias (Vitest)
 npm run build     # build de producción
 npx tsc --noEmit  # verificación de tipos
 ```
 
-> El proyecto aún no cuenta con suite de pruebas automatizadas ni CI. Si tu cambio afecta un flujo crítico (registro, progreso, evaluación), describe en el PR cómo lo probaste manualmente.
+> Si tu cambio afecta un flujo crítico (registro, progreso, evaluación), añade o actualiza las pruebas en `src/**/*.test.ts(x)`. El proyecto aún no cuenta con CI ni pruebas E2E.
 
 Checklist rápido:
 
 - [ ] La app levanta y la ruta afectada funciona.
+- [ ] `npm test` pasa sin fallos.
 - [ ] No hay errores nuevos de lint ni de tipos.
 - [ ] El build de producción termina correctamente.
 - [ ] No se agregaron secretos ni datos personales.
