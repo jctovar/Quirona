@@ -265,6 +265,7 @@ Funciones RPC de apoyo para validación de rol y tareas administrativas del equi
 |---|---|
 | `user` | Módulos, evaluaciones, progreso propio, sugerencias y perfil propio |
 | `researcher` | Panel de investigación, seguimiento de participantes y resultados agregados |
+| `admin` | Lectura global de perfiles y tareas de administración (se asigna solo por SQL o `service_role`) |
 
 - El rol se almacena en `profiles.role`.
 - La interfaz redirige según el rol al iniciar sesión.
