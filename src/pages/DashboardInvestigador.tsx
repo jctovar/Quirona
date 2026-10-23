@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavbarInvestigador } from "@/components/NavbarInvestigador";
 import { MessageSquare, Mail, Download, BarChart3 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 interface Comment {
@@ -26,7 +24,6 @@ interface Statistic {
 }
 
 const DashboardInvestigador = () => {
-  const navigate = useNavigate();
   const [username] = useState("Investigador");
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);

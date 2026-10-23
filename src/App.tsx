@@ -61,9 +61,6 @@ import NotFound from "./pages/NotFound";
 import DashboardInvestigador from "./pages/DashboardInvestigador";
 import ProfileInvestigador from "./pages/ProfileInvestigador";
 import ResearcherDashboard from "./pages/ResearcherDashboard";
-//import ResearcherUserDetail from "./pages/ResearcherUserDetail";
-//import ResearcherMessages from "./pages/ResearcherMessages";
-//import ResearcherProfile from "./pages/ResearcherProfile";
 
 const queryClient = new QueryClient();
 
@@ -136,15 +133,6 @@ const App = () => (
               <Route path="/module-4-closure" element={<Module4Closure />} />
               {/* Dashboard principal del investigador */}
               <Route path="/researcher-dashboard" element={<ResearcherDashboard />} />
-
-              {/* Detalle individual de cada usuaria (el :id permite ver perfiles diferentes) */}
-              {/* </Route><Route path="/researcher/user/:id" element={<ResearcherUserDetail />} />*/}
-
-              {/* Buzón de sugerencias recibido por las usuarias */}
-              {/* <Route path="/researcher-messages" element={<ResearcherMessages />} />*/}
-
-              {/* Perfil del investigador para editar sus datos */}
-              {/* <Route path="/researcher-profile" element={<ResearcherProfile />} />*/}
             </Route>
 
   
@@ -198,7 +186,4 @@ const App = () => (
           );
 
 export default App;
-function isAllTestsCompleted() {
-  throw new Error("Function not implemented.");
-}
 

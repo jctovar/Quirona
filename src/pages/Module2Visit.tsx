@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";

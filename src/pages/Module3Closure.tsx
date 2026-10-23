@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,7 +54,7 @@ const Module3Closure = () => {
       await updateProgress("m3_closure");
       toast.success("¡Módulo 3 completado con éxito!");
       goTo("/dashboard");
-    } catch (error) {
+    } catch {
       goTo("/dashboard");
     } finally {
       setIsSaving(false);

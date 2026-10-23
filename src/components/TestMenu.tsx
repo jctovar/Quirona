@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { loadTestProgress } from "@/lib/testProgress";
 
@@ -27,7 +27,7 @@ interface TestMenuProps {
   onStart?: () => void;
 }
 
-export const TestMenu = ({ currentTest, onStart }: TestMenuProps) => {
+export const TestMenu = ({ onStart }: TestMenuProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [progress, setProgress] = useState<Record<string, boolean>>({});

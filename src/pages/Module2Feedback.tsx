@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "react-router-dom";
 import { ArrowRight, Star, RotateCcw, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { updateProgress } from "@/lib/progressHelper";
-import { toast } from "sonner";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const feedbackData: Record<number, string> = {

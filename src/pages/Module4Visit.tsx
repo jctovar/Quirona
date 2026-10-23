@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
@@ -40,7 +37,6 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
 const Module4Visit = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
-  const [known, setKnown] = useState<Record<number, boolean>>({});
 
   const handleContinue = async () => {
   setIsSaving(true);

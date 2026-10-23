@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "react-router-dom";
-import { ArrowRight, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { ArrowRight, Clock, XCircle, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import cerebroImg from "@/assets/cerebro.jpg";
 import { supabase } from "@/supabaseClient"; // Importación de Supabase

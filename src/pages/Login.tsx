@@ -128,12 +128,6 @@ const Login = () => {
                   />
                 </div>
 
-                <div className="text-right">
-                  <Link to="/recover-password" className="text-sm text-primary hover:underline">
-                    ¿Olvidaste tu contraseña?
-                  </Link>
-                </div>
-
                 <Button 
                   type="submit" 
                   disabled={loading} // Evita múltiples clics
@@ -144,7 +138,7 @@ const Login = () => {
 
                 <div className="text-center text-sm text-muted-foreground">
                   ¿No tienes una cuenta?{" "}
-                  <Link to="/Register" className="text-primary hover:underline font-medium">
+                  <Link to="/register" className="text-primary hover:underline font-medium">
                     Regístrate aquí
                   </Link>
                 </div>

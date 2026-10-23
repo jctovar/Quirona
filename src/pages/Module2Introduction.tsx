@@ -1,12 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
-import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone, Loader2} from "lucide-react";
+import { ArrowRight, BookOpen, Heart, Shield, Loader2 } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 interface ScrollRevealProps {
   children: React.ReactNode;

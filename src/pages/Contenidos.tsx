@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { BookOpen, Heart, Shield, Users, ChevronDown, GraduationCap, Baby, HandHeart } from "lucide-react";
+import { BookOpen, Heart, Shield, Users, ChevronDown, GraduationCap, HandHeart } from "lucide-react";
 import { useState } from "react";
 import unamlogo from "@/assets/unamlogo.png";
 import suayedlogo from "@/assets/suayedlogo.png";

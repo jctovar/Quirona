@@ -1,7 +1,6 @@
 import { getErrorMessage } from "@/lib/utils";
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
-import { TestMenu } from "@/components/TestMenu";
 import { markTestCompleted } from "@/lib/testProgress";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,7 +43,6 @@ interface AnswersState {
 
 const InitialTest = () => {
   const navigate = useNavigate();
-  const [showMenu, setShowMenu] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   // 2. Inicialización del estado con valores predeterminados (incluyendo todos los campos)
   const [answers, setAnswers] = useState<AnswersState>({
@@ -173,7 +171,7 @@ const InitialTest = () => {
 
       try {
         markTestCompleted("initial-test");
-      } catch (err) {
+      } catch {
         console.warn("No se pudo actualizar el progreso localmente, pero se guardó en la nube.");
       }
 

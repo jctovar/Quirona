@@ -110,7 +110,7 @@ const AssertivenessScaleTest = () => {
   const [showMenu, setShowMenu] = useState(true);
   const [phase, setPhase] = useState<Phase>("intro");
   const [answers, setAnswers] = useState<Record<number, number>>({});
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
   const updateAnswer = (globalIndex: number, value: number) => {
     setAnswers((prev) => ({ ...prev, [globalIndex]: value }));
   };

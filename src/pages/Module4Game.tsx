@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "react-router-dom";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
-import { ArrowRight, Clock, CheckCircle, XCircle } from "lucide-react";
+import { ArrowRight, Clock, XCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import sillaImg from "@/assets/silla.jpg";
 import { supabase } from "@/supabaseClient";

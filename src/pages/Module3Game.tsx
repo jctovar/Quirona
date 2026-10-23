@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
@@ -103,7 +102,7 @@ const Module3Game = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [step, setStep] = useState<"yesno" | "group">("yesno");
   const [points, setPoints] = useState(0);
-  const [answeredQuestions, setAnsweredQuestions] = useState(0);
+  const [, setAnsweredQuestions] = useState(0);
   const [firstCriterionCorrect, setFirstCriterionCorrect] = useState<boolean | null>(null);
   const [userAnswers, setUserAnswers] = useState<Array<{
     questionId: number;
@@ -324,7 +323,7 @@ const Module3Game = () => {
 
                 <div className="space-y-4">
                   <h3 className="text-2xl font-semibold text-primary text-center">Revisemos cada frase</h3>
-                  {questions.map((question, index) => {
+                  {questions.map((question) => {
                     const userAnswer = userAnswers.find(a => a.questionId === question.id);
                     return (
                       <div key={question.id} className="border rounded-lg p-4 bg-muted/20">

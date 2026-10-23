@@ -4,7 +4,7 @@ export const loadTestProgress = (): Record<string, boolean> => {
   try {
     const item = localStorage.getItem(STORAGE_KEY);
     return item ? (JSON.parse(item) as Record<string, boolean>) : {};
-  } catch (err) {
+  } catch {
     return {};
   }
 };

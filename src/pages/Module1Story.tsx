@@ -1,11 +1,8 @@
 import { useState } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import modulo1Inicio from "@/assets/modulo1-inicio1.jpeg";
-import { supabase } from "@/supabaseClient"; // Agregado
-import { toast } from "sonner"; // Para feedback visual
 import { updateProgress } from "@/lib/progressHelper";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
@@ -13,7 +10,7 @@ const Module1Story = () => {
   const { goTo } = useRoleNavigation();
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [, setIsProcessing] = useState(false);
 
   // user preferences for accessibility
   const [fontSizeClass, setFontSizeClass] = useState("text-base");

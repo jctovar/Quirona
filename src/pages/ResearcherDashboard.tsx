@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/supabaseClient";
 import { useNavigate } from "react-router-dom";
@@ -8,12 +8,8 @@ import {
   Users, 
   CheckCircle, 
   Download, 
-  MessageSquare, 
-  Eye, 
-  UserCircle, 
   Search,
-  Loader2, 
-  ArrowRight
+  Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -145,7 +141,7 @@ const ResearcherDashboard = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch (e) {
+    } catch {
       toast.error("Error al generar el reporte");
     }
   };
@@ -200,13 +196,10 @@ const ResearcherDashboard = () => {
             </Card>
           </div>
 
-          {/* 4. ACCIONES (Excel, Buzón, , Contenido) */}
+          {/* 4. ACCIONES (Excel) */}
           <div className="flex flex-wrap gap-4 justify-center md:justify-start">
             <Button onClick={handleExportCSV} className="gradient-primary text-white px-6 py-6 h-auto">
               <Download className="mr-2 w-5 h-5" /> Descargar reporte Excel
-            </Button>
-            <Button variant="outline" onClick={() => navigate("/researcher-messages")} className="border-2 px-6 py-6 h-auto">
-              <MessageSquare className="mr-2 w-5 h-5" /> Ver Buzón
             </Button>
           </div>
 
@@ -218,7 +211,7 @@ const ResearcherDashboard = () => {
             <div className="grid gap-4">
               {userList.map((user) => (
                 <Card key={user.id} className="border-2 hover:shadow-lg transition-all">
-                  <CardContent className="p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                  <CardContent className="p-6">
                     <div>
                       <h3 className="text-lg font-bold">{user.username}</h3>
                       <p className="text-sm text-muted-foreground">
@@ -227,13 +220,6 @@ const ResearcherDashboard = () => {
                           : "Sin fecha de registro"}
                       </p>
                     </div>
-                    <Button 
-                      onClick={() => navigate(`/researcher/user/${user.id}`)}
-                      variant="ghost" 
-                      className="text-primary font-bold hover:bg-primary/5"
-                    >
-                      Ver estadísticas detalladas <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
                   </CardContent>
                 </Card>
               ))}

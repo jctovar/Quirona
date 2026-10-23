@@ -1,7 +1,6 @@
 import { getErrorMessage } from "@/lib/utils";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TestMenu } from "@/components/TestMenu";
 import { markTestCompleted } from "@/lib/testProgress";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -58,7 +57,6 @@ const miniQuestions = [
 ];
 const GeneralHealthTest = () => {
   const navigate = useNavigate();
-  const [showMenu, setShowMenu] = useState(true);
   const [phase, setPhase] = useState<Phase>("intro");
   const [ghqAnswers, setGhqAnswers] = useState<Record<number, string>>({});
   const [miniAnswers, setMiniAnswers] = useState<Record<number, string>>({});

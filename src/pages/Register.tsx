@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { PlayCircle, Heart, Stethoscope, Users, HandHeart } from "lucide-react";
+import { Heart, Stethoscope, Users, HandHeart } from "lucide-react";
 import bienvenidaVideo from "@/assets/bienvenidaQuirona.mp4";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/supabaseClient"; // supabase
@@ -104,7 +104,7 @@ const Register = () => {
     }
 
     // ENVIAMOS TODO EN UN SOLO PASO
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
       options: {
@@ -122,7 +122,7 @@ const Register = () => {
       toast.error("Error: " + getErrorMessage(error));
     } else {
       toast.success("¡Registro iniciado! Revisa tu correo para confirmar tu cuenta.");
-      setTimeout(() => navigate("/Login"), 3000);
+      setTimeout(() => navigate("/login"), 3000);
     }
   };
 

@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
-import { ArrowRight, Loader, Loader2} from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 const Module2Story = () => {

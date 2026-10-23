@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "react-router-dom";
@@ -53,7 +52,6 @@ const phraseTexts: Record<number, string> = {
 };
 
 const correctInside = [1, 3, 5, 7, 9, 11, 13, 15, 18, 19];
-const correctOutside = [2, 4, 6, 8, 10, 12, 14, 16, 17];
 const Module4Feedback = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);

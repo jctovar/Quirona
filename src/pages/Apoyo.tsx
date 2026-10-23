@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Phone, Heart, Shield } from "lucide-react";
+import { Heart, Shield } from "lucide-react";
 
 // Importar todas las imágenes
 import lineademujeres from "../assets/lineademujeres.png";

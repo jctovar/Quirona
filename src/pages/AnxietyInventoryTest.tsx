@@ -99,7 +99,7 @@ const AnxietyInventoryTest = () => {
   const [phase, setPhase] = useState<Phase>("state-intro");
   const [stateAnswers, setStateAnswers] = useState<Record<number, string>>({});
   const [traitAnswers, setTraitAnswers] = useState<Record<number, string>>({});
-  const [isSaving, setIsSaving] = useState(false);
+  const [, setIsSaving] = useState(false);
 
   const updateStateAnswer = (index: number, value: string) => {
     setStateAnswers((prev) => ({ ...prev, [index]: value }));

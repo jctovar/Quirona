@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/Navbar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraduationCap, FileText, Building2 } from "lucide-react";
+import { FileText, Building2 } from "lucide-react";
 import unamLogo from "@/assets/unamlogo.png";
 import ipnLogo from "@/assets/IPN-Logo.png";
 import escudoESCOM from "@/assets/escudoESCOM.png";

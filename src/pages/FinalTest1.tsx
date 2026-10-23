@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, AlertCircle, GripVertical, Loader2 } from "lucide-react";
+import { AlertCircle, GripVertical, Loader2 } from "lucide-react";
 import { supabase } from "@/supabaseClient";
 import { toast } from "sonner";
 import { Reorder } from "framer-motion"; // Librería ideal para listas arrastrables
@@ -13,7 +13,7 @@ const FinalTest1 = () => {
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const [isSaving, setIsSaving] = useState(false);
-    const [initialOrder1, setInitialOrder1] = useState<string[]>([]);
+    const [, setInitialOrder1] = useState<string[]>([]);
 
   // Estados para Ejercicio 1
   const [words1, setWords1] = useState<string[]>(Array(10).fill(""));
@@ -47,7 +47,7 @@ const FinalTest1 = () => {
 
       if (error) throw error;
       navigate("/final-test-2"); // Navegación al siguiente test
-    } catch (error) {
+    } catch {
       toast.error("Error al guardar los resultados");
     } finally {
       setIsSaving(false);

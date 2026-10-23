@@ -1,16 +1,14 @@
 import { useState } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
-import { ArrowRight, Loader2, BookCheck} from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import modulo1Final from "@/assets/modulo1-final.jpeg";
 import { supabase } from "@/supabaseClient"; // Importamos supabase
 import { updateProgress } from "@/lib/progressHelper";
 import { toast } from "sonner";
-import { useLocation } from "react-router-dom";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 
 const Module1Closure = () => {

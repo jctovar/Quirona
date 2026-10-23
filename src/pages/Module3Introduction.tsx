@@ -1,11 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
-import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone, Loader2 } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 interface ScrollRevealProps {
@@ -38,40 +35,9 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
     </div>
   );
 };
-const myths = [
-  {
-    icon: Heart,
-    title: '"Va al ginecólogo por tener una vida sexual irresponsable"',
-    text: 'Las enfermedades ginecológicas se han asociado con tener muchas y variadas parejas sexuales, empezar la vida sexual a temprana edad, la falta de higiene y la irresponsabilidad. A esto se le llama estigma ginecológico, ya que en vez de promover un estilo de vida saludable ha provocado que muchas mujeres no busquen ayuda o no hablen de sus enfermedades por miedo a ser señaladas. Las enfermedades ginecológicas no son exclusivas de ningún tipo de mujer.',
-  },
-  {
-    icon: MessageCircle,
-    title: '"Que exagerada eres, a mi también me duele y no dejo de hacer mis cosas"',
-    text: 'Muchas mujeres son etiquetadas como "exageradas" cuando comparten con familiares y parejas sus malestares menstruales, convenciéndolas de ocultar su dolor para evitar ser ridiculizadas o sentir que no son tomadas en serio. A menudo madres u otras mujeres que fueron educadas bajo la misma idea, son quienes aconsejan no ir a la consulta ginecológica al considerar que los malestares menstruales son parte de ser mujer.',
-  },
-  {
-    icon: Shield,
-    title: '"Eso no es cosas de señoritas"',
-    text: 'Existe el temor a recibir un trato brusco o juicios morales por parte de la familia, las amistades e incluso de los profesionales de la salud por hablar de la salud sexual, especialmente si se es joven y soltera. Aún existe la falsa creencia de que la primera visita al ginecólogo o ginecóloga debe ocurrir sólo cuando se inicia la vida sexual o a una edad avanzada (18-21 años).',
-  },
-  {
-    icon: Smartphone,
-    title: '"¿Hay un remedio casero para esto en TikTok o en Facebook?"',
-    text: 'En plataformas de redes sociales, los algoritmos priorizan el contenido que genera interacción (likes y compartidos), no la veracidad de la información. Esto facilita que se difundan información falsa o consejos engañosos que no tienen base científica. Al intentar curarte con un remedio casero, puedes "enmascarar" los síntomas de algo serio.',
-  },
-  {
-    icon: BookOpen,
-    title: '"Si apenas digo algo, todo el mundo se va a enterar"',
-    text: 'La principal preocupación de las mujeres jóvenes es que su privacidad no sea respetada frente a sus padres o tutores. Esto influye en que eviten asistir a atención preventiva para que no se les cuestione sobre su actividad sexual. Es importante conocer que algunas clínicas ofrecen servicios preventivos gratuitos, asesoría en métodos anticonceptivos o vacunas contra el VPH sin necesidad de asistir acompañada de padres o tutores. También puedes acercarte a ferias de salud sexual que se hacen en escuelas para recibir mayor información.',
-  },
-];
 const Module3Introduction = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
-  const [heardMyths, setHeardMyths] = useState<Record<number, boolean>>({});
-  const toggleMyth = (index: number) => {
-    setHeardMyths((prev) => ({ ...prev, [index]: !prev[index] }));
-  };
 const handleContinue = async () => {
     setIsSaving(true);
     try {
@@ -189,7 +155,4 @@ const handleContinue = async () => {
   );
 };
 export default Module3Introduction;
-function setIsSaving(arg0: boolean) {
-  throw new Error("Function not implemented.");
-}
 

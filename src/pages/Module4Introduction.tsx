@@ -1,11 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
-import { ArrowRight, Loader2, BookOpen, Heart, Shield, MessageCircle, Smartphone} from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 interface ScrollRevealProps {
@@ -38,30 +35,9 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
     </div>
   );
 };
-const myths = [
-  {
-    icon: Heart,
-    title: 'Lavado de manos',
-    text: 'Es obligatorio que el médico se lave las manos (o use gel antibacterial) frente a ti antes de iniciar el examen.',
-  },
-  {
-    icon: BookOpen,
-    title: 'Explicación paso a paso',
-    text: 'El médico debe narrar lo que hará a continuación durante el examen físico (por ejemplo, "ahora voy a palpar tu abdomen", "voy a tocar aquí para tomar la muestra").',
-  },
-  {
-    icon: Shield,
-    title: 'Presencia de acompañante',
-    text: 'Debes ser informada de tu derecho a tener una enfermera o persona de confianza presente durante el examen, y puedes solicitarlo.',
-  },
-];
 const Module4Introduction = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
-  const [heardMyths, setHeardMyths] = useState<Record<number, boolean>>({});
-  const toggleMyth = (index: number) => {
-    setHeardMyths((prev) => ({ ...prev, [index]: !prev[index] }));
-  };
 
   // --- FUNCIÓN PARA GUARDAR PROGRESO ---
   const handleContinue = async () => {

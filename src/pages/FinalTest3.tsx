@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/supabaseClient";
-import { CheckCircle2, PartyPopper, Loader2, ArrowRight } from "lucide-react";
+import { PartyPopper, Loader2, ArrowRight } from "lucide-react";
 
 const questions = [
   "Si quiero aprender habilidades para gestionar mejor mi vida, prefiero un terapeuta antes que una intervención psicológica online.",

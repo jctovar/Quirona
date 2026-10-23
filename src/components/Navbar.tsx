@@ -60,7 +60,6 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
         { to: "/quienes-somos", label: "¿Quiénes somos?" },
         { to: "/contenidos", label: "Contenidos" },
         { to: "/preguntas", label: "Preguntas frecuentes" },
-        { to: "/blog", label: "Blog" },
         { to: "/trabajos", label: "Trabajos de investigación" },
       ]
     : role === "user"
