@@ -7,6 +7,17 @@ import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+
+/**
+ * Juego de identificación de violencia ginecológica (Módulo 3).
+ *
+ * Cada caso se evalúa en dos criterios:
+ * 1. ¿La situación es violencia? (sí/no).
+ * 2. Si es violencia, ¿a qué grupo pertenece?
+ *
+ * Solo las preguntas que son violencia exigen ambos criterios para otorgar
+ * punto; las que no lo son se resuelven con la primera respuesta.
+ */
 const questions = [
   {
     id: 1,
@@ -89,12 +100,19 @@ const questions = [
   },
 ];
 
+/** Grupos válidos para clasificar los casos que sí son violencia. */
 const violenceGroups = [
   "violencias psicológicas y de subordinación",
   "violencias hacia tu cuerpo",
   "violencias sexuales y contra la intimidad",
 ];
 
+/**
+ * Pantalla del juego.
+ *
+ * El estado `step` alterna entre la pregunta sí/no y la selección de grupo.
+ * `playCount` se guarda en localStorage para limitar las repeticiones.
+ */
 const Module3Game = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
@@ -102,7 +120,6 @@ const Module3Game = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [step, setStep] = useState<"yesno" | "group">("yesno");
   const [points, setPoints] = useState(0);
-  const [, setAnsweredQuestions] = useState(0);
   const [firstCriterionCorrect, setFirstCriterionCorrect] = useState<boolean | null>(null);
   const [userAnswers, setUserAnswers] = useState<Array<{
     questionId: number;
@@ -112,22 +129,25 @@ const Module3Game = () => {
   }>>([]);
   const [playCount, setPlayCount] = useState(0);
 
+  // Recupera cuántas veces se ha jugado en este navegador. Se usa para
+  // mostrar la pantalla de introducción solo las primeras tres veces.
   useEffect(() => {
     const count = parseInt(localStorage.getItem('module3PlayCount') || '0');
     setPlayCount(count);
   }, []);
 
+  /** Convierte el puntaje en una calificación visual de 1 a 3 estrellas. */
   const getStars = (points: number) => {
     if (points <= 5) return 1;
     if (points <= 10) return 2;
     return 3;
   };
 
+  /** Reinicia el estado de la partida sin borrar el contador de intentos. */
   const startGame = () => {
     setQuestionIndex(0);
     setStep("yesno");
     setPoints(0);
-    setAnsweredQuestions(0);
     setFirstCriterionCorrect(null);
     setUserAnswers([]);
     setPhase("playing");
@@ -159,25 +179,30 @@ const Module3Game = () => {
     }
   };
 
+  /**
+   * Cierra la pregunta actual y avanza a la siguiente.
+   *
+   * `secondCriterion` es el resultado del grupo (o `true` cuando la pregunta
+   * no es violencia y basta con el primer criterio). Al terminar la última
+   * pregunta se guarda el puntaje y se pasa a la fase de feedback.
+   */
   const finishQuestion = (secondCriterion: boolean, firstCriterionParam?: boolean, userResponseParam?: boolean, groupAnswerParam?: string) => {
     const firstCriterionValue = firstCriterionParam !== undefined ? firstCriterionParam : firstCriterionCorrect;
-    // Para preguntas que NO son violencia (shouldBeYes = false), solo se necesita el primer criterio
-    // Para preguntas que SÍ son violencia (shouldBeYes = true), se necesitan ambos criterios
+
+    // Las preguntas que sí son violencia requieren acertar también el grupo;
+    // las que no lo son se evalúan solo con el sí/no.
     const totalCorrect = currentQuestion.shouldBeYes
       ? firstCriterionValue && secondCriterion
       : firstCriterionValue;
 
-    console.log(`Pregunta ${currentQuestion.id}: shouldBeYes=${currentQuestion.shouldBeYes}, firstCriterionValue=${firstCriterionValue}, secondCriterion=${secondCriterion}, totalCorrect=${totalCorrect}`);
-
     if (totalCorrect) {
       setPoints((p) => p + 1);
     }
-    setAnsweredQuestions((t) => t + 1);
 
-    // Guardar la respuesta de la usuaria
+    // Guarda la respuesta para mostrarla en la tabla de feedback.
     const currentAnswer = {
       questionId: currentQuestion.id,
-      userResponse: userResponseParam !== undefined ? userResponseParam : false, // true = respondió "Sí", false = respondió "No"
+      userResponse: userResponseParam !== undefined ? userResponseParam : false, // true = respondió "Sí"
       groupAnswer: groupAnswerParam || (step === "group" ? currentQuestion.correctGroup : undefined),
       isCorrect: totalCorrect,
     };
@@ -186,8 +211,9 @@ const Module3Game = () => {
     const nextIndex = questionIndex + 1;
     if (nextIndex >= questions.length) {
       setPhase("feedback");
-      // Increment play count
       saveGameResults(totalCorrect ? points + 1 : points);
+
+      // El contador local limita la introducción a las primeras partidas.
       const newCount = playCount + 1;
       localStorage.setItem('module3PlayCount', newCount.toString());
       setPlayCount(newCount);
@@ -198,9 +224,9 @@ const Module3Game = () => {
     }
   };
 
+  /** Primer criterio: decidir si el caso es violencia. */
   const handleYesNo = (answerYes: boolean) => {
     const isCorrect = answerYes === currentQuestion.shouldBeYes;
-    console.log(`handleYesNo: pregunta ${currentQuestion.id}, answerYes=${answerYes}, shouldBeYes=${currentQuestion.shouldBeYes}, isCorrect=${isCorrect}`);
     setFirstCriterionCorrect(isCorrect);
 
     if (answerYes) {
@@ -214,9 +240,11 @@ const Module3Game = () => {
     finishQuestion(secondCriterion, isCorrect, false); // false porque respondió "No"
   };
 
+  /** Segundo criterio: clasificar el caso en el grupo correcto. */
   const handleGroup = (group: string) => {
     const secondCriterion = group === currentQuestion.correctGroup;
-    finishQuestion(secondCriterion, firstCriterionCorrect || false, true, group); // true porque respondió "Sí", group es la selección
+    // Se pasa `true` como respuesta porque este paso solo ocurre tras un “Sí”.
+    finishQuestion(secondCriterion, firstCriterionCorrect || false, true, group);
   };
 
   return (

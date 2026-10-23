@@ -1,14 +1,21 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { ModuleCard } from "@/components/ModuleCard";
-import { BookOpen, Shield, Heart, Users, Loader2, ArrowRight, CheckCircle, MessageSquare } from "lucide-react";
+import { BookOpen, Shield, Heart, Users, Loader2, ArrowRight, CheckCircle, MessageSquare, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/supabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"; // Corregido el import de Button
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
+/**
+ * Espejo de la fila de `user_progress`.
+ *
+ * Cada bandera representa un paso completado; `progress_percentage` lo calcula
+ * un trigger de PostgreSQL a partir de estas columnas. Los nombres deben
+ * coincidir exactamente con los que usa `updateProgress`.
+ */
 interface ProgressRecord {
   progress_percentage: number | null;
   m1_story: boolean | null;
@@ -43,6 +50,16 @@ interface ProgressRecord {
   m4_closure: boolean | null;
 }
 
+/**
+ * Panel principal de la usuaria.
+ *
+ * Responsabilidades:
+ * - Expulsar a las cuentas de investigación hacia su panel.
+ * - Cargar el nombre y el progreso desde Supabase.
+ * - Calcular en qué paso debe reanudar cada módulo.
+ * - Desbloquear los módulos en cascada (el cierre del anterior es requisito).
+ * - Mostrar las evaluaciones finales cuando los cuatro módulos están cerrados.
+ */
 const Dashboard = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("Usuario");
@@ -53,6 +70,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Guardia de acceso: las cuentas de investigación no deben ver el panel
+    // de usuaria, aunque lleguen a la ruta escribiéndola a mano.
     const checkUserAccess = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate("/"); return; }
@@ -63,36 +82,38 @@ const Dashboard = () => {
         .eq('id', user.id)
         .single();
 
-      // Si es investigador, lo mandamos a su panel
       if (profile?.role === 'researcher') {
         navigate("/researcher-dashboard");
       }
     };
     checkUserAccess();
+
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        
+
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           navigate("/");
           return;
         }
 
-        // 1. OBTENER NOMBRE DESDE TABLA PROFILES
+        // El nombre visible vive en `profiles`; si el trigger de registro aún
+        // no lo creó, se usan los metadatos de Auth como respaldo.
         const { data: profile } = await supabase
           .from('profiles')
           .select('username')
           .eq('id', user.id)
           .single();
-        
+
         if (profile?.username) {
           setUsername(profile.username);
         } else {
           setUsername(user.user_metadata?.full_name || user.email?.split('@')[0] || "Usuario");
         }
 
-        // 2. CONSULTAR PROGRESO DETALLADO
+        // Se traen todas las banderas porque el cálculo de reanudación y los
+        // candados de los módulos necesitan el detalle completo.
         const { data: progressData } = await supabase
           .from('user_progress')
           .select('*')
@@ -114,9 +135,15 @@ const Dashboard = () => {
     fetchUserData();
   }, [navigate]);
 
-  // LÓGICA DE REANUDACIÓN: Determina a qué ruta enviar según el progreso
+  /**
+   * Devuelve la primera pantalla pendiente del módulo.
+   *
+   * El orden de las comprobaciones debe coincidir con el recorrido real de
+   * `App.tsx`: historia (`/module-N`) → introducción → quiz → visita → juego →
+   * feedback → cierre. Si no hay fila de progreso, se empieza por la historia.
+   */
   const getResumeRoute = (moduleNum: number) => {
-    if (!progressRecord) return `/module-${moduleNum}-story`;
+    if (!progressRecord) return `/module-${moduleNum}`;
 
     const p = progressRecord;
     if (moduleNum === 1) {
@@ -132,11 +159,13 @@ const Dashboard = () => {
     if (moduleNum === 2) {
       if (!p.m2_story) return '/module-2';
       if (!p.m2_intro) return '/module-2-intro';
-      if (!p.m2_quiz1) return '/module-2-quiz-1';
+      // El módulo 2 tiene dos quizzes: el inicial y el de refuerzo posterior
+      // al feedback. Sus rutas no son simétricas (`quiz` y `game-2`).
+      if (!p.m2_quiz1) return '/module-2-quiz';
       if (!p.m2_visit) return '/module-2-visit';
       if (!p.m2_game) return '/module-2-game';
       if (!p.m2_feedback) return '/module-2-feedback';
-      if (!p.m2_quiz2) return '/module-2-quiz-2';
+      if (!p.m2_quiz2) return '/module-2-game-2';
       if (!p.m2_closure) return '/module-2-closure';
       return '/module-2';
     }
@@ -164,6 +193,7 @@ const Dashboard = () => {
     return `/module-${moduleNum}-story`;
   };
 
+  /** Cierra la sesión de Supabase y vuelve a la portada. */
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
@@ -173,28 +203,49 @@ const Dashboard = () => {
       toast.error("Error al cerrar sesión");
     }
   };
+
+  /**
+   * Envía una sugerencia anónima al buzón de investigación.
+   *
+   * `user_id` se obtiene de la sesión, no de un campo del formulario, para que
+   * la RLS pueda asociar el mensaje a la cuenta autenticada.
+   */
   const sendSuggestion = async () => {
     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Tu sesión expiró. Vuelve a iniciar sesión.");
+      return;
+    }
+
     const { error } = await supabase
       .from('suggestions')
-      .insert([{ user_id: user?.id, message: suggestion }]);
+      .insert([{ user_id: user.id, message: suggestion }]);
 
     if (!error) {
       toast.success("¡Gracias! Tu mensaje ha sido enviado a los investigadores.");
       setSuggestion("");
       setIsModalOpen(false);
+    } else {
+      toast.error("No se pudo enviar la sugerencia. Inténtalo de nuevo.");
     }
   };
 
+  /**
+   * Gestiona el clic en una tarjeta de módulo.
+   *
+   * Desbloqueo en cascada:
+   * - Módulo 1: siempre disponible.
+   * - Módulos 2 a 4: requieren el cierre del módulo inmediatamente anterior.
+   */
   const handleModuleClick = (index: number) => {
-    // Verificar si el módulo está desbloqueado
     const moduleNum = index + 1;
-    let isUnlocked = false;
-
-    if (moduleNum === 1) isUnlocked = true;
-    if (moduleNum === 2) isUnlocked = progressRecord?.m1_closure === true;
-    if (moduleNum === 3) isUnlocked = progressRecord?.m2_closure === true;
-    if (moduleNum === 4) isUnlocked = progressRecord?.m3_closure === true;
+    const unlockRequirements = [
+      true,
+      progressRecord?.m1_closure === true,
+      progressRecord?.m2_closure === true,
+      progressRecord?.m3_closure === true,
+    ];
+    const isUnlocked = unlockRequirements[moduleNum - 1] ?? false;
 
     if (isUnlocked) {
       navigate(getResumeRoute(moduleNum));
@@ -203,6 +254,9 @@ const Dashboard = () => {
     }
   };
 
+  // Metadatos de las tarjetas. Los campos `isUnlocked` e `isCompleted` solo
+  // controlan la presentación; la validación definitiva se repite en
+  // `handleModuleClick` antes de navegar.
   const modules = [
     {
       title: "Ginecología preventiva",
@@ -238,6 +292,7 @@ const Dashboard = () => {
     },
   ];
 
+  // Las evaluaciones finales se habilitan únicamente al cerrar el módulo 4.
   const allModulesCompleted = progressRecord?.m4_closure === true;
 
   if (loading) {
@@ -376,22 +431,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
-// Componente local auxiliar para el icono de candado que faltaba en los imports
-const Lock = ({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-  </svg>
-);
 
 export default Dashboard;

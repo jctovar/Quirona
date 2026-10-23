@@ -13,12 +13,24 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+/** Datos mínimos que se muestran en el listado de usuarias. */
 interface ResearcherUser {
   id: string;
   username: string | null;
   created_at: string | null;
 }
 
+/**
+ * Panel de investigación.
+ *
+ * La autorización real vive en RLS, pero esta pantalla vuelve a comprobar el
+ * rol antes de consultar datos globales para dar un mensaje claro y evitar
+ * peticiones innecesarias. Además:
+ * - Cuenta solo perfiles con rol `user`.
+ * - Suma los cierres de módulo de `user_progress`.
+ * - Exporta un CSV uniendo ambas tablas en memoria (PostgREST no hace joins
+ *   automáticos y `profiles` no tiene columna `email`).
+ */
 const ResearcherDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -31,7 +43,8 @@ const ResearcherDashboard = () => {
       try {
         setLoading(true);
 
-        // 1. Validar Sesión y Rol
+        // 1. Validar sesión y rol. La RLS ya impide leer datos ajenos; esta
+        // comprobación evita mostrar un panel vacío a una cuenta normal.
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { navigate("/"); return; }
 
@@ -48,14 +61,15 @@ const ResearcherDashboard = () => {
         }
         setResearcherName(profile.username || "Investigador");
 
-        // 2. Obtener Estadísticas Globales
-        // Contar usuarias (solo las que tienen rol 'user')
+        // 2. Estadísticas globales.
+        // `head: true` pide solo el conteo, sin traer las filas completas.
         const { count: userCount } = await supabase
           .from('profiles')
           .select('*', { count: 'exact', head: true })
           .eq('role', 'user');
 
-        // Suma total de módulos terminados por todas las usuarias
+        // Cada bandera de cierre vale un módulo completado. La suma refleja
+        // el avance agregado, no el número de usuarias que terminaron todo.
         const { data: progressData } = await supabase
           .from('user_progress')
           .select('m1_closure, m2_closure, m3_closure, m4_closure');
@@ -69,7 +83,7 @@ const ResearcherDashboard = () => {
           return acc + count;
         }, 0);
 
-        // 3. Lista de usuarias para la tabla
+        // 3. Listado de usuarias para la tabla de detalle.
         const { data: users } = await supabase
           .from('profiles')
           .select('id, username, created_at')
@@ -90,26 +104,15 @@ const ResearcherDashboard = () => {
     };
 
     checkRoleAndFetchData();
-    const checkResearcherAccess = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) { navigate("/"); return; }
-
-        const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-
-        // Si es una usuaria normal, no tiene nada que hacer aquí
-        if (profile?.role !== 'researcher') {
-        toast.error("No tienes permisos para acceder a esta sección.");
-        navigate("/dashboard");
-        }
-    };
-    checkResearcherAccess();
   }, [navigate]);
 
-  // Función para exportar a CSV (Excel)
+  /**
+   * Exporta el avance de las usuarias a un CSV compatible con Excel.
+   *
+   * Se consultan `user_progress` y `profiles` por separado y se unen en
+   * memoria por `id`. `profiles` no tiene columna `email`; el nombre visible
+   * es `username`. Las columnas M1–M4 se exportan como Sí/No.
+   */
   const handleExportCSV = async () => {
     try {
       const [progressResult, profilesResult] = await Promise.all([
@@ -125,6 +128,7 @@ const ResearcherDashboard = () => {
       if (progressResult.error) throw progressResult.error;
       if (profilesResult.error) throw profilesResult.error;
 
+      // Mapa auxiliar para resolver el nombre sin repetir búsquedas.
       const names = new Map(
         (profilesResult.data ?? []).map((profile) => [profile.id, profile.username]),
       );
@@ -135,12 +139,15 @@ const ResearcherDashboard = () => {
       )).join("\n");
 
       const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
+      link.href = url;
       link.setAttribute("download", "reporte_investigacion.csv");
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      link.remove();
+      // Libera el Blob; sin esto el navegador conserva el archivo en memoria.
+      URL.revokeObjectURL(url);
     } catch {
       toast.error("Error al generar el reporte");
     }
@@ -196,14 +203,14 @@ const ResearcherDashboard = () => {
             </Card>
           </div>
 
-          {/* 4. ACCIONES (Excel) */}
+          {/* 3. ACCIONES (Excel) */}
           <div className="flex flex-wrap gap-4 justify-center md:justify-start">
             <Button onClick={handleExportCSV} className="gradient-primary text-white px-6 py-6 h-auto">
               <Download className="mr-2 w-5 h-5" /> Descargar reporte Excel
             </Button>
           </div>
 
-          {/* 3. LISTA DE USUARIAS */}
+          {/* 4. LISTA DE USUARIAS */}
           <div className="space-y-6">
             <h2 className="text-2xl font-bold flex items-center gap-2">
               <Search className="w-6 h-6 text-primary" /> Detalle por usuaria

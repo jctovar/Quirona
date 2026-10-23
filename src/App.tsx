@@ -62,8 +62,22 @@ import DashboardInvestigador from "./pages/DashboardInvestigador";
 import ProfileInvestigador from "./pages/ProfileInvestigador";
 import ResearcherDashboard from "./pages/ResearcherDashboard";
 
+// Cliente compartido de React Query. Se crea una sola vez para conservar la
+// caché durante toda la vida de la aplicación.
 const queryClient = new QueryClient();
 
+/**
+ * Mapa de rutas de Quirona.
+ *
+ * La aplicación se organiza en tres bloques:
+ * 1. Rutas públicas (portada, información, login y registro).
+ * 2. Rutas de usuaria, envueltas por `UserLayout` (Navbar + contenido).
+ * 3. Rutas de investigación bajo `/researcher`, que reutilizan las mismas
+ *    pantallas de módulos pero conservan su propio prefijo.
+ *
+ * El panel `/researcher-dashboard` se declara fuera de los layouts porque la
+ * propia página renderiza su Navbar con el nombre del investigador.
+ */
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -71,6 +85,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+            {/* Rutas públicas: no requieren sesión. */}
             <Route path="/" element={<Index />} />
             <Route path="/quienes-somos" element={<QuienesSomos />} />
             <Route path="/preguntas" element={<Preguntas />} />
@@ -79,7 +94,15 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
-            {/* RUTAS DE USUARIA */}
+            {/* Panel de investigación: valida el rol y pinta su propio Navbar. */}
+            <Route path="/researcher-dashboard" element={<ResearcherDashboard />} />
+
+            {/*
+              RUTAS DE USUARIA
+
+              `UserLayout` inyecta el Navbar común. Las rutas son absolutas
+              porque comparten el mismo nivel que las páginas públicas.
+            */}
             <Route element={<UserLayout />}>
               <Route path="/initial-question" element={<InitialQuestion />} />
               <Route path="/pre-education" element={<PreEducation />} />
@@ -97,7 +120,14 @@ const App = () => (
               <Route path="/final-test-2" element={<FinalTest2 />} />
               <Route path="/final-test-3" element={<FinalTest3 />} />
 
-              {/* MÓDULOS */}
+              {/*
+                MÓDULOS
+
+                Cada bloque sigue el orden pedagógico:
+                historia → introducción → quiz → visita → juego → feedback → cierre.
+                El cierre de un módulo es lo que desbloquea el siguiente desde
+                el Dashboard.
+              */}
               <Route path="/module-1" element={<Module1Story />} />
               <Route path="/module-1-intro" element={<Module1Introduction />} />
               <Route path="/module-1-quiz" element={<Module1Quiz />} />
@@ -131,14 +161,15 @@ const App = () => (
               <Route path="/module-4-game" element={<Module4Game />} />
               <Route path="/module-4-feedback" element={<Module4Feedback />} />
               <Route path="/module-4-closure" element={<Module4Closure />} />
-              {/* Dashboard principal del investigador */}
-              <Route path="/researcher-dashboard" element={<ResearcherDashboard />} />
             </Route>
 
-  
-  
-          
-            {/* RUTAS DE INVESTIGADOR */}
+            {/*
+              RUTAS DE INVESTIGADOR
+
+              Las rutas hijas son relativas (`module-1`, no `/module-1`): el
+              prefijo `/researcher` lo aporta la ruta padre. Así `useRoleNavigation`
+              puede reutilizar los mismos componentes sin duplicar lógica.
+            */}
             <Route path="/researcher" element={<ResearcherLayout />}>
               <Route path="perfilInvestigador" element={<DashboardInvestigador />} />
               <Route path="profileInvestigador" element={<ProfileInvestigador />} />
@@ -176,7 +207,7 @@ const App = () => (
               <Route path="module-4-feedback" element={<Module4Feedback />} />
               <Route path="module-4-closure" element={<Module4Closure />} />              
             </Route>
-            {/* 404 */}
+            {/* Cualquier ruta no declarada cae en la pantalla 404. */}
             <Route path="*" element={<NotFound />} />
 
           </Routes>

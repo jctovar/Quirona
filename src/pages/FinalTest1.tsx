@@ -9,23 +9,30 @@ import { supabase } from "@/supabaseClient";
 import { toast } from "sonner";
 import { Reorder } from "framer-motion"; // Librería ideal para listas arrastrables
 
+/**
+ * Primera evaluación final: redes semánticas.
+ *
+ * Consta de dos ejercicios (consulta ginecológica y violencia ginecológica).
+ * La persona escribe hasta diez palabras y luego las ordena por importancia.
+ * Se exige un mínimo de cinco palabras con contenido por ejercicio.
+ */
 const FinalTest1 = () => {
-    const navigate = useNavigate();
-    const [page, setPage] = useState(1);
-    const [isSaving, setIsSaving] = useState(false);
-    const [, setInitialOrder1] = useState<string[]>([]);
+  const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Estados para Ejercicio 1
+  // Palabras capturadas y orden final del ejercicio 1.
   const [words1, setWords1] = useState<string[]>(Array(10).fill(""));
   const [ordered1, setOrdered1] = useState<string[]>([]);
 
-  // Estados para Ejercicio 2
+  // Palabras capturadas y orden final del ejercicio 2.
   const [words2, setWords2] = useState<string[]>(Array(10).fill(""));
   const [ordered2, setOrdered2] = useState<string[]>([]);
 
-  // Validación: mínimo 5 palabras con contenido
+  /** Validación mínima: cinco palabras no vacías. */
   const isValid = (currentWords: string[]) => currentWords.filter(w => w.trim() !== "").length >= 5;
 
+  /** Guarda ambos ejercicios y avanza al test 2. */
   const handleSaveAndNext = async () => {
     setIsSaving(true);
     try {
@@ -54,12 +61,12 @@ const FinalTest1 = () => {
     }
   };
 
+  /** Avanza de instrucciones al ejercicio 1 y de ahí al ejercicio 2. */
   const nextStep = () => {
     if (page === 2) {
+      // Al pasar del ejercicio 1 al 2 se fija el orden inicial elegido.
       const initialList = words1.filter(w => w.trim() !== "");
       setOrdered1(initialList);
-      // Guardamos una copia que NUNCA se mueva para saber el orden original
-      setInitialOrder1(initialList); 
     }
     setPage(page + 1);
     window.scrollTo(0, 0);
