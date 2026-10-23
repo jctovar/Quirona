@@ -41,11 +41,8 @@ jobs:
       - name: Build de producción
         run: npm run build
 
-      # El lint aún arrastra errores conocidos (ver README). No bloquea el CI
-      # para no impedir la integración mientras se paga esa deuda técnica.
-      - name: Lint (informativo)
+      - name: Lint
         run: npm run lint
-        continue-on-error: true
 
       - name: Publicar cobertura
         uses: actions/upload-artifact@v4
