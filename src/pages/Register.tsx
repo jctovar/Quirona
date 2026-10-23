@@ -21,8 +21,19 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+/**
+ * Pasos del registro. El avance es lineal y no se persiste hasta el envío
+ * final: si la persona recarga, vuelve a la selección de programa.
+ */
 type RegistrationStep = 'selection' | 'video' | 'consent' | 'form';
 
+/**
+ * Catálogo de programas.
+ *
+ * `available` controla si la tarjeta es seleccionable. Por ahora solo está
+ * habilitado el programa de prevención de violencia ginecológica; los demás
+ * se muestran como “próximamente” para no ocultar la oferta futura.
+ */
 const programs = [
   {
     id: 'adolescentes',
@@ -54,6 +65,14 @@ const programs = [
   },
 ];
 
+/**
+ * Registro de nuevas usuarias.
+ *
+ * Recorrido: selección de programa → video de bienvenida → asentimiento
+ * informado → formulario. Los datos extra (username, nationality y tutores)
+ * viajan en `options.data` y los consume un trigger de Supabase al crear el
+ * perfil; no se guardan en el cliente.
+ */
 const Register = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState<RegistrationStep>('selection');
@@ -103,12 +122,13 @@ const Register = () => {
       return;
     }
 
-    // ENVIAMOS TODO EN UN SOLO PASO
+    // Supabase crea el usuario y dispara el trigger que inserta la fila en
+    // `profiles` usando estos metadatos. No se envía `confirmPassword`.
     const { error } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
       options: {
-        // Estos datos viajan "escondidos" y el Trigger los atrapa
+        // Las claves deben coincidir con las que lee el trigger de registro.
         data: {
           username: formData.username,
           nationality: formData.nationality,
@@ -122,6 +142,7 @@ const Register = () => {
       toast.error("Error: " + getErrorMessage(error));
     } else {
       toast.success("¡Registro iniciado! Revisa tu correo para confirmar tu cuenta.");
+      // Se deja tiempo para leer el aviso antes de volver al login.
       setTimeout(() => navigate("/login"), 3000);
     }
   };

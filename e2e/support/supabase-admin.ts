@@ -1,3 +1,11 @@
+/**
+ * Utilidades de administración para las pruebas E2E.
+ *
+ * Este archivo se ejecuta únicamente en Node (global setup/teardown y specs),
+ * nunca en el bundle del navegador. Por eso puede usar la clave
+ * `service_role`: se necesita para crear/eliminar usuarios y sembrar progreso
+ * sin pasar por las reglas RLS.
+ */
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
@@ -11,6 +19,7 @@ interface E2EConfig {
   password: string;
 }
 
+/** Lee las variables de entorno sin fallar si falta alguna. */
 function readConfig(): Partial<E2EConfig> {
   return {
     url: process.env.VITE_SUPABASE_URL,
@@ -20,6 +29,10 @@ function readConfig(): Partial<E2EConfig> {
   };
 }
 
+/**
+ * Indica si hay credenciales suficientes para ejecutar las pruebas
+ * autenticadas. Sin ellas, los specs se omiten y el setup no crea usuarios.
+ */
 export function isE2EConfigured(): boolean {
   const config = readConfig();
   return Boolean(
@@ -27,6 +40,7 @@ export function isE2EConfigured(): boolean {
   );
 }
 
+/** Devuelve la configuración validada o lanza un error explicativo. */
 export function getE2EConfig(): E2EConfig {
   const config = readConfig();
   if (!isE2EConfigured()) {
@@ -37,12 +51,20 @@ export function getE2EConfig(): E2EConfig {
   return config as E2EConfig;
 }
 
+/**
+ * Deriva el correo del investigador de prueba usando un alias `+researcher`.
+ * Si el correo no tiene dominio, añade el sufijo `.researcher`.
+ */
 export function getResearcherEmail(): string {
   const { email } = getE2EConfig();
   const [localPart, domain] = email.split("@");
   return domain ? `${localPart}+researcher@${domain}` : `${email}.researcher`;
 }
 
+/**
+ * Crea un cliente con `service_role` y sin persistencia de sesión.
+ * Solo debe importarse desde código de pruebas en Node.
+ */
 export function createAdminClient(): AdminClient {
   const { url, serviceKey } = getE2EConfig();
   return createClient<Database>(url, serviceKey, {
@@ -50,6 +72,10 @@ export function createAdminClient(): AdminClient {
   });
 }
 
+/**
+ * Busca una cuenta por correo en la primera página de Auth.
+ * El proyecto de pruebas tiene pocos usuarios, así que 1000 es suficiente.
+ */
 export async function findUserByEmail(
   admin: AdminClient,
   email: string,
@@ -67,8 +93,13 @@ export async function findUserByEmail(
   );
 }
 
-// Estas tablas referencian auth.users sin ON DELETE CASCADE, así que hay que
-// vaciarlas antes de eliminar al usuario de prueba.
+/**
+ * Elimina un usuario de prueba y sus datos dependientes.
+ *
+ * Estas tablas referencian `auth.users` sin `ON DELETE CASCADE`, así que hay
+ * que vaciarlas antes de borrar la cuenta de Auth. `user_progress` y
+ * `profiles` sí se limpian por cascada/trigger.
+ */
 export async function deleteTestUser(
   admin: AdminClient,
   userId: string,

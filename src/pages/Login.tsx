@@ -6,13 +6,25 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { supabase } from "@/supabaseClient"; // 1. Importamos la conexión
+import { supabase } from "@/supabaseClient";
 
+/**
+ * Inicio de sesión con Supabase.
+ *
+ * Flujo:
+ * 1. Validar que correo y contraseña no estén vacíos.
+ * 2. Autenticar con `signInWithPassword`.
+ * 3. Consultar el rol en `profiles`.
+ * 4. Redirigir al panel de investigación o al inicio del recorrido de usuaria.
+ *
+ * Si la consulta del perfil falla, se prioriza no bloquear a la persona y se
+ * envía al flujo de usuaria.
+ */
 const Login = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false); // Estado para deshabilitar el botón mientras carga
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    username: "", // Usaremos este campo como el email
+    username: "", // El campo se llama username por legado, pero contiene el email.
     password: "",
   });
 
@@ -20,70 +32,66 @@ const Login = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // 2. Función convertida a ASYNC para esperar la respuesta de Supabase
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  // 1. Validación de Frontend (Mantenemos la tuya)
-  if (!formData.username || !formData.password) {
-    toast.error("Por favor ingresa tu correo y contraseña.");
-    return;
-  }
+    e.preventDefault();
 
-  setLoading(true);
-
-  // 2. LLAMADA REAL A SUPABASE
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: formData.username, // Tu estado usa 'username' para el campo de email
-    password: formData.password,
-  });
-
-  if (error) {
-    // Tu manejo de errores (Mantenemos la lógica de confirmación y credenciales)
-    if (error.message === "Email not confirmed") {
-      toast.error("Por favor, confirma tu correo electrónico para poder entrar.");
-    } else if (error.message === "Invalid login credentials") {
-      toast.error("El correo o la contraseña son incorrectos.");
-    } else {
-      toast.error(error.message);
+    // Validación local para evitar una petición innecesaria a Supabase.
+    if (!formData.username || !formData.password) {
+      toast.error("Por favor ingresa tu correo y contraseña.");
+      return;
     }
-    setLoading(false);
-    return;
-  }
 
-  // 3. VALIDACIÓN DE ROL (La parte nueva)
-  if (data.user) {
-    try {
-      // Consultamos la tabla profiles para ver quién acaba de entrar
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .single();
+    setLoading(true);
 
-      if (profileError) throw profileError;
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: formData.username,
+      password: formData.password,
+    });
 
-      // 4. DIRECCIONAMIENTO INTELIGENTE
-      if (profile?.role === 'researcher') {
-        toast.success(`¡Bienvenido al panel de investigación!`);
-        // El investigador va directo a sus estadísticas
-        setTimeout(() => navigate("/researcher-dashboard"), 1000);
+    if (error) {
+      // Supabase devuelve mensajes distintos para correo sin confirmar y para
+      // credenciales inválidas; se traducen para no mostrar texto técnico.
+      if (error.message === "Email not confirmed") {
+        toast.error("Por favor, confirma tu correo electrónico para poder entrar.");
+      } else if (error.message === "Invalid login credentials") {
+        toast.error("El correo o la contraseña son incorrectos.");
       } else {
-        toast.success("¡Bienvenida de nuevo a QUIRONA!");
-        // La usuaria sigue tu flujo normal
-        setTimeout(() => navigate("/initial-question"), 1000);
+        toast.error(error.message);
       }
-
-    } catch (err) {
-      console.error("Error al obtener el perfil:", err);
-      // Si algo falla con el perfil, por seguridad la mandamos al flujo de usuaria
-      navigate("/initial-question");
-    } finally {
-      // El loading se apaga dentro de los timeouts o aquí si hubo error
       setLoading(false);
+      return;
     }
-  }
-};
+
+    if (data.user) {
+      try {
+        // El rol vive en `profiles`, no en los metadatos de Auth. La RLS
+        // permite leer la propia fila.
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        if (profile?.role === 'researcher') {
+          toast.success("¡Bienvenido al panel de investigación!");
+          // Pequeña pausa para que el toast sea visible antes de navegar.
+          setTimeout(() => navigate("/researcher-dashboard"), 1000);
+        } else {
+          toast.success("¡Bienvenida de nuevo a QUIRONA!");
+          setTimeout(() => navigate("/initial-question"), 1000);
+        }
+
+      } catch (err) {
+        console.error("Error al obtener el perfil:", err);
+        // Ante un fallo de perfil se evita dejar a la persona en el login.
+        navigate("/initial-question");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">

@@ -8,6 +8,19 @@ import {
   isE2EConfigured,
 } from "./support/supabase-admin";
 
+/**
+ * Flujo autenticado de extremo a extremo.
+ *
+ * El primer test recorre por UI el test inicial y el Módulo 1 completo; después
+ * siembra el resto de banderas para verificar el Dashboard al 100% y el panel
+ * de investigación sin repetir los cuatro módulos. El segundo test inicia
+ * sesión como investigador y comprueba el listado y la exportación CSV.
+ *
+ * Las cuentas las crea `global-setup` y las elimina `global-teardown`.
+ */
+
+// Las 30 banderas de `user_progress`. Sembrarlas todas equivale a completar
+// los cuatro módulos y permite validar el estado final del Dashboard.
 const FULL_PROGRESS = {
   m1_story: true,
   m1_intro: true,
@@ -41,6 +54,7 @@ const FULL_PROGRESS = {
   m4_closure: true,
 };
 
+/** Inicia sesión con las credenciales indicadas y envía el formulario. */
 async function login(page: Page, email: string, password: string) {
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill(email);
@@ -48,6 +62,12 @@ async function login(page: Page, email: string, password: string) {
   await page.locator('form button[type="submit"]').click();
 }
 
+/**
+ * Completa el test inicial con una combinación válida.
+ *
+ * Los IDs corresponden a los radios/selects del formulario; se eligen opciones
+ * que cumplen las validaciones condicionales del componente.
+ */
 async function completeInitialTest(page: Page) {
   await page.locator("#gen-mujer").click();
   await page.locator("#sexo-mujer").click();
@@ -75,6 +95,8 @@ async function completeInitialTest(page: Page) {
   await page.getByRole("button", { name: "Pasar al siguiente test" }).click();
 }
 
+// Los tests comparten la misma cuenta y el progreso sembrado, así que se
+// ejecutan en serie para evitar carreras sobre `user_progress`.
 test.describe.configure({ mode: "serial" });
 
 test.describe("flujo autenticado", () => {

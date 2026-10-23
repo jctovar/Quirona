@@ -5,12 +5,19 @@ import { Button } from "@/components/ui/button";
 import { loadTestProgress } from "@/lib/testProgress";
 
 interface TestInfo {
+  /** Clave usada en el progreso local de `testProgress`. */
   id: string;
   title: string;
+  /** Ruta de la pantalla del cuestionario. */
   path: string;
   small?: string;
 }
 
+/**
+ * Catálogo de tests iniciales en el orden recomendado.
+ *
+ * `id` debe coincidir con el que cada pantalla pasa a `markTestCompleted`.
+ */
 const tests: TestInfo[] = [
   { id: "initial-test", title: "Test inicial", path: "/initial-test" },
   { id: "semantic-network", title: "Red semántica", path: "/semantic-network-test"},
@@ -27,16 +34,27 @@ interface TestMenuProps {
   onStart?: () => void;
 }
 
+/**
+ * Menú de los seis tests iniciales.
+ *
+ * El estado “Completado” se lee de `localStorage` (ver `lib/testProgress`).
+ * Hasta que los seis estén marcados, el botón para entrar a los módulos
+ * permanece deshabilitado.
+ */
 export const TestMenu = ({ onStart }: TestMenuProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [progress, setProgress] = useState<Record<string, boolean>>({});
 
+  // Se relee al montar porque cada test actualiza el almacenamiento local
+  // cuando termina y luego vuelve a este menú.
   useEffect(() => {
     setProgress(loadTestProgress());
   }, []);
 
   const goTo = (test: TestInfo) => {
+    // Si ya estamos en el test, el botón sirve para cerrar el menú y
+    // continuar donde estaba, no para recargar la misma ruta.
     if (location.pathname === test.path) {
       onStart?.();
     } else {
@@ -44,6 +62,7 @@ export const TestMenu = ({ onStart }: TestMenuProps) => {
     }
   };
 
+  // El acceso a módulos es todo-o-nada: faltar un test bloquea el botón.
   const allCompleted = tests.every((test) => progress[test.id]);
 
   return (

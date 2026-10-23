@@ -8,8 +8,15 @@ import { ArrowRight, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
-import { Loader2 } from "lucide-react"; // Para el estado de carga
+import { Loader2 } from "lucide-react";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+
+/**
+ * Afirmaciones de verdadero/falso del Módulo 3.
+ *
+ * Igual que en los demás quizzes, no se califican en pantalla: se guardan para
+ * el análisis agregado del proyecto.
+ */
 const statements = [
   "Las buenas pacientes ponen atención y por eso no hacen preguntas.",
   "Está comprobado que las mujeres toleran más el dolor que los hombres.",
@@ -17,47 +24,52 @@ const statements = [
   "La elección de tener hijos o no, depende sólo de la mujer que va a tenerlos.",
   "Las mujeres lesbianas necesitan ir al ginecólogo igual que una mujer heterosexual.",
 ];
+/**
+ * Quiz del Módulo 3.
+ *
+ * Guarda las respuestas en `module_3_responses` y marca `m3_quiz`. El `upsert`
+ * permite repetir el quiz sin duplicar la fila.
+ */
 const Module3Quiz = () => {
   const { goTo } = useRoleNavigation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const allAnswered = Object.keys(answers).length === statements.length;
   const [isSaving, setIsSaving] = useState(false);
+  /** Valida, guarda las respuestas y marca `m3_quiz`. */
   const handleSubmit = async () => {
-  if (!allAnswered) {
-    toast.error("Por favor responde todas las afirmaciones antes de continuar.");
-    return;
-  }
+    if (!allAnswered) {
+      toast.error("Por favor responde todas las afirmaciones antes de continuar.");
+      return;
+    }
 
-  setIsSaving(true);
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("No hay sesión de usuario activa");
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("No hay sesión de usuario activa");
 
-    // 1. Guardamos las respuestas en la tabla del Módulo 3
-    // Usamos upsert para que si el usuario repite el quiz, se actualice su registro
-    const { error: quizError } = await supabase
-      .from('module_3_responses')
-      .upsert({
-        id: user.id,
-        quiz_answers: answers,
-        updated_at: new Date()
-      });
+      // El upsert permite repetir el quiz sin duplicar la fila de respuestas.
+      const { error: quizError } = await supabase
+        .from('module_3_responses')
+        .upsert({
+          id: user.id,
+          quiz_answers: answers,
+          updated_at: new Date()
+        });
 
-    if (quizError) throw quizError;
+      if (quizError) throw quizError;
 
-    // 2. Actualizamos el progreso en la tabla general
-    await updateProgress("m3_quiz");
+      await updateProgress("m3_quiz");
 
-    setSubmitted(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  } catch (error) {
-    console.error("Error al guardar quiz:", error);
-    toast.error("Hubo un problema al guardar tus respuestas.");
-  } finally {
-    setIsSaving(false);
-  }
-};
+      setSubmitted(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      console.error("Error al guardar quiz:", error);
+      toast.error("Hubo un problema al guardar tus respuestas.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <UserNavbarWrapper />

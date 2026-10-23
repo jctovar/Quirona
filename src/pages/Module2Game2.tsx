@@ -9,6 +9,13 @@ import { toast } from "sonner";
 import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+/**
+ * Quiz de refuerzo del Módulo 2.
+ *
+ * Cada afirmación se marca como verdadera si representa un motivo válido para
+ * interrumpir o salir de la consulta. `correctAnswers` mantiene la respuesta
+ * esperada en el mismo orden que `statements`.
+ */
 const statements = [
   "Que no tengas la intimidad suficiente para cambiarte.",
   "Que el personal de la salud no te trate con respeto.",
@@ -33,6 +40,12 @@ const correctAnswers = [
   "verdadero"  // 9. Suciedad -> Motivo de interrupción
 ];
 
+/**
+ * Pantalla del quiz de refuerzo.
+ *
+ * Permite hasta tres intentos. El puntaje se calcula comparando cada respuesta
+ * con `correctAnswers`; el progreso solo se marca al enviar el quiz.
+ */
 const Module2Game2 = () => {
   const { goTo } = useRoleNavigation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -42,11 +55,12 @@ const Module2Game2 = () => {
   
   const allAnswered = Object.keys(answers).length === statements.length;
 
+  // Aciertos = total de afirmaciones menos las respuestas incorrectas.
   const score = statements.length - statements
     .map((_, index) => index)
     .filter(index => answers[index] !== correctAnswers[index]).length;
 
-  // --- FUNCIÓN DE GUARDADO ---
+  /** Guarda respuestas y puntaje, y marca `m2_quiz2`. */
   const handleSubmit = async () => {
     if (!allAnswered) {
       toast.error("Por favor responde todas las afirmaciones antes de continuar.");
@@ -83,6 +97,7 @@ const Module2Game2 = () => {
     }
   };
 
+  /** Reinicia el formulario conservando el límite de tres intentos. */
   const handleRepeat = () => {
     if (attempts < 3) {
       setAnswers({});

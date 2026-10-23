@@ -5,16 +5,17 @@ import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, BookOpen, Heart, Shield, MessageCircle, Smartphone, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/supabaseClient"; // Importamos supabase
-import { updateProgress } from "@/lib/progressHelper"; // Importamos el helper
+import { supabase } from "@/supabaseClient";
+import { updateProgress } from "@/lib/progressHelper";
 import { toast } from "sonner";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
-
 
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
 }
+
+/** Revela el contenido al entrar al viewport (animación de lectura). */
 const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -68,6 +69,12 @@ const myths = [
     text: 'La principal preocupación de las mujeres jóvenes es que su privacidad no sea respetada frente a sus padres o tutores. Esto influye en que eviten asistir a atención preventiva para que no se les cuestione sobre su actividad sexual. Es importante conocer que algunas clínicas ofrecen servicios preventivos gratuitos, asesoría en métodos anticonceptivos o vacunas contra el VPH sin necesidad de asistir acompañada de padres o tutores. También puedes acercarte a ferias de salud sexual que se hacen en escuelas para recibir mayor información.',
   },
 ];
+/**
+ * Introducción del Módulo 1.
+ *
+ * La usuaria marca los mitos que ya había escuchado. Se guarda un mapa
+ * completo en `module_1_responses.intro_phrases` y se marca `m1_intro`.
+ */
 const Module1Introduction = () => {
   const { goTo } = useRoleNavigation();
   const [heardMyths, setHeardMyths] = useState<Record<number, boolean>>({});
@@ -76,14 +83,15 @@ const Module1Introduction = () => {
     setHeardMyths((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
+/** Guarda los mitos escuchados y avanza al quiz. */
 const handleContinue = async () => {
     setIsSaving(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No se encontró sesión de usuario");
 
-      // 1. Guardamos las respuestas de los mitos
-      // Guardamos el objeto heardMyths tal cual en la columna intro_phrases
+      // Se normaliza el mapa para que todos los mitos tengan un valor
+      // booleano, incluso los que la usuaria no marcó.
       const finalizedAnswers = myths.reduce((acc, _, index) => {
         acc[index] = heardMyths[index] || false;
         return acc;
@@ -99,17 +107,15 @@ const handleContinue = async () => {
 
       if (saveError) throw saveError;
 
-      // 2. Actualizamos el progreso usando el Helper
-      // El helper se encarga de sumar 1 paso más y calcular el %
+      // El helper activa la bandera y el trigger recalcula el porcentaje.
       await updateProgress("m1_intro");
 
-      // 3. Navegamos al siguiente paso
       goTo("/module-1-quiz");
 
     } catch (error) {
       console.error("Error:", error);
       toast.error("Hubo un problema al guardar tu progreso.");
-      // Opcional: navigate igualmente para no trabar el flujo
+      // Se permite continuar para no bloquear el recorrido.
       goTo("/module-1-quiz");
     } finally {
       setIsSaving(false);

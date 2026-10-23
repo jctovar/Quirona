@@ -9,6 +9,8 @@ interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
 }
+
+/** Revela el contenido al entrar al viewport (animación de lectura). */
 const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -33,11 +35,15 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
     </div>
   );
 };
+/**
+ * Paso informativo del Módulo 2 sobre molestia, dolor y autonomía.
+ * No captura respuestas: solo marca `m2_visit` y avanza al juego.
+ */
 const Module2Visit = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
 
-  // --- FUNCIÓN DE PROGRESO ---
+  /** Marca el paso y navega; si falla la red, no bloquea el recorrido. */
   const handleContinue = async () => {
     setIsSaving(true);
     try {

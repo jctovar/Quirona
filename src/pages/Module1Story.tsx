@@ -6,13 +6,19 @@ import modulo1Inicio from "@/assets/modulo1-inicio1.jpeg";
 import { updateProgress } from "@/lib/progressHelper";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+/**
+ * Historia introductoria del Módulo 1.
+ *
+ * La lectura avanza por páginas; al final se muestra una pregunta de cierre y
+ * se marca `m1_story` antes de pasar a la introducción.
+ */
 const Module1Story = () => {
   const { goTo } = useRoleNavigation();
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
   const [, setIsProcessing] = useState(false);
 
-  // user preferences for accessibility
+  // Escala tipográfica elegida por la persona (accesibilidad).
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
 
   const pages = [
@@ -158,23 +164,24 @@ const Module1Story = () => {
       </div>
     ),
   ];
+  /** Marca la historia como leída y avanza a la introducción. */
   const completeActivity = async () => {
     setIsProcessing(true);
-    
-    // Llamamos al helper para que haga el trabajo sucio en la DB
-    await updateProgress("m1_story"); 
 
-    // Pase lo que pase, avanzamos
+    await updateProgress("m1_story");
+
+    // Se navega incluso si falla el guardado para no bloquear la lectura.
     goTo("/module-1-intro");
     setIsProcessing(false);
   };
+
+  /** Avanza de página o, al final, muestra las preguntas de cierre. */
   const handleContinue = () => {
     if (showQuestions) {
-      // En lugar de navigate directo, llamamos a la función de progreso
       completeActivity();
       return;
     }
-    
+
     if (page < pages.length - 1) {
       setPage((p) => p + 1);
     } else {

@@ -5,8 +5,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2 } from "lucide-react";
-import { supabase } from "@/supabaseClient"; // Importación de Supabase
-import { updateProgress } from "@/lib/progressHelper"; // Importación del Helper
+import { supabase } from "@/supabaseClient";
+import { updateProgress } from "@/lib/progressHelper";
 import { toast } from "sonner";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 interface ScrollRevealProps {
@@ -14,6 +14,10 @@ interface ScrollRevealProps {
   className?: string;
 }
 
+/**
+ * Revela su contenido con una transición cuando entra al viewport.
+ * Se usa para que las tarjetas largas no aparezcan todas de golpe.
+ */
 const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -41,6 +45,7 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
     </div>
   );
 };
+/** Puntos informativos que la usuaria marca cuando ya los conocía. */
 const visitPoints = [
   "Tú puedes asistir a tu primera consulta ginecológica sin necesidad de presentar síntomas o alguna molestia. Esta primera consulta puede centrarse en tu historia clínica, por ejemplo, identificar si tienes antecedentes familiares de enfermedades como cáncer o hipertensión, también pueden evaluar si necesitas vacunas importantes como la del Virus del Papiloma Humano (VPH) o refuerzos de otras inmunizaciones. O incluso empezar a reflexionar sobre tu plan de vida reproductiva.",
   "La médica o el médico te hará preguntas sobre tus periodos menstruales, actividades sexuales (si las hay) y el uso de alcohol o tabaco. Dar respuestas honestas es clave para que recibas la mejor atención, aunque algunos temas parezcan difíciles de compartir como situaciones de violencia física o abuso.",
@@ -49,11 +54,18 @@ const visitPoints = [
   "Tienes derecho a hablar con tu médico de forma privada y confidencial. Aunque vayas acompañada por un conocido o un familiar, las ginecólogas y los ginecólogos suelen ofrecer un tiempo a solas para que puedas expresar dudas que quizás te den pena comentar frente a tus acompañantes.",
   "¡Puedes hablar de otras dudas o inquietudes sobre tu salud integral! No dudes en hablar sobre el acné, los cólicos fuertes, el uso de anticonceptivos, prevenir infecciones (ITS) o incluso, si te has sentido triste o con mucha ansiedad.",
 ];
+/**
+ * Paso de “visita al consultorio” del Módulo 1.
+ *
+ * La usuaria marca los puntos que ya conocía. Se guarda un mapa completo
+ * (true/false por índice) para distinguir “no marcado” de “no respondido”.
+ */
 const Module1Visit = () => {
   const { goTo } = useRoleNavigation();
   const [known, setKnown] = useState<Record<number, boolean>>({});
   const [isSaving, setIsSaving] = useState(false);
 
+/** Guarda el cuestionario de la visita y avanza al juego. */
 const handleContinue = async () => {
     setIsSaving(true);
     try {
@@ -86,7 +98,7 @@ const handleContinue = async () => {
     } catch (error) {
       console.error("Error:", error);
       toast.error("Hubo un error al guardar tu avance.");
-      // Opcional: navegar de todos modos
+      // Se permite continuar para no bloquear el recorrido si falla la red.
       goTo("/module-1-game");
     } finally {
       setIsSaving(false);

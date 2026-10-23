@@ -16,6 +16,12 @@ const statements = [
   "Está bien que mi revisión ginecológica sea en el mismo lugar en el que me entrevistan.",
   "Si no hay un espacio exclusivo para cambiarme, deben darme tiempo a solas para hacerlo con privacidad.",
 ];
+/**
+ * Primer quiz del Módulo 2 (verdadero/falso).
+ *
+ * Guarda las respuestas en `module_2_responses.quiz1_answers` y marca
+ * `m2_quiz1`. El segundo quiz se realiza tras el juego y el feedback.
+ */
 const Module2Quiz = () => {
   const { goTo } = useRoleNavigation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -23,7 +29,7 @@ const Module2Quiz = () => {
   const [isSaving, setIsSaving] = useState(false);
   const allAnswered = Object.keys(answers).length === statements.length;
 
-  // --- FUNCIÓN DE GUARDADO Y PROGRESO ---
+  /** Valida, guarda las respuestas y marca `m2_quiz1`. */
   const handleSubmit = async () => {
     if (!allAnswered) {
       toast.error("Por favor responde todas las afirmaciones antes de continuar.");

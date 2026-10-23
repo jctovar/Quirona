@@ -7,6 +7,12 @@ import {
   isE2EConfigured,
 } from "./support/supabase-admin";
 
+/**
+ * Limpia las cuentas creadas por `global-setup`.
+ *
+ * Se ejecuta incluso si algún spec falla, siempre que Playwright llegue al
+ * teardown. Si una cuenta ya no existe, solo se avisa por consola.
+ */
 export default async function globalTeardown() {
   if (!isE2EConfigured()) return;
 

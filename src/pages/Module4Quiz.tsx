@@ -10,6 +10,13 @@ import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+
+/**
+ * Afirmaciones de verdadero/falso del Módulo 4.
+ *
+ * Se presentan sin calificación inmediata: el objetivo es registrar las ideas
+ * previas de la usuaria antes de la visita y el juego.
+ */
 const statements = [
   "Ser asertiva significa decir lo que necesito con claridad y respeto, sin agredir.",
   "Ser asertiva es lo mismo que ser grosera o conflictiva.",
@@ -23,12 +30,20 @@ const statements = [
   "Pedir apoyo (como hablar con alguien de confianza) después de una mala experiencia puede ayudar.",
   "Es mi obligación denunciar si tengo una experiencia de violencia ginecológica.",
 ];
+/**
+ * Quiz del Módulo 4 sobre asertividad y límites.
+ *
+ * Guarda las respuestas en `module_4_responses.quiz_answers` mediante upsert y
+ * marca `m4_quiz` al enviar.
+ */
 const Module4Quiz = () => {
   const { goTo } = useRoleNavigation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const allAnswered = Object.keys(answers).length === statements.length;
+
+  /** Valida, guarda las respuestas y marca `m4_quiz`. */
   const handleSubmit = async () => {
     if (!allAnswered) {
       toast.error("Por favor responde todas las afirmaciones antes de continuar.");

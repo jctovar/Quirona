@@ -22,6 +22,15 @@ interface NavbarProps {
   onLogout?: () => void;
 }
 
+/**
+ * Barra de navegación compartida por las áreas pública, de usuaria y de
+ * investigación.
+ *
+ * La sesión se escucha en tiempo real (`onAuthStateChange`) para que el menú
+ * reaccione al login/logout sin depender solo de la prop inicial. El tipo de
+ * menú se deduce de la URL: las rutas que empiezan por `/researcher` muestran
+ * el menú de investigación.
+ */
 export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -29,7 +38,8 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [auth, setAuth] = useState(isAuthenticated);
 
-  // 🔥 Detectar sesión REAL
+  // Mantiene el menú sincronizado con la sesión real de Supabase. La prop
+  // `isAuthenticated` solo sirve como valor inicial.
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -42,7 +52,8 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
     };
   }, []);
 
-  // 🔥 Detectar tipo de usuario (temporal por ruta)
+  // Detección temporal del rol por ruta. El rol real vive en `profiles.role`;
+  // esta convención evita una consulta adicional en cada render del Navbar.
   const isResearcher = location.pathname.startsWith("/researcher");
 
   const role = !auth
@@ -53,7 +64,7 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
 
   const isActive = (path: string) => location.pathname === path;
 
-  // 🔥 MENÚ DINÁMICO
+  // Tres menús posibles: visitante, usuaria e investigador.
   const menuItems =
   role === "guest"
     ? [
@@ -77,7 +88,7 @@ export const Navbar = ({ isAuthenticated = false, username, onLogout }: NavbarPr
 
         { to: "/researcher/profileInvestigador", label: "Perfil" },
       ];
-  // 🔥 LOGOUT REAL
+  // Cierra la sesión y notifica al contenedor para que limpie su estado.
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setAuth(false);

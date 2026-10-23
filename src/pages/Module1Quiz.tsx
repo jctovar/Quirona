@@ -16,6 +16,13 @@ const statements = [
   "Cuando una joven como Ximena asiste a una consulta ginecológica, no puede hacer preguntas sobre dudas que tenga.",
   "Solo se debe asistir a una consulta ginecológica cuando tenga síntomas o malestares en mi región púbica, o cuando haya empezado mi vida sexual.",
 ];
+/**
+ * Quiz inicial del Módulo 1.
+ *
+ * Las respuestas no se califican aquí: se guardan en
+ * `module_1_responses.quiz_answers` para el análisis del proyecto y se marca
+ * `m1_quiz` al enviar.
+ */
 const Module1Quiz = () => {
   const { goTo } = useRoleNavigation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -24,6 +31,7 @@ const Module1Quiz = () => {
 
   const allAnswered = Object.keys(answers).length === statements.length;
   
+  /** Persiste las respuestas y marca `m1_quiz`. */
   const handleSubmit = async () => {
     if (!allAnswered) {
       toast.error("Por favor responde todas las afirmaciones antes de continuar.");

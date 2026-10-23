@@ -41,10 +41,17 @@ interface AnswersState {
   actividadSalud: string | undefined;
 }
 
+/**
+ * Test sociodemográfico inicial.
+ *
+ * Guarda una fila en `initial_test_responses` y marca el test en localStorage.
+ * Después continúa con el cuestionario de redes semánticas. Las preguntas
+ * condicionales (orientación “Otra”, lengua indígena y área de salud) solo se
+ * validan cuando la respuesta anterior las activa.
+ */
 const InitialTest = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
-  // 2. Inicialización del estado con valores predeterminados (incluyendo todos los campos)
   const [answers, setAnswers] = useState<AnswersState>({
     edad: [18], // Inicializado como array de números para el Slider
     genero: undefined,
@@ -88,8 +95,7 @@ const InitialTest = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // --- 1. LISTA DE CAMPOS OBLIGATORIOS ---
-    // Estos son los nombres de las variables en tu estado 'answers'
+    // Claves de `AnswersState` que deben tener respuesta antes de guardar.
     const camposObligatorios: (keyof AnswersState)[] = [
       "genero", "sexoNacer", "orientacion", "estado", "estudios", 
       "trasfondo", "afromexicana", "indigena", "lenguaIndigena", 
@@ -97,7 +103,7 @@ const InitialTest = () => {
       "trabajadores", "cuartos", "consultaGine", "estudiosSalud"
     ];
 
-    // --- 2. VALIDACIÓN GENERAL ---
+    // Validación general de campos obligatorios.
     for (const campo of camposObligatorios) {
       if (answers[campo] === undefined || answers[campo] === "") {
         toast.error("Por favor, responde todas las preguntas antes de continuar.");
@@ -105,9 +111,9 @@ const InitialTest = () => {
       }
     }
 
-    // --- 3. VALIDACIONES CONDICIONALES ---
-    // (Preguntas que solo son obligatorias si se respondió "Sí" o "Otra" en la anterior)
-    
+    // Validaciones condicionales: solo aplican si la respuesta anterior las
+    // activa (“Otra”, “Sí”).
+
     if (answers.orientacion === "Otra" && !answers.orientacionOtra?.trim()) {
       toast.error("Por favor, especifica tu orientación sexual.");
       return;
@@ -125,7 +131,6 @@ const InitialTest = () => {
       }
     }
 
-    // --- 4. GUARDADO EN BASE DE DATOS ---
     setIsSaving(true);
 
     try {
@@ -166,7 +171,6 @@ const InitialTest = () => {
 
       if (error) throw error;
 
-      // --- 5. ÉXITO Y REDIRECCIÓN ---
       toast.success("¡Test completado con éxito!");
 
       try {
@@ -175,7 +179,7 @@ const InitialTest = () => {
         console.warn("No se pudo actualizar el progreso localmente, pero se guardó en la nube.");
       }
 
-      // Navegamos al siguiente test
+      // El siguiente instrumento es la red semántica.
       navigate("/semantic-network-test");
 
     } catch (error) {

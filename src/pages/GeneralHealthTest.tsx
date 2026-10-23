@@ -55,14 +55,27 @@ const miniQuestions = [
   "Durante este último mes ¿Has intentado suicidarte?",
   "A lo largo de tu vida ¿Alguna vez has intentado suicidarte?",
 ];
+/**
+ * Cuestionario General de Salud (GHQ-30) + tamizaje breve de riesgo.
+ *
+ * Si alguna respuesta del tamizaje es “sí”, se guarda
+ * `sent_to_derivation = true` y se redirige a la pantalla de derivación sin
+ * permitir volver atrás. En caso contrario se marca el test como completado.
+ */
 const GeneralHealthTest = () => {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>("intro");
   const [ghqAnswers, setGhqAnswers] = useState<Record<number, string>>({});
   const [miniAnswers, setMiniAnswers] = useState<Record<number, string>>({});
   const [isSaving, setIsSaving] = useState(false);
+
+  /** Registra una respuesta del GHQ-30. */
   const updateGhq = (i: number, v: string) => setGhqAnswers((p) => ({ ...p, [i]: v }));
+
+  /** Registra una respuesta del tamizaje de riesgo. */
   const updateMini = (i: number, v: string) => setMiniAnswers((p) => ({ ...p, [i]: v }));
+
+  /** Valida el GHQ-30 y pasa al tamizaje breve. */
   const handleGhqSubmit = () => {
     const missing = ghqItems.filter((_, i) => ghqAnswers[i] === undefined);
     if (missing.length > 0) {
@@ -72,6 +85,7 @@ const GeneralHealthTest = () => {
     setPhase("mini");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  /** Valida el tamizaje, guarda ambas escalas y decide la navegación. */
   const handleMiniSubmit = async () => {
     const missing = miniQuestions.filter((_, i) => miniAnswers[i] === undefined);
     if (missing.length > 0) {
@@ -85,14 +99,13 @@ const GeneralHealthTest = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Sesión no encontrada");
 
-      // 1. Detectar Riesgo
+      // Cualquier respuesta afirmativa del tamizaje activa la derivación.
       const hasRisk = Object.values(miniAnswers).some((v) => v === "si");
 
-      // 2. Preparar datos
+      // Las respuestas se guardan como arreglos ordenados.
       const ghqArray = ghqItems.map((_, i) => parseInt(ghqAnswers[i]));
       const miniArray = miniQuestions.map((_, i) => miniAnswers[i]);
 
-      // 3. Guardar en Supabase
       const { error } = await supabase
         .from('general_health_responses')
         .upsert({
@@ -106,9 +119,8 @@ const GeneralHealthTest = () => {
 
       if (error) throw error;
 
-      // 4. Lógica de Navegación Condicional
+      // La derivación se muestra como paso obligatorio sin retorno.
       if (hasRisk) {
-        // Redirección de la que no se puede regresar (replace: true)
         navigate("/derivacion", { replace: true });
       } else {
         toast.success("¡Evaluación de salud completada!");

@@ -10,6 +10,8 @@ interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
 }
+
+/** Revela el contenido al entrar al viewport (animación de lectura). */
 const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -34,22 +36,27 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
     </div>
   );
 };
+/**
+ * Paso de representación del Módulo 3: traduce los mandatos de género a
+ * situaciones cotidianas antes del juego de clasificación.
+ */
 const Module3Representation = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
+
+  /** Marca `m3_representation` y avanza al juego. */
   const handleContinue = async () => {
-  setIsSaving(true);
-  try {
-    // Marcamos m3_feedback en el progreso
-    await updateProgress("m3_representation");
-    goTo("/module-3-game");
-  } catch (error) {
-    console.error("Error al guardar progreso:", error);
-    goTo("/module-3-game");
-  } finally {
-    setIsSaving(false);
-  }
-};
+    setIsSaving(true);
+    try {
+      await updateProgress("m3_representation");
+      goTo("/module-3-game");
+    } catch (error) {
+      console.error("Error al guardar progreso:", error);
+      goTo("/module-3-game");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">

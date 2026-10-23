@@ -9,6 +9,8 @@ interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
 }
+
+/** Revela el contenido al entrar al viewport (animación de lectura). */
 const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -52,14 +54,18 @@ const myths = [
     text: 'Debes ser informada de tu derecho a tener una enfermera o persona de confianza presente durante el examen, y puedes solicitarlo.',
   },
 ];
+/**
+ * Introducción del Módulo 2: estándares de una consulta respetuosa.
+ * Marca `m2_intro` y avanza al primer quiz.
+ */
 const Module2Introduction = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
-  
+
+  /** Marca el paso y navega; si falla la red, no bloquea el recorrido. */
   const handleContinue = async () => {
     setIsSaving(true);
     try {
-      // Marcamos m2_intro en la tabla de progreso
       await updateProgress("m2_intro");
       goTo("/module-2-quiz");
     } catch (error) {

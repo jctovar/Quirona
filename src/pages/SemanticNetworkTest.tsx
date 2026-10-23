@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Navbar } from "@/components/Navbar";
 import { GripVertical, Check, AlertCircle } from "lucide-react";
-import { supabase } from "@/supabaseClient"; // Agregado
+import { supabase } from "@/supabaseClient";
 
 type Phase = 
   | "training-intro" | "training-words" | "training-summary" | "training-rank" | "training-complete"
@@ -17,7 +17,7 @@ type Phase =
   | "exercise2-words" | "exercise2-summary" | "exercise2-rank"
   | "complete";
 
-// --- Tu componente DraggableList original ---
+/** Lista ordenable por arrastre usada en las fases de ranking. */
 interface DraggableListProps {
   items: string[];
   onReorder: (items: string[]) => void;
@@ -70,47 +70,59 @@ const DraggableList = ({ items, onReorder, stimulusWord }: DraggableListProps) =
   );
 };
 
+/**
+ * Cuestionario de redes semánticas naturales modificadas.
+ *
+ * Fases: entrenamiento (3 palabras) → ejercicio 1 → ejercicio 2. En cada
+ * ejercicio se capturan hasta diez palabras, se muestra un resumen y luego se
+ * ordenan por importancia. Al final se guardan el orden inicial y el orden
+ * final en `semantic_network_responses`.
+ */
 const SemanticNetworkTest = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(true);
   const [phase, setPhase] = useState<Phase>("training-intro");
-  const [isSaving, setIsSaving] = useState(false); // Para el botón final
-  
-  // Estados originales
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Entrenamiento: tres palabras y su orden final.
   const [trainingWords, setTrainingWords] = useState<string[]>(["", "", ""]);
   const [trainingRanked, setTrainingRanked] = useState<string[]>([]);
-  
+
+  // Ejercicio 1: palabras capturadas, orden final y orden original para la DB.
   const [exercise1Words, setExercise1Words] = useState<string[]>(Array(10).fill(""));
   const [exercise1Ranked, setExercise1Ranked] = useState<string[]>([]);
-  const [ex1InitialOrder, setEx1InitialOrder] = useState<string[]>([]); // Para DB
+  const [ex1InitialOrder, setEx1InitialOrder] = useState<string[]>([]);
 
+  // Ejercicio 2: misma estructura que el ejercicio 1.
   const [exercise2Words, setExercise2Words] = useState<string[]>(Array(10).fill(""));
   const [exercise2Ranked, setExercise2Ranked] = useState<string[]>([]);
-  const [ex2InitialOrder, setEx2InitialOrder] = useState<string[]>([]); // Para DB
+  const [ex2InitialOrder, setEx2InitialOrder] = useState<string[]>([]);
 
-  // Funciones de actualización originales
+  /** Actualiza una palabra del entrenamiento sin mutar el arreglo. */
   const updateTrainingWord = (index: number, value: string) => {
     const newWords = [...trainingWords];
     newWords[index] = value;
     setTrainingWords(newWords);
   };
 
+  /** Actualiza una palabra del ejercicio 1. */
   const updateExercise1Word = (index: number, value: string) => {
     const newWords = [...exercise1Words];
     newWords[index] = value;
     setExercise1Words(newWords);
   };
 
+  /** Actualiza una palabra del ejercicio 2. */
   const updateExercise2Word = (index: number, value: string) => {
     const newWords = [...exercise2Words];
     newWords[index] = value;
     setExercise2Words(newWords);
   };
 
+  /** Descarta espacios en blanco antes de validar o guardar. */
   const getFilledWords = (words: string[]) => words.filter(w => w.trim() !== "");
 
-  // --- Manejo de Fases con Validación y Captura de Orden Inicial ---
-
+  /** Valida el entrenamiento y pasa al resumen. */
   const handleTrainingNext = () => {
     const filled = getFilledWords(trainingWords);
     if (filled.length < 3) {
@@ -121,29 +133,36 @@ const SemanticNetworkTest = () => {
     setPhase("training-summary");
   };
 
+  /** Valida el ejercicio 1 y guarda el orden en que se escribieron. */
   const handleExercise1Next = () => {
     const filled = getFilledWords(exercise1Words);
-    if (filled.length < 5) { // 
+    if (filled.length < 5) {
       toast.error("Por favor, completa por lo menos 5 palabras para continuar");
       return;
     }
-    setEx1InitialOrder(filled); // Guardamos como las escribió
+    setEx1InitialOrder(filled);
     setExercise1Ranked(filled);
     setPhase("exercise1-summary");
   };
 
+  /** Valida el ejercicio 2 y guarda el orden en que se escribieron. */
   const handleExercise2Next = () => {
     const filled = getFilledWords(exercise2Words);
-    if (filled.length < 5) { 
+    if (filled.length < 5) {
       toast.error("Por favor, completa por lo menos 5 palabras para continuar");
       return;
     }
-    setEx2InitialOrder(filled); // Guardamos como las escribió
+    setEx2InitialOrder(filled);
     setExercise2Ranked(filled);
     setPhase("exercise2-summary");
   };
 
-  // --- FUNCIÓN FINAL CON SUPABASE ---
+  /**
+   * Guarda ambos ejercicios en `semantic_network_responses`.
+   *
+   * `exN_initial` conserva el orden de captura y `exN_final` el orden de
+   * importancia elegido por la usuaria.
+   */
   const handleComplete = async () => {
     setIsSaving(true);
     try {
@@ -166,9 +185,9 @@ const SemanticNetworkTest = () => {
 
       toast.success("¡Cuestionario completado exitosamente!");
       markTestCompleted("semantic-network");
-      
-      // Redirigir a initial-question como pediste
-      navigate("/initial-question"); 
+
+      // El cuestionario inicial es el paso previo al recorrido de módulos.
+      navigate("/initial-question");
 
     } catch (error) {
       toast.error("Error al guardar: " + getErrorMessage(error));
@@ -177,6 +196,7 @@ const SemanticNetworkTest = () => {
     }
   };
 
+  /** Une palabras con comas y “y” final para mostrarlas en el resumen. */
   const formatWordsList = (words: string[]) => {
     if (words.length === 0) return "";
     if (words.length === 1) return words[0];
@@ -193,7 +213,7 @@ const SemanticNetworkTest = () => {
     );
   }
 
-  // --- RENDERIZADO CON TUS TEXTOS ORIGINALES ---
+  // Cada fase comparte la misma tarjeta; el contenido cambia según `phase`.
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
       <Navbar isAuthenticated />

@@ -5,13 +5,19 @@ import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+/**
+ * Historia introductoria del Módulo 2.
+ *
+ * Mantiene el mismo patrón de lectura paginada que el Módulo 1 y marca
+ * `m2_story` al terminar.
+ */
 const Module2Story = () => {
   const { goTo } = useRoleNavigation();
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // user preferences for accessibility
+  // Escala tipográfica elegida por la persona (accesibilidad).
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
 
   const pages = [
@@ -71,22 +77,21 @@ const Module2Story = () => {
     ),
   ];
 
+  /** Marca `m2_story` y avanza; el fallback evita bloquear la lectura. */
   const completeActivity = async () => {
     setIsProcessing(true);
     try {
-      // Llamamos al helper para marcar m2_story
-      // El helper recalculará automáticamente el % basado en los 30 pasos totales
       await updateProgress("m2_story");
       goTo("/module-2-intro");
     } catch (error) {
       console.error("Error al guardar progreso:", error);
-      // Navegamos de todos modos para no bloquear a la usuaria
       goTo("/module-2-intro");
     } finally {
       setIsProcessing(false);
     }
   };
 
+  /** Avanza de página o muestra las preguntas de cierre. */
   const handleContinue = () => {
     if (showQuestions) {
       completeActivity();

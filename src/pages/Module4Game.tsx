@@ -10,6 +10,14 @@ import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+/**
+ * Juego de clasificación del Módulo 4.
+ *
+ * La usuaria identifica frases que expresan límites y derechos en la consulta
+ * (correctas) frente a frases que normalizan la violencia o la incomodidad
+ * (incorrectas). Comparte el mecanismo de cola y temporizador de los módulos
+ * anteriores.
+ */
 const phrases = [
   { id: 1, text: '“Perdón por molestar, mejor no pregunto para no verme intensa.”', correct: true },
   { id: 2, text: '“Necesito que cierren la puerta y que nadie entre sin mi consentimiento.”', correct: false },
@@ -33,6 +41,8 @@ const phrases = [
 ];
 const TOTAL_TIME = 60;
 const MAX_VISIBLE = 5;
+
+/** Baraja una copia del arreglo (Fisher-Yates) sin mutar el original. */
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -41,6 +51,12 @@ function shuffleArray<T>(arr: T[]): T[] {
   }
   return a;
 }
+/**
+ * Pantalla del juego del Módulo 4.
+ *
+ * Mantiene el mismo estado de ventana (`queue` + `visible`) y envía el
+ * resultado al feedback mediante `location.state`.
+ */
 const Module4Game = () => {
   const { goTo } = useRoleNavigation();
   const location = useLocation();
@@ -62,7 +78,7 @@ const Module4Game = () => {
     setTimeLeft(TOTAL_TIME);
     setPhase("playing");
   }, []);
-  // Timer
+  // Temporizador de la ronda; se limpia al cambiar de fase o desmontar.
   useEffect(() => {
     if (phase !== "playing") return;
     if (timeLeft <= 0) {
@@ -72,7 +88,8 @@ const Module4Game = () => {
     const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(timer);
   }, [phase, timeLeft]);
-  // Check if all phrases are classified
+
+  // Cierra la ronda si ya no quedan frases por clasificar.
   useEffect(() => {
     if (phase === "playing" && accepted.length + rejected.length === phrases.length) {
       setPhase("done");
@@ -91,12 +108,16 @@ const Module4Game = () => {
     e.preventDefault();
     if (draggedId === null) return;
 
-    // Add to accepted
+    // El cerebro representa “frase correcta”: se guarda como aceptada.
     setAccepted((p) => [...p, draggedId]);
     removePhrase(draggedId);
     setDraggedId(null);
   };
 
+  /**
+   * Sustituye la frase resuelta por la siguiente de la cola, manteniendo
+   * siempre hasta cinco tarjetas visibles.
+   */
   const removePhrase = (id: number) => {
     setVisible((prev) => {
       const remaining = prev.filter((p) => p.id !== id);
@@ -113,7 +134,7 @@ const Module4Game = () => {
     setRejected((p) => [...p, id]);
     removePhrase(id);
   };
-  // Calculate score
+  // Acierto = aceptar una frase correcta o descartar una incorrecta.
   const getScore = () => {
     let correct = 0;
     accepted.forEach((id) => {
@@ -126,6 +147,10 @@ const Module4Game = () => {
     });
     return correct;
   };
+  /**
+   * Persiste el puntaje del Módulo 4 y marca `m4_game`. La navegación al
+   * feedback ocurre incluso ante un fallo de red.
+   */
   const handleFinishGame = async () => {
     setIsSaving(true);
     const score = getScore();
@@ -163,7 +188,8 @@ const Module4Game = () => {
       setIsSaving(false);
     }
   };
-  // Ensure at least one correct phrase is visible
+  // Garantiza que siempre haya al menos una frase correcta visible para que
+  // la ronda no quede sin opciones válidas al final de la cola.
   useEffect(() => {
     if (phase !== "playing") return;
     const hasCorrect = visible.some((v) => v.correct);

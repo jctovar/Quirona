@@ -5,10 +5,17 @@ import { useLocation } from "react-router-dom";
 import { ArrowRight, Clock, XCircle, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import cerebroImg from "@/assets/cerebro.jpg";
-import { supabase } from "@/supabaseClient"; // Importación de Supabase
+import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
+/**
+ * Juego de clasificación del Módulo 1.
+ *
+ * La usuaria arrastra frases al “cerebro” (correctas) o las descarta
+ * (incorrectas). Solo se muestran cinco a la vez; al resolver una se saca la
+ * siguiente de la cola. El puntaje final cuenta aciertos en ambos grupos.
+ */
 const phrases = [
   { id: 1, text: '"Vas al ginecólogo si hiciste algo indebido"', correct: false },
   { id: 2, text: '"Puedes ir a consulta ginecológica para informarte"', correct: true },
@@ -30,6 +37,8 @@ const phrases = [
 ];
 const TOTAL_TIME = 60;
 const MAX_VISIBLE = 5;
+
+/** Baraja una copia del arreglo (Fisher-Yates) sin mutar el original. */
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -38,6 +47,12 @@ function shuffleArray<T>(arr: T[]): T[] {
   }
   return a;
 }
+/**
+ * Pantalla del juego.
+ *
+ * `queue` guarda las frases aún no visibles y `visible` las cinco activas.
+ * Al aceptar o rechazar una frase se rellena el hueco con la siguiente.
+ */
 const Module1Game = () => {
   const { goTo } = useRoleNavigation();
   const location = useLocation();
@@ -60,7 +75,8 @@ const Module1Game = () => {
     setTimeLeft(TOTAL_TIME);
     setPhase("playing");
   }, []);
-  // Timer
+  // Temporizador: solo corre durante la partida y se limpia al desmontar o
+  // cambiar de fase para evitar intervalos duplicados.
   useEffect(() => {
     if (phase !== "playing") return;
     if (timeLeft <= 0) {
@@ -70,7 +86,8 @@ const Module1Game = () => {
     const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(timer);
   }, [phase, timeLeft]);
-  // Check if all phrases are classified
+
+  // La partida termina antes de tiempo si ya se clasificaron todas las frases.
   useEffect(() => {
     if (phase === "playing" && accepted.length + rejected.length === phrases.length) {
       setPhase("done");
@@ -89,12 +106,16 @@ const Module1Game = () => {
     e.preventDefault();
     if (draggedId === null) return;
 
-    // Add to accepted
+    // El cerebro representa “frase correcta”: se guarda como aceptada.
     setAccepted((p) => [...p, draggedId]);
     removePhrase(draggedId);
     setDraggedId(null);
   };
 
+  /**
+   * Quita una frase de la zona visible y, si quedan pendientes, coloca la
+   * siguiente de la cola en su lugar.
+   */
   const removePhrase = (id: number) => {
     setVisible((prev) => {
       const remaining = prev.filter((p) => p.id !== id);
@@ -111,7 +132,7 @@ const Module1Game = () => {
     setRejected((p) => [...p, id]);
     removePhrase(id);
   };
-  // Calculate score
+  // Un acierto es aceptar una frase correcta o descartar una incorrecta.
   const getScore = () => {
     let correct = 0;
     accepted.forEach((id) => {
@@ -124,6 +145,12 @@ const Module1Game = () => {
     });
     return correct;
   };
+  /**
+   * Persiste el puntaje del juego y marca `m1_game`.
+   *
+   * La navegación se hace incluso si falla la red para no dejar a la usuaria
+   * atrapada en la pantalla del juego; el feedback recibe el estado local.
+   */
   const handleFinishGame = async () => {
     setIsSaving(true);
     const score = getScore();

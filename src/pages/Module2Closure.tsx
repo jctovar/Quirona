@@ -5,10 +5,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
-import { supabase } from "@/supabaseClient"; // Importación necesaria
-import { updateProgress } from "@/lib/progressHelper"; // Importación necesaria
+import { supabase } from "@/supabaseClient";
+import { updateProgress } from "@/lib/progressHelper";
 import { toast } from "sonner";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+
+/**
+ * Cierre del Módulo 2.
+ *
+ * Guarda tres reflexiones en `module_2_responses.closure_answers` y, tras la
+ * historia de resolución, marca `m2_closure` para desbloquear el Módulo 3.
+ */
 const Module2Closure = () => {
   const { goTo } = useRoleNavigation();
   const [phase, setPhase] = useState<"questions" | "story">("questions");
@@ -17,9 +24,8 @@ const Module2Closure = () => {
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
   const [isSaving, setIsSaving] = useState(false);
 
-  // --- FUNCIÓN 1: GUARDAR REFLEXIONES ---
+  /** Valida y guarda las reflexiones antes de mostrar la historia final. */
   const handleSaveQuestions = async () => {
-    // Verificamos que no envíen campos vacíos
     if (!answers.fear.trim() || !answers.phrase.trim() || !answers.advice.trim()) {
       toast.error("Por favor, responde todas las preguntas para continuar.");
       return;
@@ -50,13 +56,12 @@ const Module2Closure = () => {
     }
   };
 
-  // --- FUNCIÓN 2: FINALIZAR MÓDULO ---
+  /** Marca `m2_closure`; el Dashboard usa esta bandera para abrir el M3. */
   const handleFinalizeModule = async () => {
     setIsSaving(true);
     try {
-      // Marcamos el paso final del módulo 2
       await updateProgress("m2_closure");
-      
+
       toast.success("¡Módulo 2 completado con éxito!");
       goTo("/dashboard");
     } catch (error) {

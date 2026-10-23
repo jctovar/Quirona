@@ -9,6 +9,8 @@ interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
 }
+
+/** Revela el contenido al entrar al viewport (animación de lectura). */
 const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -35,13 +37,18 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
     </div>
   );
 };
+/**
+ * Introducción del Módulo 3: conceptos de violencia ginecológica.
+ * Marca `m3_intro` y avanza al quiz.
+ */
 const Module3Introduction = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
-const handleContinue = async () => {
+
+  /** Marca el paso y navega; el fallback evita bloquear la lectura. */
+  const handleContinue = async () => {
     setIsSaving(true);
     try {
-      // Guardamos m3_intro en user_progress
       await updateProgress("m3_intro");
       goTo("/module-3-quiz");
     } catch (error) {

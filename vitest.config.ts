@@ -19,6 +19,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov"],
+      // La cobertura se concentra en lógica reutilizable y Login. Los módulos
+      // educativos son principalmente presentación y se cubren con Playwright.
       include: [
         "src/lib/**/*.{ts,tsx}",
         "src/hooks/**/*.{ts,tsx}",

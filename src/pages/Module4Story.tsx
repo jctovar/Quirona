@@ -6,13 +6,19 @@ import { ArrowRight } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
 import { Loader2 } from "lucide-react";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+/**
+ * Historia introductoria del Módulo 4.
+ *
+ * Cierra el arco narrativo del programa y marca `m4_story` antes de la
+ * introducción.
+ */
 const Module4Story = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
 
-  // user preferences for accessibility
+  // Escala tipográfica elegida por la persona (accesibilidad).
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
 
   const pages = [
@@ -140,11 +146,11 @@ const Module4Story = () => {
     ),
   ];
 
+  /** Marca `m4_story` al final o avanza a la siguiente página. */
   const handleContinue = async () => {
     if (showQuestions) {
       setIsSaving(true);
       try {
-        // Marcamos el primer paso del Módulo 4
         await updateProgress("m4_story");
         goTo("/module-4-intro");
       } catch (error) {

@@ -93,6 +93,13 @@ const QuestionItem = ({ number, text, options, value, onChange }: QuestionItemPr
     </RadioGroup>
   </div>
 );
+/**
+ * Inventario de ansiedad (estado y rasgo).
+ *
+ * Primero se responde la escala de estado y luego la de rasgo. Al final se
+ * guardan ambas series numéricas en `anxiety_inventory_responses` y se marca
+ * el test como completado en localStorage.
+ */
 const AnxietyInventoryTest = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(true);
@@ -101,12 +108,17 @@ const AnxietyInventoryTest = () => {
   const [traitAnswers, setTraitAnswers] = useState<Record<number, string>>({});
   const [, setIsSaving] = useState(false);
 
+  /** Registra una respuesta de la escala de estado. */
   const updateStateAnswer = (index: number, value: string) => {
     setStateAnswers((prev) => ({ ...prev, [index]: value }));
   };
+
+  /** Registra una respuesta de la escala de rasgo. */
   const updateTraitAnswer = (index: number, value: string) => {
     setTraitAnswers((prev) => ({ ...prev, [index]: value }));
   };
+
+  /** Valida la escala de estado y avanza a la de rasgo. */
   const handleStateSubmit = () => {
     const unanswered = stateQuestions.filter((_, i) => !stateAnswers[i]);
     if (unanswered.length > 0) {
@@ -117,7 +129,7 @@ const AnxietyInventoryTest = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // --- FUNCIÓN FINAL CON SUPABASE ---
+  /** Valida la escala de rasgo, guarda ambas series y marca el test. */
   const handleTraitSubmit = async () => {
     const unanswered = traitQuestions.filter((_, i) => !traitAnswers[i]);
     if (unanswered.length > 0) {
@@ -130,7 +142,7 @@ const AnxietyInventoryTest = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No se encontró sesión activa");
 
-      // Convertimos los objetos de respuestas en arreglos ordenados de números
+      // Postgres guarda las respuestas como arreglos ordenados de números.
       const stateArray = stateQuestions.map((_, i) => parseInt(stateAnswers[i]));
       const traitArray = traitQuestions.map((_, i) => parseInt(traitAnswers[i]));
 
@@ -158,7 +170,7 @@ const AnxietyInventoryTest = () => {
     }
   };
 
-  // Redirigir al siguiente test: Escala de Asertividad
+  /** Continúa con la escala de asertividad. */
   const handleNext = () => {
     navigate("/assertiveness-scale");
   };

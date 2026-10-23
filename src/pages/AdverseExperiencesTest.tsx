@@ -24,6 +24,13 @@ const questions = [
   "¿Algún miembro de tu familia sufría depresión o alguna otra enfermedad mental, o trató de suicidarse?",
   "¿Algún miembro de tu familia estuvo en la cárcel?",
 ];
+/**
+ * Cuestionario de experiencias adversas en la infancia.
+ *
+ * Guarda un arreglo de respuestas “si”/“no” en
+ * `adverse_experiences_responses.answers`. Es un instrumento sensible: no se
+ * interpreta en el cliente, solo se registra para el análisis del proyecto.
+ */
 const AdverseExperiencesTest = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(true);
@@ -31,9 +38,12 @@ const AdverseExperiencesTest = () => {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [isSaving, setIsSaving] = useState(false);
 
+  /** Registra la respuesta de una pregunta. */
   const updateAnswer = (index: number, value: string) => {
     setAnswers((prev) => ({ ...prev, [index]: value }));
   };
+
+  /** Valida que no falten preguntas y guarda el cuestionario. */
   const handleSubmit = async () => {
     const unanswered = questions.filter((_, i) => !answers[i]);
     
@@ -48,7 +58,7 @@ const AdverseExperiencesTest = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No se encontró sesión activa.");
 
-      // Convertimos el objeto de respuestas en un arreglo [ "si", "no", ... ]
+      // Postgres guarda un arreglo ordenado de respuestas.
       const answersArray = questions.map((_, i) => answers[i]);
 
       const { error } = await supabase
@@ -74,8 +84,8 @@ const AdverseExperiencesTest = () => {
     }
   };
 
+  /** Vuelve al menú de tests para continuar con el siguiente cuestionario. */
   const handleNext = () => {
-    // Redirección obligatoria al menú principal de tests
     navigate("/initial-question");
   };
 

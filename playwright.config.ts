@@ -17,6 +17,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
+  // El setup crea las cuentas temporales y el teardown las elimina. Ambos
+  // usan service_role solo en Node.
   globalSetup: "./e2e/global-setup.ts",
   globalTeardown: "./e2e/global-teardown.ts",
   reporter: process.env.CI

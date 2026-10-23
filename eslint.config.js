@@ -20,6 +20,8 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      // Detecta imports, variables y parámetros muertos. El prefijo `_` marca
+      // argumentos deliberadamente ignorados.
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_" },

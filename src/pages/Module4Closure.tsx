@@ -11,6 +11,13 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 
+/**
+ * Cierre del Módulo 4 y del programa formativo.
+ *
+ * Recoge cuatro reflexiones, las guarda en
+ * `module_4_responses.closure_answers` y marca `m4_closure`. Esa bandera
+ * habilita las evaluaciones finales en el Dashboard.
+ */
 const Module4Closure = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
@@ -24,8 +31,8 @@ const Module4Closure = () => {
   });
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
 
+  /** Valida que las cuatro respuestas tengan contenido y las guarda. */
   const handleFinishQuestions = async () => {
-    // Validación básica
     if (Object.values(answers).some(a => !a.trim())) {
       toast.error("Por favor, comparte tus reflexiones en todos los campos.");
       return;
@@ -53,6 +60,7 @@ const Module4Closure = () => {
     }
   };
 
+  /** Marca el cierre del programa; habilita las evaluaciones finales. */
   const handleCompleteModule = async () => {
     setIsSaving(true);
     try {

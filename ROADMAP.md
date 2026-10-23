@@ -24,7 +24,7 @@ Esfuerzo: `S` < 2 h · `M` < 1 día · `L` 1–3 días. `AC` = criterio de acept
 |---|-----|----------|-----|-----|------------------------|
 | 1.1 | **Auditoría de RLS en Supabase**: habilitar RLS en todas las tablas (`profiles`, `user_progress`, respuestas de tests, buzón) y crear políticas `SELECT/INSERT/UPDATE` restringidas a `auth.uid() = id`. Para lecturas del investigador, política separada que valide `role = 'researcher'` (vía función `security definer` o claim en JWT). Datos sensibles de salud de adolescentes: considerar cifrado de columnas sensibles | SQL en Supabase | **P0** | M | Con sesión de usuaria A no es posible leer/escribir filas de usuaria B (probar en SQL Editor con `set role authenticated` o con dos cuentas reales) |
 | 1.2 | **Route guard de investigador**: crear `<RequireResearcher>` que verifique sesión (`getUser()`) + `role === 'researcher'` y envuelva `/researcher/*` y `/researcher-dashboard` | `src/App.tsx`, nuevo `src/components/RequireResearcher.tsx`, `src/layouts/ResearcherLayout.tsx` (hoy renderiza `isAuthenticated` hardcodeado) | **P0** | S | `/researcher/perfilInvestigador` sin sesión redirige a `/login`; usuaria sin rol redirige a `/dashboard` |
-| 1.3 | **Eliminar fuga de respuestas en consola**: quitar `console.log` con `shouldBeYes` (respuestas correctas del juego) | `src/pages/Module3Game.tsx:171,204` | **P0** | S | Ningún log expone respuestas correctas |
+| 1.3 | **Eliminar fuga de respuestas en consola**: quitar `console.log` con `shouldBeYes` (respuestas correctas del juego) | `src/pages/Module3Game.tsx` | **P0** | S | Ningún log expone respuestas correctas — ✅ completado |
 | 1.4 | Drop automático de `console.*` en build de producción (conservar `console.error` si se desea) | `vite.config.ts` (`esbuild: { drop: ['console','debugger'] }` en prod) | P1 | S | `grep -r "console.log" dist/assets/*.js` vacío |
 
 ## Fase 2 — Calidad y rendimiento (días 3–6)
@@ -36,6 +36,7 @@ Esfuerzo: `S` < 2 h · `M` < 1 día · `L` 1–3 días. `AC` = criterio de acept
 | 2.3 | **Code splitting**: `React.lazy` + `Suspense` por rutas (dashboards con recharts, módulos como chunks), `manualChunks` para vendors pesados | `src/App.tsx`, `vite.config.ts` | P1 | M | Bundle inicial < 300 KB gzip; desaparece el warning de chunk > 500 KB |
 | 2.4 | Optimizar assets: PNGs de líneas de ayuda (1–1.8 MB c/u) → WebP ~150 KB; video `bienvenidaQuirona.mp4` (4.5 MB) → Supabase Storage/CDN o recomprimir a 720p | `src/assets/*` | P1 | M | Total de assets < 3 MB; carga aceptable en 3G |
 | 2.5 | Preload del video con `poster` y carga diferida en la landing | `src/pages/Index.tsx` | P2 | S | LCP de landing no bloqueado por el video |
+| 2.6 | Revisar y ampliar comentarios: documentar reglas de negocio, RLS, navegación por rol, progreso local y datos sembrados de E2E | `src/**`, `e2e/**` | P2 | M | Comentarios en español útiles en lógica no obvia; sin comentarios obsoletos — ✅ completado |
 
 ## Fase 3 — UX, legal y SEO (días 6–9)
 

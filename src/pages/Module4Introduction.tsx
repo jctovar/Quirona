@@ -9,6 +9,8 @@ interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
 }
+
+/** Revela el contenido al entrar al viewport (animación de lectura). */
 const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -35,16 +37,20 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
     </div>
   );
 };
+/**
+ * Introducción del Módulo 4: herramientas para responder a la violencia.
+ * Marca `m4_intro` y avanza al quiz.
+ */
 const Module4Introduction = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
 
-  // --- FUNCIÓN PARA GUARDAR PROGRESO ---
+  /** Marca el paso y navega; el fallback evita bloquear la lectura. */
   const handleContinue = async () => {
     setIsSaving(true);
     try {
       await updateProgress("m4_intro");
-      goTo("/module-4-quiz"); // Ruta al quiz del módulo 4
+      goTo("/module-4-quiz");
     } catch (error) {
       console.error("Error al guardar progreso:", error);
       goTo("/module-4-quiz");

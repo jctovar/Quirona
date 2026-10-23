@@ -105,19 +105,29 @@ const ScaleItem = ({ number, text, value, onChange }: ScaleItemProps) => (
     </div>
   </div>
 );
+/**
+ * Escala de asertividad de 21 reactivos.
+ *
+ * Se guarda un arreglo numérico completo en
+ * `assertiveness_scale_responses.answers`. Al terminar se marca el test en
+ * localStorage y se vuelve al menú de cuestionarios.
+ */
 const AssertivenessScaleTest = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(true);
   const [phase, setPhase] = useState<Phase>("intro");
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [, setIsSaving] = useState(false);
+
+  /** Registra una respuesta usando el índice global del instrumento. */
   const updateAnswer = (globalIndex: number, value: number) => {
     setAnswers((prev) => ({ ...prev, [globalIndex]: value }));
   };
+
+  /** Valida que estén los 21 reactivos y guarda la escala. */
   const handleSubmit = async () => {
     const answeredCount = Object.keys(answers).length;
-    
-    // Validación obligatoria: totalItems es 21
+
     if (answeredCount < totalItems) {
       toast.error(
         `Por favor responde todas las preguntas. Faltan ${totalItems - answeredCount} por contestar.`
@@ -131,7 +141,7 @@ const AssertivenessScaleTest = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No se encontró sesión activa");
 
-      // Convertimos el objeto Record<number, number> en un arreglo ordenado [ans1, ans2, ... ans21]
+      // Postgres guarda un arreglo ordenado [ans1, ans2, … ans21].
       const answersArray = Array.from({ length: totalItems }, (_, i) => answers[i]);
 
       const { error } = await supabase
@@ -157,8 +167,8 @@ const AssertivenessScaleTest = () => {
     }
   };
 
+  /** Vuelve al menú de tests para continuar con el siguiente cuestionario. */
   const handleNext = () => {
-    // Redirigimos a la pantalla de inicio de tests (donde está el menú)
     navigate("/initial-question");
   };
   

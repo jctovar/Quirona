@@ -5,13 +5,19 @@ import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+/**
+ * Historia introductoria del Módulo 3.
+ *
+ * Presenta una situación de violencia ginecológica y marca `m3_story` al
+ * terminar la lectura.
+ */
 const Module3Story = () => {
   const { goTo } = useRoleNavigation();
   const [showQuestions, setShowQuestions] = useState(false);
   const [page, setPage] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
 
-  // user preferences for accessibility
+  // Escala tipográfica elegida por la persona (accesibilidad).
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
 
   const pages = [
@@ -135,11 +141,11 @@ const Module3Story = () => {
     ),
   ];
 
+  /** Marca `m3_story` al final o avanza a la siguiente página. */
   const handleContinue = async () => {
     if (showQuestions) {
       setIsSaving(true);
       try {
-        // Marcamos m3_story en la base de datos
         await updateProgress("m3_story");
         goTo("/module-3-intro");
       } catch (error) {

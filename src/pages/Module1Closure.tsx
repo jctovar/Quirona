@@ -6,11 +6,19 @@ import { Label } from "@/components/ui/label";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
 import { ArrowRight, Loader2 } from "lucide-react";
 import modulo1Final from "@/assets/modulo1-final.jpeg";
-import { supabase } from "@/supabaseClient"; // Importamos supabase
+import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import { toast } from "sonner";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 
+/**
+ * Cierre del Módulo 1.
+ *
+ * Primero recoge tres reflexiones abiertas y las guarda en
+ * `module_1_responses.closure_answers`. Después muestra la historia de
+ * resolución y, al finalizar, marca `m1_closure` (lo que desbloquea el Módulo
+ * 2 en el Dashboard).
+ */
 const Module1Closure = () => {
   const { goTo } = useRoleNavigation();
   const [phase, setPhase] = useState<"questions" | "story">("questions");
@@ -106,9 +114,8 @@ const Module1Closure = () => {
     ),
   ];
 
-// --- FUNCIÓN 1: GUARDAR RESPUESTAS ABIERTAS ---
+  /** Valida y guarda las tres reflexiones antes de mostrar la historia. */
   const handleSaveAnswers = async () => {
-    // Validación: que al menos hayan escrito algo
     if (!answers.fear.trim() || !answers.phrase.trim() || !answers.advice.trim()) {
       toast.error("Por favor, comparte tus reflexiones antes de continuar.");
       return;
@@ -139,14 +146,15 @@ const Module1Closure = () => {
     }
   };
 
-  // --- FUNCIÓN 2: FINALIZAR MÓDULO Y ACTUALIZAR PROGRESO ---
+  /**
+   * Marca el cierre del módulo. El trigger de `user_progress` recalcula el
+   * porcentaje global; el Dashboard usa `m1_closure` para desbloquear el M2.
+   */
   const handleFinalizeModule = async () => {
     setIsSaving(true);
     try {
-      // Marcamos la última parte del Módulo 1 (m1_closure)
-      // El helper recalculará el % y lo subirá al 25% (o 28% si es exacto)
       await updateProgress("m1_closure");
-      
+
       toast.success("¡Felicidades! Has completado el Módulo 1.");
       goTo("/dashboard");
     } catch (error) {

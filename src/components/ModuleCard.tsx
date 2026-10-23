@@ -5,11 +5,19 @@ import { LucideIcon } from "lucide-react";
 interface ModuleCardProps {
   title: string;
   description: string;
+  /** Autoría académica; se omite si el módulo no la declara. */
   author?: string;
+  /** Icono de lucide que representa el módulo. */
   icon: LucideIcon;
   onClick: () => void;
 }
 
+/**
+ * Tarjeta reutilizable del catálogo de módulos.
+ *
+ * No decide si el módulo está bloqueado: el Dashboard controla el estado y
+ * muestra los avisos de bloqueo/completado alrededor de esta tarjeta.
+ */
 export const ModuleCard = ({ title, description, author, icon: Icon, onClick }: ModuleCardProps) => {
   return (
     <Card className="group hover:shadow-quirona transition-quirona cursor-pointer border-2 hover:border-primary">

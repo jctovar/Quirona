@@ -11,6 +11,13 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";   
 
+/**
+ * Cierre del Módulo 3.
+ *
+ * Recoge tres reflexiones sobre el módulo, las guarda en
+ * `module_3_responses.feedback_responses` y marca `m3_closure` al terminar la
+ * historia. Es el paso que desbloquea el Módulo 4.
+ */
 const Module3Closure = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
@@ -18,8 +25,9 @@ const Module3Closure = () => {
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState({ fear: "", phrase: "", advice: "" });
   const [fontSizeClass, setFontSizeClass] = useState("text-base");
+
+  /** Valida y guarda las reflexiones; ante error permite continuar. */
   const handleFinishQuestions = async () => {
-    // Validamos que no estén vacías
     if (!answers.fear || !answers.phrase || !answers.advice) {
       toast.error("Por favor, comparte tus reflexiones antes de continuar.");
       return;
@@ -48,6 +56,7 @@ const Module3Closure = () => {
     }
   };
 
+  /** Marca `m3_closure`; el Dashboard usa esta bandera para abrir el M4. */
   const handleCompleteModule = async () => {
     setIsSaving(true);
     try {

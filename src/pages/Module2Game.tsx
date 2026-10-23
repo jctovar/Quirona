@@ -4,11 +4,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "react-router-dom";
 import { ArrowRight, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import { supabase } from "@/supabaseClient"; // Importación de Supabase
+import { supabase } from "@/supabaseClient";
 import { updateProgress } from "@/lib/progressHelper";
 import consultorioImg from "@/assets/consultorio.png";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
+
+/**
+ * Juego de clasificación del Módulo 2.
+ *
+ * La interacción es la misma que en el Módulo 1: arrastrar frases correctas al
+ * cerebro, descartar las incorrectas y reponer desde una cola. El contenido
+ * aquí representa elementos de una consulta ginecológica respetuosa.
+ */
 const phrases = [
   { id: 1, text: 'Área para cambiarte', correct: true },
   { id: 2, text: 'Sábanas sucias', correct: false },
@@ -29,6 +37,8 @@ const phrases = [
 ];
 const TOTAL_TIME = 60;
 const MAX_VISIBLE = 5;
+
+/** Baraja una copia del arreglo (Fisher-Yates) sin mutar el original. */
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -37,6 +47,13 @@ function shuffleArray<T>(arr: T[]): T[] {
   }
   return a;
 }
+/**
+ * Pantalla del juego.
+ *
+ * `queue`/`visible` implementan el mismo mecanismo de ventana deslizante que
+ * el Módulo 1. El estado de intentos viaja por `location.state` para limitar
+ * las repeticiones desde el feedback.
+ */
 const Module2Game = () => {
   const { goTo } = useRoleNavigation();
   const location = useLocation();
@@ -58,7 +75,7 @@ const Module2Game = () => {
     setTimeLeft(TOTAL_TIME);
     setPhase("playing");
   }, []);
-  // Timer
+  // Temporizador de la ronda; se limpia al cambiar de fase o desmontar.
   useEffect(() => {
     if (phase !== "playing") return;
     if (timeLeft <= 0) {
@@ -68,7 +85,8 @@ const Module2Game = () => {
     const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(timer);
   }, [phase, timeLeft]);
-  // Check if all phrases are classified
+
+  // Cierra la ronda si ya no quedan frases por clasificar.
   useEffect(() => {
     if (phase === "playing" && accepted.length + rejected.length === phrases.length) {
       setPhase("done");
@@ -87,12 +105,16 @@ const Module2Game = () => {
     e.preventDefault();
     if (draggedId === null) return;
 
-    // Add to accepted
+    // El cerebro representa “elemento correcto”: se guarda como aceptado.
     setAccepted((p) => [...p, draggedId]);
     removePhrase(draggedId);
     setDraggedId(null);
   };
 
+  /**
+   * Sustituye la frase resuelta por la siguiente de la cola, manteniendo
+   * siempre hasta cinco tarjetas visibles.
+   */
   const removePhrase = (id: number) => {
     setVisible((prev) => {
       const remaining = prev.filter((p) => p.id !== id);
@@ -109,7 +131,7 @@ const Module2Game = () => {
     setRejected((p) => [...p, id]);
     removePhrase(id);
   };
-  // Calculate score
+  // Acierto = aceptar una frase correcta o descartar una incorrecta.
   const getScore = () => {
     let correct = 0;
     accepted.forEach((id) => {
@@ -122,7 +144,10 @@ const Module2Game = () => {
     });
     return correct;
   };
-  // --- FUNCIÓN PARA GUARDAR RESULTADOS Y PROGRESO ---
+  /**
+   * Guarda el puntaje y marca `m2_game`. Si falla la red, el feedback recibe
+   * igualmente el estado local para no romper el recorrido.
+   */
   const handleFinishGame = async () => {
     setIsSaving(true);
     const score = getScore();
@@ -163,7 +188,8 @@ const Module2Game = () => {
       setIsSaving(false);
     }
   };
-  // Ensure at least one correct phrase is visible
+  // Garantiza que siempre haya al menos una frase correcta visible para que
+  // la ronda no quede sin opciones válidas al final de la cola.
   useEffect(() => {
     if (phase !== "playing") return;
     const hasCorrect = visible.some((v) => v.correct);

@@ -65,7 +65,7 @@ const Module2Feedback = () => {
     setIsSaving(true);
     try {
       await updateProgress("m2_feedback");
-      // USAMOS TU RUTA ORIGINAL PARA EVITAR EL 404
+      // El feedback del primer juego continúa con el quiz de refuerzo.
       goTo("/module-2-game-2");
     } catch (error) {
       console.error("Error al guardar progreso:", error);

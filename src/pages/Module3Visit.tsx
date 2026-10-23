@@ -2,13 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import useRoleNavigation from "@/hooks/useRoleNavigation";
-import { ArrowRight, Loader2 } from "lucide-react"; // Importamos Loader2
+import { ArrowRight, Loader2 } from "lucide-react";
 import { updateProgress } from "@/lib/progressHelper";
 import UserNavbarWrapper from "@/components/UserNavbarWrapper";
 interface ScrollRevealProps {
   children: React.ReactNode;
   className?: string;
 }
+
+/** Revela el contenido al entrar al viewport (animación de lectura). */
 const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -33,15 +35,20 @@ const ScrollReveal = ({ children, className = "" }: ScrollRevealProps) => {
     </div>
   );
 };
+/**
+ * Paso informativo del Módulo 3 sobre mandatos de género.
+ * Marca `m3_visit` y continúa con la representación.
+ */
 const Module3Visit = () => {
   const { goTo } = useRoleNavigation();
   const [isSaving, setIsSaving] = useState(false);
+
+  /** Marca el paso y avanza; el fallback evita bloquear la lectura. */
   const handleContinue = async () => {
     setIsSaving(true);
     try {
-      // Guardamos el paso 4 del Módulo 3
       await updateProgress("m3_visit");
-      goTo("/module-3-representation"); // Siguiente sección
+      goTo("/module-3-representation");
     } catch (error) {
       console.error("Error al guardar progreso:", error);
       goTo("/module-3-representation");
