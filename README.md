@@ -10,6 +10,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE)
+[![CI](https://github.com/jctovar/Quirona/actions/workflows/ci.yml/badge.svg)](https://github.com/jctovar/Quirona/actions/workflows/ci.yml)
 
 Proyecto académico de la **FES Iztacala, UNAM**, con la colaboración de **SUAyED**, **IPN** y **ESCOM**.
 
@@ -85,6 +86,7 @@ El sistema contempla dos tipos de acceso:
 | **Estado y datos** | TanStack Query 5, React Hooks |
 | **Formularios** | React Hook Form + Zod |
 | **Backend** | Supabase (PostgreSQL, Auth, Row Level Security) |
+| **Pruebas** | Vitest + Testing Library (unidad/integración), Playwright (E2E) |
 | **Gráficas** | Recharts |
 | **Hosting sugerido** | Netlify (incluye `dist/_redirects` para SPA) |
 
@@ -114,6 +116,7 @@ flowchart LR
 ```text
 quirona/
 ├── docs/                    # Capturas y documentación del proyecto
+├── e2e/                     # Pruebas end-to-end (Playwright)
 ├── public/                  # Archivos estáticos y _redirects (SPA)
 ├── supabase/                # Migraciones SQL y verificaciones de seguridad
 ├── src/
@@ -130,9 +133,9 @@ quirona/
 │   └── supabaseClient.js    # Cliente de Supabase
 ├── .env.example             # Plantilla de variables de entorno
 ├── ROADMAP.md               # Plan de trabajo y pendientes
+├── playwright.config.ts     # Configuración de pruebas E2E
 ├── tailwind.config.ts
-├── vitest.config.ts         # Configuración de pruebas
-└── vite.config.ts
+├── vitest.config.ts         # Configuración de pruebas unitarias
 └── vite.config.ts
 ```
 
@@ -204,6 +207,8 @@ En el hosting, configura las mismas variables en el panel del proveedor (Netlify
 | `npm test` | Ejecuta la suite de pruebas unitarias (Vitest) |
 | `npm run test:watch` | Pruebas en modo interactivo |
 | `npm run test:coverage` | Pruebas con reporte de cobertura |
+| `npm run test:e2e` | Pruebas end-to-end con Playwright (requiere `npm run build`) |
+| `npm run test:e2e:ui` | Playwright en modo interactivo |
 
 ---
 
@@ -319,6 +324,8 @@ Si encuentras una vulnerabilidad, **no abras un issue público**: repórtala al 
 
 ## 🧪 Pruebas
 
+### Unidad e integración (Vitest)
+
 La suite usa **Vitest** + **Testing Library** sobre `jsdom`:
 
 | Comando | Descripción |
@@ -327,7 +334,7 @@ La suite usa **Vitest** + **Testing Library** sobre `jsdom`:
 | `npm run test:watch` | Reejecuta al guardar cambios |
 | `npm run test:coverage` | Genera el reporte en `coverage/` |
 
-**36 pruebas en 7 archivos:**
+**42 pruebas en 8 archivos:**
 
 | Área | Archivo | Qué cubre |
 |---|---|---|
@@ -338,8 +345,29 @@ La suite usa **Vitest** + **Testing Library** sobre `jsdom`:
 | Responsive | `src/hooks/use-mobile.tsx` | Breakpoint, cambio de tamaño y limpieza del listener |
 | Componente | `src/components/ModuleCard.tsx` | Contenido, autoría y callback |
 | Componente | `src/components/TestMenu.tsx` | Estados de progreso, bloqueo de módulos y navegación |
+| Integración | `src/pages/Login.tsx` | Validación, errores de Supabase, rol `researcher` y redirecciones |
 
 Configuración: `vitest.config.ts` y `src/test/setup.ts`. El setup incluye un `localStorage` en memoria por una incompatibilidad entre Node 26 y jsdom.
+
+El flujo de integración de login mockea `@/supabaseClient` y `sonner`, de modo que valida la lógica de la página sin tocar la base de datos real.
+
+### End-to-end (Playwright)
+
+| Comando | Descripción |
+|---|---|
+| `npm run test:e2e` | Compila y prueba el build servido en `http://127.0.0.1:4173` |
+| `npm run test:e2e:ui` | Abre el modo interactivo de Playwright |
+
+**4 pruebas** sobre Chromium en `e2e/public.spec.ts`: portada, validación del login, primer paso del registro y navegación pública. La configuración está en `playwright.config.ts`; las pruebas E2E usan el build de producción, por lo que debes ejecutar `npm run build` antes (el CI lo hace automáticamente).
+
+### Integración continua
+
+En cada PR y push a `main`, GitHub Actions (`.github/workflows/ci.yml`) ejecuta:
+
+1. Tipos, pruebas con cobertura y build.
+2. Pruebas E2E con Chromium sobre el build.
+
+El lint se reporta pero no bloquea mientras se paga su deuda técnica. La cobertura se publica como artefacto y el reporte de Playwright se adjunta si hay fallos.
 
 ---
 
@@ -379,7 +407,9 @@ npm run build     # genera dist/
 | Verificación de tipos (`tsc --noEmit`) | ✅ |
 | Lint (`npm run lint`) | ⚠️ 24 errores y 7 advertencias conocidas |
 | Pruebas unitarias (`npm test`) | ✅ 36 pruebas |
-| Pruebas de integración/E2E y CI | ⏳ Pendiente |
+| Pruebas de integración de login | ✅ 6 pruebas |
+| CI (GitHub Actions) | ✅ Tipos, pruebas, cobertura, E2E y build |
+| Pruebas E2E | ✅ 4 pruebas (Playwright) |
 | Revisión de seguridad de RLS y políticas de acceso | 🔄 En curso |
 
 El plan detallado de pendientes está en [`ROADMAP.md`](./ROADMAP.md).

@@ -2,6 +2,7 @@
 
 > Basado en el análisis del 28-sep-2026.
 > Estado inicial: build ✅ · `tsc --noEmit` ✅ · lint ❌ (24 errores, 7 warnings) · bundle 1.2 MB (348 KB gzip) · sin tests ni CI.
+> Estado actual (oct-2026): 42 pruebas Vitest + 4 E2E Playwright · CI en `.github/workflows/ci.yml` · lint sigue con 24 errores conocidos.
 
 **Convenciones:** Prioridad `P0` bloqueante · `P1` importante · `P2` recomendado.
 Esfuerzo: `S` < 2 h · `M` < 1 día · `L` 1–3 días. `AC` = criterio de aceptación.
@@ -49,9 +50,9 @@ Esfuerzo: `S` < 2 h · `M` < 1 día · `L` 1–3 días. `AC` = criterio de acept
 
 | # | Fix | Archivos | Pri | Esf | Criterio de aceptación |
 |---|-----|----------|-----|-----|------------------------|
-| 4.1 | CI/CD con GitHub Actions: lint + `tsc --noEmit` + build en cada PR; deploy automático al merge | `.github/workflows/ci.yml` | P1 | M | PR sin build verde no se puede merge |
+| 4.1 | CI/CD con GitHub Actions: lint + `tsc --noEmit` + build en cada PR; deploy automático al merge | `.github/workflows/ci.yml` | P1 | M | PR sin build verde no se puede merge — ✅ CI base implementada; falta deploy automático |
 | 4.2 | Monitoreo de errores (Sentry o similar) + filtro de datos sensibles en los eventos | `main.tsx` | P2 | M | Errores de producción visibles en el panel con stack trace |
-| 4.3 | Tests E2E de flujos críticos: registro → login → test inicial → progreso de módulo 1 → cierre | Playwright | P2 | L | Suite corre en CI; detecta regressiones de progreso |
+| 4.3 | Tests E2E de flujos críticos: registro → login → test inicial → progreso de módulo 1 → cierre | Playwright | P2 | L | Suite corre en CI; detecta regresiones de progreso — ✅ smoke de páginas públicas; falta flujo autenticado |
 | 4.4 | Versionado y release: `1.0.0-rc.1`, changelog, smoke test manual documentado | `package.json` | P1 | S | Tag de release en el repo |
 
 ---
