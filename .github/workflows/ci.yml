@@ -33,7 +33,7 @@ jobs:
         run: npm ci
 
       - name: Verificar tipos
-        run: npx tsc --noEmit -p tsconfig.app.json
+        run: npm run typecheck
 
       - name: Pruebas y cobertura
         run: npm run test:coverage
@@ -59,10 +59,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      # Valores de relleno: las pruebas E2E solo recorren páginas públicas y
-      # no realizan peticiones autenticadas a Supabase.
-      VITE_SUPABASE_URL: https://example.supabase.co
-      VITE_SUPABASE_ANON_KEY: dummy-anon-key
+      # En forks o PRs sin secretos se usan valores de relleno y las pruebas
+      # autenticadas se omiten; las públicas siguen ejecutándose.
+      VITE_SUPABASE_URL: "${{ secrets.VITE_SUPABASE_URL || 'https://example.supabase.co' }}"
+      VITE_SUPABASE_ANON_KEY: "${{ secrets.VITE_SUPABASE_ANON_KEY || 'dummy-anon-key' }}"
+      SUPABASE_SERVICE_ROLE_KEY: "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}"
+      E2E_USER_EMAIL: "${{ secrets.E2E_USER_EMAIL }}"
+      E2E_USER_PASSWORD: "${{ secrets.E2E_USER_PASSWORD }}"
 
     steps:
       - name: Checkout

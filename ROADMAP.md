@@ -52,7 +52,7 @@ Esfuerzo: `S` < 2 h · `M` < 1 día · `L` 1–3 días. `AC` = criterio de acept
 |---|-----|----------|-----|-----|------------------------|
 | 4.1 | CI/CD con GitHub Actions: lint + `tsc --noEmit` + build en cada PR; deploy automático al merge | `.github/workflows/ci.yml` | P1 | M | PR sin build verde no se puede merge — ✅ CI base implementada; falta deploy automático |
 | 4.2 | Monitoreo de errores (Sentry o similar) + filtro de datos sensibles en los eventos | `main.tsx` | P2 | M | Errores de producción visibles en el panel con stack trace |
-| 4.3 | Tests E2E de flujos críticos: registro → login → test inicial → progreso de módulo 1 → cierre | Playwright | P2 | L | Suite corre en CI; detecta regresiones de progreso — ✅ smoke de páginas públicas; falta flujo autenticado |
+| 4.3 | Tests E2E de flujos críticos: registro → login → test inicial → progreso de módulo 1 → cierre | Playwright | P2 | L | Suite corre en CI; detecta regresiones de progreso — ✅ login real y progreso del módulo 1; falta recorrido completo |
 | 4.4 | Versionado y release: `1.0.0-rc.1`, changelog, smoke test manual documentado | `package.json` | P1 | S | Tag de release en el repo |
 
 ---

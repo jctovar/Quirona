@@ -171,7 +171,7 @@ npx tsc --noEmit  # verificación de tipos
 npm run test:e2e  # E2E con Playwright (requiere el build)
 ```
 
-> Si tu cambio afecta un flujo crítico (registro, progreso, evaluación), añade o actualiza las pruebas en `src/**/*.test.ts(x)` o en `e2e/`. El CI ejecuta tipos, pruebas con cobertura, E2E y build en cada PR.
+> Si tu cambio afecta un flujo crítico (registro, progreso, evaluación), añade o actualiza las pruebas en `src/**/*.test.ts(x)` o en `e2e/`. El CI ejecuta tipos, pruebas con cobertura, E2E y build en cada PR. Las E2E autenticadas requieren `SUPABASE_SERVICE_ROLE_KEY`, `E2E_USER_EMAIL` y `E2E_USER_PASSWORD` en `.env`; si faltan, se omiten automáticamente.
 
 Checklist rápido:
 

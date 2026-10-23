@@ -358,7 +358,20 @@ El flujo de integración de login mockea `@/supabaseClient` y `sonner`, de modo 
 | `npm run test:e2e` | Compila y prueba el build servido en `http://127.0.0.1:4173` |
 | `npm run test:e2e:ui` | Abre el modo interactivo de Playwright |
 
-**4 pruebas** sobre Chromium en `e2e/public.spec.ts`: portada, validación del login, primer paso del registro y navegación pública. La configuración está en `playwright.config.ts`; las pruebas E2E usan el build de producción, por lo que debes ejecutar `npm run build` antes (el CI lo hace automáticamente).
+**5 pruebas** sobre Chromium:
+
+- `e2e/public.spec.ts` (4): portada, validación del login, primer paso del registro y navegación pública.
+- `e2e/authenticated.spec.ts` (1): login real, guardado de progreso en el módulo 1 y verificación directa en la base de datos.
+
+La prueba autenticada crea un usuario temporal en la instancia de Supabase configurada y lo elimina al terminar (`e2e/global-setup.ts` y `e2e/global-teardown.ts`). Requiere estas variables en `.env` (nunca en el cliente):
+
+| Variable | Uso |
+|---|---|
+| `SUPABASE_SERVICE_ROLE_KEY` | Crear/eliminar el usuario de prueba y verificar la BD. **Solo para E2E; nunca en el frontend** |
+| `E2E_USER_EMAIL` | Correo del usuario temporal |
+| `E2E_USER_PASSWORD` | Contraseña del usuario temporal |
+
+Si faltan, la prueba autenticada se omite y solo se ejecutan las públicas. En CI se configuran como *secrets* del repositorio. La configuración está en `playwright.config.ts`; las pruebas usan el build de producción, por lo que debes ejecutar `npm run build` antes (el CI lo hace automáticamente).
 
 ### Integración continua
 
@@ -409,7 +422,7 @@ npm run build     # genera dist/
 | Pruebas unitarias (`npm test`) | ✅ 36 pruebas |
 | Pruebas de integración de login | ✅ 6 pruebas |
 | CI (GitHub Actions) | ✅ Tipos, pruebas, cobertura, E2E y build |
-| Pruebas E2E | ✅ 4 pruebas (Playwright) |
+| Pruebas E2E | ✅ 5 pruebas (Playwright, incluye flujo autenticado) |
 | Revisión de seguridad de RLS y políticas de acceso | 🔄 En curso |
 
 El plan detallado de pendientes está en [`ROADMAP.md`](./ROADMAP.md).
