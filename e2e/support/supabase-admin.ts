@@ -37,6 +37,12 @@ export function getE2EConfig(): E2EConfig {
   return config as E2EConfig;
 }
 
+export function getResearcherEmail(): string {
+  const { email } = getE2EConfig();
+  const [localPart, domain] = email.split("@");
+  return domain ? `${localPart}+researcher@${domain}` : `${email}.researcher`;
+}
+
 export function createAdminClient(): AdminClient {
   const { url, serviceKey } = getE2EConfig();
   return createClient<Database>(url, serviceKey, {
