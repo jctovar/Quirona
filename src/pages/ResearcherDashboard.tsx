@@ -70,7 +70,7 @@ const ResearcherDashboard = () => {
         // 3. Lista de usuarias para la tabla
         const { data: users } = await supabase
           .from('profiles')
-          .select('id, username, email, created_at')
+          .select('id, username, created_at')
           .eq('role', 'user')
           .order('created_at', { ascending: false });
 
@@ -110,19 +110,26 @@ const ResearcherDashboard = () => {
   // Función para exportar a CSV (Excel)
   const handleExportCSV = async () => {
     try {
-      const { data, error } = await supabase
-        .from('user_progress')
-        .select(`
-          progress_percentage,
-          m1_closure, m2_closure, m3_closure, m4_closure,
-          profiles (username, email)
-        `);
+      const [progressResult, profilesResult] = await Promise.all([
+        supabase
+          .from('user_progress')
+          .select('id, progress_percentage, m1_closure, m2_closure, m3_closure, m4_closure'),
+        supabase
+          .from('profiles')
+          .select('id, username')
+          .eq('role', 'user'),
+      ]);
 
-      if (error) throw error;
+      if (progressResult.error) throw progressResult.error;
+      if (profilesResult.error) throw profilesResult.error;
 
-      const headers = "Nombre,Email,Progreso %,M1,M2,M3,M4\n";
-      const rows = data.map(r => (
-        `${r.profiles.username},${r.profiles.email},${r.progress_percentage},${r.m1_closure ? 'Si':'No'},${r.m2_closure ? 'Si':'No'},${r.m3_closure ? 'Si':'No'},${r.m4_closure ? 'Si':'No'}`
+      const names = new Map(
+        (profilesResult.data ?? []).map((profile) => [profile.id, profile.username]),
+      );
+
+      const headers = "Nombre,Progreso %,M1,M2,M3,M4\n";
+      const rows = (progressResult.data ?? []).map(r => (
+        `${names.get(r.id) ?? "Sin nombre"},${r.progress_percentage},${r.m1_closure ? 'Si':'No'},${r.m2_closure ? 'Si':'No'},${r.m3_closure ? 'Si':'No'},${r.m4_closure ? 'Si':'No'}`
       )).join("\n");
 
       const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
@@ -208,7 +215,11 @@ const ResearcherDashboard = () => {
                   <CardContent className="p-6 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                       <h3 className="text-lg font-bold">{user.username}</h3>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {user.created_at
+                          ? `Registro: ${new Date(user.created_at).toLocaleDateString("es-MX")}`
+                          : "Sin fecha de registro"}
+                      </p>
                     </div>
                     <Button 
                       onClick={() => navigate(`/researcher/user/${user.id}`)}
