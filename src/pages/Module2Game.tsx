@@ -156,7 +156,7 @@ const Module2Game = () => {
         } 
       });
 
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error al guardar resultados del juego:", error);
       // Navegamos de todos modos para no interrumpir el flujo
       goTo("/module-2-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });

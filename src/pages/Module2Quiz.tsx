@@ -53,7 +53,7 @@ const Module2Quiz = () => {
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
 
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error al guardar quiz:", error);
       toast.error("Hubo un problema al registrar tus respuestas.");
     } finally {

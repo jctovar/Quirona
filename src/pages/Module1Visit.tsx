@@ -84,7 +84,7 @@ const handleContinue = async () => {
       // 3. Navegamos al juego
       goTo("/module-1-game");
 
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error:", error);
       toast.error("Hubo un error al guardar tu avance.");
       // Opcional: navegar de todos modos

@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/lib/utils";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TestMenu } from "@/components/TestMenu";
@@ -150,8 +151,8 @@ const AnxietyInventoryTest = () => {
       setPhase("complete");
       window.scrollTo({ top: 0, behavior: "smooth" });
 
-    } catch (error: any) {
-      toast.error("Error al guardar: " + error.message);
+    } catch (error) {
+      toast.error("Error al guardar: " + getErrorMessage(error));
     } finally {
       setIsSaving(false);
     }

@@ -9,13 +9,47 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button"; // Corregido el import de Button
 import { Textarea } from "@/components/ui/textarea";
 
+interface ProgressRecord {
+  progress_percentage: number | null;
+  m1_story: boolean | null;
+  m1_intro: boolean | null;
+  m1_quiz: boolean | null;
+  m1_visit: boolean | null;
+  m1_game: boolean | null;
+  m1_feedback: boolean | null;
+  m1_closure: boolean | null;
+  m2_story: boolean | null;
+  m2_intro: boolean | null;
+  m2_quiz1: boolean | null;
+  m2_visit: boolean | null;
+  m2_game: boolean | null;
+  m2_feedback: boolean | null;
+  m2_quiz2: boolean | null;
+  m2_closure: boolean | null;
+  m3_story: boolean | null;
+  m3_intro: boolean | null;
+  m3_quiz: boolean | null;
+  m3_visit: boolean | null;
+  m3_representation: boolean | null;
+  m3_game: boolean | null;
+  m3_feedback: boolean | null;
+  m3_closure: boolean | null;
+  m4_story: boolean | null;
+  m4_intro: boolean | null;
+  m4_quiz: boolean | null;
+  m4_visit: boolean | null;
+  m4_game: boolean | null;
+  m4_feedback: boolean | null;
+  m4_closure: boolean | null;
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("Usuario");
   const [overallProgress, setOverallProgress] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [suggestion, setSuggestion] = useState("");
-  const [progressRecord, setProgressRecord] = useState<any>(null);
+  const [progressRecord, setProgressRecord] = useState<ProgressRecord | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

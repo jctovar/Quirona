@@ -76,7 +76,7 @@ const Module2Game2 = () => {
 
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error:", error);
       toast.error("Error al registrar tus respuestas.");
     } finally {

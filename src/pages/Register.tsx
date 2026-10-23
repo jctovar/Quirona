@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/lib/utils";
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -118,7 +119,7 @@ const Register = () => {
     });
 
     if (error) {
-      toast.error("Error: " + error.message);
+      toast.error("Error: " + getErrorMessage(error));
     } else {
       toast.success("¡Registro iniciado! Revisa tu correo para confirmar tu cuenta.");
       setTimeout(() => navigate("/Login"), 3000);

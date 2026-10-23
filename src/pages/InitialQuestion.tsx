@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/lib/utils";
 import { Navbar } from "@/components/Navbar";
 import { TestMenu } from "@/components/TestMenu";
 import { Button } from "@/components/ui/button";
@@ -33,8 +34,8 @@ const InitialQuestion = () => {
       } else {
         navigate("/pre-education");
       }
-    } catch (error: any) {
-      toast.error("Error al guardar: " + error.message);
+    } catch (error) {
+      toast.error("Error al guardar: " + getErrorMessage(error));
     } finally {
       setIsUpdating(false); // Terminamos de cargar (pase lo que pase)
     }

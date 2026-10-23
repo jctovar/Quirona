@@ -133,7 +133,7 @@ const Module1Closure = () => {
 
       setPhase("story"); // Pasamos a la historia final
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error al guardar cierre:", error);
       toast.error("Hubo un error al guardar tus respuestas.");
     } finally {

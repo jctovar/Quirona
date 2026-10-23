@@ -23,4 +23,12 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+  {
+    // Componentes generados por shadcn: exportan variantes/hooks junto a
+    // componentes a propósito, por lo que la regla de Fast Refresh no aplica.
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
 );

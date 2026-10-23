@@ -43,7 +43,7 @@ const Module2Closure = () => {
 
       setPhase("story");
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error:", error);
       toast.error("Hubo un error al guardar tus respuestas.");
     } finally {

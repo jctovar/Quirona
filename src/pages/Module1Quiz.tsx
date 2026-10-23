@@ -54,7 +54,7 @@ const Module1Quiz = () => {
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
 
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error:", error);
       toast.error("Hubo un error al enviar tus respuestas.");
     } finally {

@@ -107,7 +107,7 @@ const handleContinue = async () => {
       // 3. Navegamos al siguiente paso
       goTo("/module-1-quiz");
 
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error:", error);
       toast.error("Hubo un problema al guardar tu progreso.");
       // Opcional: navigate igualmente para no trabar el flujo

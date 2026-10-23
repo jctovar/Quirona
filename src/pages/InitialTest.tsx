@@ -1,3 +1,4 @@
+import { getErrorMessage } from "@/lib/utils";
 import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { TestMenu } from "@/components/TestMenu";
@@ -179,8 +180,8 @@ const InitialTest = () => {
       // Navegamos al siguiente test
       navigate("/semantic-network-test");
 
-    } catch (error: any) {
-      toast.error("Error al guardar: " + error.message);
+    } catch (error) {
+      toast.error("Error al guardar: " + getErrorMessage(error));
     } finally {
       setIsSaving(false);
     }

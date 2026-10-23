@@ -157,7 +157,7 @@ const Module1Game = () => {
         } 
       });
 
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error al guardar juego:", error);
       // Navegamos aunque falle la red para no arruinar la experiencia
       goTo("/module-1-feedback", { state: { score, accepted, rejected, attempts: prevAttempts + 1 } });

@@ -17,12 +17,18 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+interface ResearcherUser {
+  id: string;
+  username: string | null;
+  created_at: string | null;
+}
+
 const ResearcherDashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [researcherName, setResearcherName] = useState("Investigador");
   const [stats, setStats] = useState({ totalUsers: 0, totalModulesCompleted: 0 });
-  const [userList, setUserList] = useState<any[]>([]);
+  const [userList, setUserList] = useState<ResearcherUser[]>([]);
 
   useEffect(() => {
     const checkRoleAndFetchData = async () => {

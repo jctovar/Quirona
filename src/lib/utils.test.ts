@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 
 describe("cn", () => {
   it("concatena clases", () => {
@@ -23,5 +23,23 @@ describe("cn", () => {
 
   it("devuelve cadena vacía sin argumentos", () => {
     expect(cn()).toBe("");
+  });
+});
+
+describe("getErrorMessage", () => {
+  it("extrae el mensaje de una instancia de Error", () => {
+    expect(getErrorMessage(new Error("falló la red"))).toBe("falló la red");
+  });
+
+  it("extrae el mensaje de errores tipo Supabase", () => {
+    expect(getErrorMessage({ message: "credenciales inválidas" })).toBe(
+      "credenciales inválidas",
+    );
+  });
+
+  it("acepta cadenas y usa el fallback cuando no hay mensaje", () => {
+    expect(getErrorMessage("error de texto")).toBe("error de texto");
+    expect(getErrorMessage(null)).toBe("Error desconocido");
+    expect(getErrorMessage({}, "Error personalizado")).toBe("Error personalizado");
   });
 });
