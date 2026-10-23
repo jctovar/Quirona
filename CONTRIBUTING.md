@@ -178,7 +178,7 @@ Checklist rápido:
 - [ ] La app levanta y la ruta afectada funciona.
 - [ ] `npm test` pasa sin fallos.
 - [ ] `npm run test:e2e` pasa sin fallos (si tocaste rutas o flujos públicos).
-- [ ] No hay errores nuevos de lint ni de tipos.
+- [ ] No hay errores de lint ni de tipos.
 - [ ] El build de producción termina correctamente.
 - [ ] No se agregaron secretos ni datos personales.
 - [ ] Se actualizó la documentación si cambió el comportamiento.

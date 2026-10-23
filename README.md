@@ -334,13 +334,13 @@ La suite usa **Vitest** + **Testing Library** sobre `jsdom`:
 | `npm run test:watch` | Reejecuta al guardar cambios |
 | `npm run test:coverage` | Genera el reporte en `coverage/` |
 
-**42 pruebas en 8 archivos:**
+**45 pruebas en 8 archivos:**
 
 | Área | Archivo | Qué cubre |
 |---|---|---|
 | Progreso local | `src/lib/testProgress.ts` | Persistencia en `localStorage`, JSON corrupto y acumulación de tests |
 | Progreso en BD | `src/lib/progressHelper.ts` | Guardado según rol (mock de Supabase), errores y sesión ausente |
-| Utilidades | `src/lib/utils.ts` | Merge de clases y conflictos de Tailwind |
+| Utilidades | `src/lib/utils.ts` | Merge de clases, conflictos de Tailwind y extracción de mensajes de error |
 | Ruteo por rol | `src/hooks/useRoleNavigation.ts` | Rutas de usuaria vs. investigador |
 | Responsive | `src/hooks/use-mobile.tsx` | Breakpoint, cambio de tamaño y limpieza del listener |
 | Componente | `src/components/ModuleCard.tsx` | Contenido, autoría y callback |
@@ -382,7 +382,7 @@ En cada PR y push a `main`, GitHub Actions (`.github/workflows/ci.yml`) ejecuta:
 1. Tipos, pruebas con cobertura y build.
 2. Pruebas E2E con Chromium sobre el build.
 
-El lint se reporta pero no bloquea mientras se paga su deuda técnica. La cobertura se publica como artefacto y el reporte de Playwright se adjunta si hay fallos.
+El lint es bloqueante: `npm run lint` debe pasar sin errores ni advertencias. La cobertura se publica como artefacto y el reporte de Playwright se adjunta si hay fallos.
 
 ---
 
@@ -420,7 +420,7 @@ npm run build     # genera dist/
 |---|---|
 | Build de producción (`npm run build`) | ✅ |
 | Verificación de tipos (`tsc --noEmit`) | ✅ |
-| Lint (`npm run lint`) | ⚠️ 24 errores y 7 advertencias conocidas |
+| Lint (`npm run lint`) | ✅ Sin errores ni advertencias |
 | Pruebas unitarias (`npm test`) | ✅ 36 pruebas |
 | Pruebas de integración de login | ✅ 6 pruebas |
 | CI (GitHub Actions) | ✅ Tipos, pruebas, cobertura, E2E y build |

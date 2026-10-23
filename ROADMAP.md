@@ -2,7 +2,7 @@
 
 > Basado en el análisis del 28-sep-2026.
 > Estado inicial: build ✅ · `tsc --noEmit` ✅ · lint ❌ (24 errores, 7 warnings) · bundle 1.2 MB (348 KB gzip) · sin tests ni CI.
-> Estado actual (oct-2026): 42 pruebas Vitest + 4 E2E Playwright · CI en `.github/workflows/ci.yml` · lint sigue con 24 errores conocidos.
+> Estado actual (oct-2026): 45 pruebas Vitest + 6 E2E Playwright · CI en `.github/workflows/ci.yml` · lint en 0 errores y 0 advertencias.
 
 **Convenciones:** Prioridad `P0` bloqueante · `P1` importante · `P2` recomendado.
 Esfuerzo: `S` < 2 h · `M` < 1 día · `L` 1–3 días. `AC` = criterio de aceptación.
@@ -31,7 +31,7 @@ Esfuerzo: `S` < 2 h · `M` < 1 día · `L` 1–3 días. `AC` = criterio de acept
 
 | # | Fix | Archivos | Pri | Esf | Criterio de aceptación |
 |---|-----|----------|-----|-----|------------------------|
-| 2.1 | Corregir los 24 errores de ESLint: reemplazar `any` por tipos en tests/dashboards, `require()` → `import` en `tailwind.config.ts:94`, interfaces vacías en `ui/command.tsx` y `ui/textarea.tsx` | ~10 archivos en `src/pages/`, `tailwind.config.ts` | P1 | M | `npm run lint` → 0 errores |
+| 2.1 | Corregir los 24 errores de ESLint: reemplazar `any` por tipos en tests/dashboards, `require()` → `import` en `tailwind.config.ts:94`, interfaces vacías en `ui/command.tsx` y `ui/textarea.tsx` | ~10 archivos en `src/pages/`, `tailwind.config.ts` | P1 | M | `npm run lint` → 0 errores — ✅ completado (0 errores, 0 warnings) |
 | 2.2 | Eliminar código muerto: función fantasma `isAllTestsCompleted()` (lanza error) e imports comentados de páginas de investigador | `src/App.tsx:201-203` | P1 | S | `tsc --noEmit` sigue en 0; sin código comentado muerto en `App.tsx` |
 | 2.3 | **Code splitting**: `React.lazy` + `Suspense` por rutas (dashboards con recharts, módulos como chunks), `manualChunks` para vendors pesados | `src/App.tsx`, `vite.config.ts` | P1 | M | Bundle inicial < 300 KB gzip; desaparece el warning de chunk > 500 KB |
 | 2.4 | Optimizar assets: PNGs de líneas de ayuda (1–1.8 MB c/u) → WebP ~150 KB; video `bienvenidaQuirona.mp4` (4.5 MB) → Supabase Storage/CDN o recomprimir a 720p | `src/assets/*` | P1 | M | Total de assets < 3 MB; carga aceptable en 3G |
@@ -77,7 +77,7 @@ Paralelizables desde el día 1: **1.1 (backend/SQL)** con **1.2–1.4 (frontend)
 - [ ] RLS verificado con prueba de acceso cruzado entre cuentas
 - [ ] Guard de rutas de investigador activo
 - [ ] 0 `console.log` con datos sensibles en `dist/`
-- [ ] `npm run lint` y `tsc --noEmit` en 0 errores
+- [x] `npm run lint` y `tsc --noEmit` en 0 errores
 - [ ] Bundle inicial < 300 KB gzip · assets < 3 MB
 - [ ] Recarga directa de rutas sin 404
 - [ ] Aviso de privacidad + consentimiento antes de recolectar datos
