@@ -122,7 +122,7 @@ quirona/
 ├── src/
 │   ├── assets/              # Imágenes, logos y video de bienvenida
 │   ├── components/          # Componentes de aplicación
-│   │   └── ui/              # Biblioteca shadcn/ui (49 componentes)
+│   │   └── ui/              # Biblioteca shadcn/ui (22 componentes en uso)
 │   ├── hooks/               # Hooks personalizados (rol, mobile, toast)
 │   ├── layouts/             # UserLayout, ResearcherLayout
 │   ├── lib/                 # Utilidades, progreso y helpers
