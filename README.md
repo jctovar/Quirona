@@ -1,7 +1,6 @@
 <div align="center">
 
-# 🌸 Quirona
-# Salud femenina, Bienestar universal
+# 🌸 Quirona, Bienestar femenino, salud universal
 
 **Plataforma educativa digital sobre salud ginecológica, prevención de violencia ginecológica y derechos en salud para mujeres adolescentes.**
 
