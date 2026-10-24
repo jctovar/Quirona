@@ -1,6 +1,7 @@
 <div align="center">
 
-# 🌸 Quirona Empower Her
+# 🌸 Quirona
+# Salud femenina, Bienestar universal
 
 **Plataforma educativa digital sobre salud ginecológica, prevención de violencia ginecológica y derechos en salud para mujeres adolescentes.**
 
