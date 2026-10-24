@@ -12,7 +12,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](./LICENSE)
 [![CI](https://github.com/jctovar/Quirona/actions/workflows/ci.yml/badge.svg)](https://github.com/jctovar/Quirona/actions/workflows/ci.yml)
 
-Proyecto académico de la **FES Iztacala, UNAM**, con la colaboración de **SUAyED**, **IPN** y **ESCOM**.
+Proyecto académico del **Laboratorio de Psicología e Innovación Tecnológica** del **SUAyED FES Iztacala, UNAM**, con la colaboración de **IPN** y **ESCOM**.
 
 </div>
 
